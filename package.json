@@ -1,0 +1,36 @@
+{
+    "name": "@wharfkit/cli",
+    "version": "0.1.0",
+    "description": "Command line utilities for Wharf",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "main": "dist/cli.js",
+    "bin": {
+        "wharfkit": "./dist/cli.js"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wharfkit/cli.git"
+    },
+    "bugs": {
+        "url": "https://github.com/wharfkit/cli/issues"
+    },
+    "homepage": "https://github.com/wharfkit/cli#readme",
+    "dependencies": {
+        "@wharfkit/antelope": "^0.8.0",
+        "commander": "^11.0.0"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.22.10",
+        "@rollup/plugin-babel": "^6.0.3",
+        "@rollup/plugin-json": "^4.1.0",
+        "@rollup/plugin-node-resolve": "^14.1.0",
+        "@types/node": "^20.5.1",
+        "rollup": "^2.70.2",
+        "typescript": "^5.1.6"
+    }
+}

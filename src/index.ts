@@ -1,0 +1,21 @@
+import {Command} from 'commander'
+
+import {version} from '../package.json'
+import {generateContract} from './commands/contract'
+
+const program = new Command()
+
+program.version(version).name('wharfkit').description('Wharf Command Line Utilities')
+
+program
+    .command('generate')
+    .description('Generate Contract Kit code for the named smart contract')
+    .argument('<account>', 'The account name of the contract (e.g. "eosio.token")')
+    .requiredOption(
+        '-u, --url <url>',
+        'The URL of the API to connect with (e.g. "https://jungle4.greymass.com")',
+        process.env.WHARFKIT_URL
+    )
+    .action(generateContract)
+
+program.parse()
