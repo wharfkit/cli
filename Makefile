@@ -1,28 +1,41 @@
 SHELL := /bin/bash
 SRC_FILES := $(shell find src -name '*.ts')
+TEST_FILES := $(shell find test/tests -name '*.ts')
+MOCHA_OPTS := -u tdd -r ts-node/register -r tsconfig-paths/register --extension ts
 BIN := ./node_modules/.bin
 
-dist: ${SRC_FILES} package.json tsconfig.json node_modules rollup.config.js
-	@${BIN}/rollup -c && touch dist
+lib: ${SRC_FILES} package.json tsconfig.json node_modules rollup.config.js
+	@${BIN}/rollup -c && touch lib
+
+.PHONY: test
+test: node_modules
+	@TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
+		${BIN}/mocha ${MOCHA_OPTS} ${TEST_FILES} --no-timeout --grep '$(grep)'
+
+.PHONY: ci-test
+ci-test: node_modules
+	@TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
+		${BIN}/nyc ${NYC_OPTS} --reporter=text \
+		${BIN}/mocha ${MOCHA_OPTS} -R list ${TEST_FILES} --no-timeout
 
 .PHONY: test_generate
-test_generate: node_modules clean dist
-	node dist/cli.js generate eosio.token -u https://jungle4.greymass.com
+test_generate: node_modules clean lib
+	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com
 
 .PHONY: check
 check: node_modules
-	@${BIN}/eslint src st --ext .ts --max-warnings 0 --format unix && echo "Ok"
+	@${BIN}/eslint src test --ext .ts --max-warnings 0 --format unix && echo "Ok"
 
 .PHONY: format
 format: node_modules
-	@${BIN}/eslint src --ext .ts --fix
+	@${BIN}/eslint src test --ext .ts --fix
 
 node_modules:
 	yarn install --non-interactive --frozen-lockfile --ignore-scripts
 
 .PHONY: clean
 clean:
-	rm -rf dist/
+	rm -rf lib/
 
 .PHONY: distclean
 distclean: clean
