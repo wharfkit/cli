@@ -12,6 +12,12 @@ test: node_modules
 	@TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
 		${BIN}/mocha ${MOCHA_OPTS} ${TEST_FILES} --no-timeout --grep '$(grep)'
 
+.PHONY: ci-test
+ci-test: node_modules
+	@TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
+		${BIN}/nyc ${NYC_OPTS} --reporter=text \
+		${BIN}/mocha ${MOCHA_OPTS} -R list ${TEST_FILES} --no-timeout
+
 .PHONY: test_generate
 test_generate: node_modules clean lib
 	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com
