@@ -5,7 +5,7 @@ import shebang from 'rollup-plugin-add-shebang';
 
 import pkg from './package.json'
 
-const external = Object.keys(pkg.dependencies)
+const external = ['fs', ...Object.keys(pkg.dependencies)]
 
 /** @type {import('rollup').RollupOptions} */
 export default {

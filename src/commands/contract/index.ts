@@ -1,5 +1,6 @@
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
+import * as fs from 'fs'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {generateContractClass} from './contract'
 import {generateImportStatement, getCoreImports} from './helpers'
@@ -11,12 +12,29 @@ import { APIClient } from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
 
-export async function generateContractFromParams(contractName, { url }) {
+interface CommandOptions {
+    url: string
+    file?: string
+}
+
+export async function generateContractFromCommand(contractName, { url, file }: CommandOptions) {
     const apiClient = new APIClient({ url })
     const contractKit = new ContractKit({ client: apiClient })
+
+    log(`Fetching ABI for ${contractName}...`)
     const contract = await contractKit.load(contractName)
 
-    return generateContract(contractName, contract.abi)
+    log(`Generating Contract helpers for ${contractName}...`)
+    const contractCode = await generateContract(contractName, contract.abi)
+
+    log(`Generated Contract helper class for ${contractName}...`)
+    if (file) {
+        fs.writeFileSync(file, contractCode)
+        log(`Generated Contract helper for ${contractName} saved to ${file}`)
+    } else {
+        log(`Generated Contract helper class:\n`)
+        log(contractCode)
+    }
 }
 
 export async function generateContract(contractName, abi) {
@@ -130,9 +148,14 @@ export async function generateContract(contractName, abi) {
 
         const options = await prettier.resolveConfig(process.cwd())
         return prettier.format(printer.printFile(sourceFile), options)
+        // return printer.printFile(sourceFile)
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
         throw e
     }
+}
+
+function log(message) {
+    process.stderr.write(`${message}\n`)
 }
