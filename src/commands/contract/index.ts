@@ -21,18 +21,18 @@ export async function generateContractFromCommand(contractName, {url, file}: Com
     const apiClient = new APIClient({url})
     const contractKit = new ContractKit({client: apiClient})
 
-    log(`Fetching ABI for ${contractName}...`)
+    log(`Fetching ABI for ${contractName}...`, 'debug')
     const contract = await contractKit.load(contractName)
 
-    log(`Generating Contract helpers for ${contractName}...`)
+    log(`Generating Contract helpers for ${contractName}...`, 'debug')
     const contractCode = await generateContract(contractName, contract.abi)
 
-    log(`Generated Contract helper class for ${contractName}...`)
+    log(`Generated Contract helper class for ${contractName}...`, 'debug')
     if (file) {
         fs.writeFileSync(file, contractCode)
         log(`Generated Contract helper for ${contractName} saved to ${file}`)
     } else {
-        log(`Generated Contract helper class:\n`)
+        log(`Generated Contract helper class:\n`, 'debug')
         log(contractCode)
     }
 }
@@ -163,6 +163,10 @@ export async function generateContract(contractName, abi) {
     }
 }
 
-function log(message) {
-    process.stdout.write(`${message}\n`)
+type logLevel = 'info' | 'debug'
+
+function log(message, level: logLevel = 'info') {
+    if (level === 'info' || process.env.WHARFKIT_DEBUG) {
+        process.stdout.write(`${message}\n`)
+    }
 }
