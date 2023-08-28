@@ -127,7 +127,6 @@ export async function generateContract(contractName, abi) {
 
         const exportStatement = ts.factory.createExportAssignment(
             undefined,
-            undefined,
             false,
             ts.factory.createIdentifier(namespaceName)
         )

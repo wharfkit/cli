@@ -12,7 +12,6 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
         ts.factory.createParameterDeclaration(
             undefined,
             undefined,
-            undefined,
             'args',
             undefined,
             ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('PartialBy'), [
@@ -35,7 +34,6 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
     )
 
     const constructorMember = ts.factory.createConstructorDeclaration(
-        undefined,
         undefined,
         constructorParams,
         constructorBody
@@ -97,6 +95,7 @@ function generateConstructorFunction(contractName): ts.ExpressionStatement {
 
 function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     const typeParameter = ts.factory.createTypeParameterDeclaration(
+        undefined,
         'T',
         ts.factory.createUnionTypeNode(
             abi.actions.map((action) =>
@@ -111,7 +110,6 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     const nameParameter = ts.factory.createParameterDeclaration(
         undefined,
         undefined,
-        undefined,
         'name',
         undefined,
         ts.factory.createTypeReferenceNode('T'),
@@ -121,7 +119,6 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     const dataParameter = ts.factory.createParameterDeclaration(
         undefined,
         undefined,
-        undefined,
         'data',
         undefined,
         ts.factory.createTypeReferenceNode('ActionNameParams[T]'),
@@ -129,7 +126,6 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     )
 
     const optionsParameter = ts.factory.createParameterDeclaration(
-        undefined,
         undefined,
         undefined,
         'options',
@@ -162,7 +158,6 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     return ts.factory.createMethodDeclaration(
         undefined,
         undefined,
-        undefined,
         'action',
         undefined,
         [typeParameter],
@@ -174,6 +169,7 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
 
 function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
     const typeParameter = ts.factory.createTypeParameterDeclaration(
+        undefined,
         'T',
         ts.factory.createUnionTypeNode(
             abi.tables.map((table) =>
@@ -186,7 +182,6 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
     const nameParameter = ts.factory.createParameterDeclaration(
         undefined,
         undefined,
-        undefined,
         'name',
         undefined,
         ts.factory.createTypeReferenceNode('T'),
@@ -194,7 +189,6 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
     )
 
     const scopeParameter = ts.factory.createParameterDeclaration(
-        undefined,
         undefined,
         undefined,
         'scope',
@@ -225,7 +219,6 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
     )
 
     return ts.factory.createMethodDeclaration(
-        undefined,
         undefined,
         undefined,
         'table',
