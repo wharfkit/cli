@@ -1,32 +1,19 @@
-import {babel} from '@rollup/plugin-babel'
-import {nodeResolve} from '@rollup/plugin-node-resolve'
+import typescript from '@rollup/plugin-typescript'
+import cleanup from 'rollup-plugin-cleanup'
 import json from '@rollup/plugin-json'
-import fs from 'fs'
+import pkg from './package.json'
 
-const pkg = JSON.parse(fs.readFileSync('./package.json'))
-const external = Object.keys(pkg.dependencies || {}).concat(['fs/promises'])
+const external = Object.keys(pkg.dependencies)
 
-const extensions = ['.js', '.ts']
-
+/** @type {import('rollup').RollupOptions} */
 export default {
     input: 'src/index.ts',
     output: {
-        file: './dist/cli.js',
+        file: pkg.main,
         format: 'cjs',
-        banner: '#!/usr/bin/env node',
-        inlineDynamicImports: true,
+        sourcemap: true,
+        exports: 'named',
     },
+    plugins: [typescript({target: 'es6'}), json(), cleanup({extensions: ['js', 'ts']})],
     external,
-    plugins: [
-        nodeResolve({
-            extensions,
-            modulesOnly: true,
-        }),
-        json(),
-        babel({
-            exclude: ['node_modules/**'],
-            babelHelpers: 'bundled',
-            extensions,
-        }),
-    ],
 }
