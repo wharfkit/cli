@@ -164,5 +164,5 @@ export async function generateContract(contractName, abi) {
 }
 
 function log(message) {
-    process.stderr.write(`${message}\n`)
+    process.stdout.write(`${message}\n`)
 }
