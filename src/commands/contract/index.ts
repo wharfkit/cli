@@ -2,13 +2,13 @@ import * as prettier from 'prettier'
 import * as ts from 'typescript'
 import * as fs from 'fs'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
-import {generateContractClass} from './contract'
+import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap} from './maps'
 import {generateNamespace, generateNamespaceName} from './namespace'
 import {generateStructClasses} from './structs'
-import { APIClient } from '@wharfkit/antelope'
+import {APIClient} from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
 
@@ -17,9 +17,9 @@ interface CommandOptions {
     file?: string
 }
 
-export async function generateContractFromCommand(contractName, { url, file }: CommandOptions) {
-    const apiClient = new APIClient({ url })
-    const contractKit = new ContractKit({ client: apiClient })
+export async function generateContractFromCommand(contractName, {url, file}: CommandOptions) {
+    const apiClient = new APIClient({url})
+    const contractKit = new ContractKit({client: apiClient})
 
     log(`Fetching ABI for ${contractName}...`)
     const contract = await contractKit.load(contractName)
@@ -39,13 +39,6 @@ export async function generateContractFromCommand(contractName, { url, file }: C
 
 export async function generateContract(contractName, abi) {
     try {
-        const namespaceName = generateNamespaceName(contractName)
-
-        const importContractStatement = generateImportStatement(
-            ['ActionOptions', 'Contract as BaseContract', 'ContractArgs', 'PartialBy'],
-            '@wharfkit/contract'
-        )
-
         const allAntelopeImports = [
             'ABI',
             'Action',
@@ -60,7 +53,17 @@ export async function generateContract(contractName, abi) {
 
         antelopeImports.sort()
 
-        const importCoreStatement = generateImportStatement(antelopeImports, '@wharfkit/antelope')
+        const importAntelopeStatement = generateImportStatement(
+            antelopeImports,
+            '@wharfkit/antelope'
+        )
+
+        const namespaceName = generateNamespaceName(contractName)
+
+        const importContractStatement = generateImportStatement(
+            ['ActionOptions', 'Contract as BaseContract', 'ContractArgs', 'PartialBy'],
+            '@wharfkit/contract'
+        )
 
         const {classDeclaration} = await generateContractClass(contractName, abi)
 
@@ -141,14 +144,19 @@ export async function generateContract(contractName, abi) {
         ])
 
         const sourceFile = ts.factory.createSourceFile(
-            [importContractStatement, importCoreStatement, namespaceDeclaration, exportStatement],
+            [
+                importAntelopeStatement,
+                importContractStatement,
+                namespaceDeclaration,
+                exportStatement,
+            ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None
         )
 
         const options = await prettier.resolveConfig(process.cwd())
+
         return prettier.format(printer.printFile(sourceFile), options)
-        // return printer.printFile(sourceFile)
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)

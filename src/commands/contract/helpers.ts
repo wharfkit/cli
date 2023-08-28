@@ -17,15 +17,23 @@ export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
     for (const struct of abi.structs) {
         for (const field of struct.fields) {
+            const fieldTypeIsStruct = abi.structs.find((abiStruct) => abiStruct.name === field.type)
+
+            // We don't need to import any core classes if the field type is a struct
+            if (fieldTypeIsStruct) {
+                continue
+            }
+
             const coreClass = findCoreClass(field.type)
 
             if (coreClass) {
                 coreImports.push(coreClass)
             }
 
-            const isAction = abi.actions.find((action) => action.type === struct.name)
+            const structIsActionParams = !!abi.actions.find((action) => action.type === struct.name)
 
-            if (!isAction) {
+            // We don't need to action types unless the struct is an action param
+            if (!structIsActionParams) {
                 continue
             }
 
