@@ -1,14 +1,23 @@
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
-import {abiToBlob} from '@wharfkit/contract'
+import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {generateContractClass} from './contract'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap} from './maps'
 import {generateNamespace, generateNamespaceName} from './namespace'
 import {generateStructClasses} from './structs'
+import { APIClient } from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
+
+export async function generateContractFromParams(contractName, { url }) {
+    const apiClient = new APIClient({ url })
+    const contractKit = new ContractKit({ client: apiClient })
+    const contract = await contractKit.load(contractName)
+
+    return generateContract(contractName, contract.abi)
+}
 
 export async function generateContract(contractName, abi) {
     try {

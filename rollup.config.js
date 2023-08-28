@@ -1,6 +1,8 @@
 import typescript from '@rollup/plugin-typescript'
 import cleanup from 'rollup-plugin-cleanup'
 import json from '@rollup/plugin-json'
+import shebang from 'rollup-plugin-add-shebang';
+
 import pkg from './package.json'
 
 const external = Object.keys(pkg.dependencies)
@@ -14,6 +16,6 @@ export default {
         sourcemap: true,
         exports: 'named',
     },
-    plugins: [typescript({target: 'es6'}), json(), cleanup({extensions: ['js', 'ts']})],
+    plugins: [typescript({target: 'es6'}), json(), cleanup({extensions: ['js', 'ts']}), shebang()],
     external,
 }

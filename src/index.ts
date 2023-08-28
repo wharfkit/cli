@@ -1,7 +1,7 @@
 import {Command} from 'commander'
 
 import {version} from '../package.json'
-import {generateContract} from './commands/contract'
+import {generateContractFromParams} from './commands/contract'
 
 const program = new Command()
 
@@ -16,6 +16,6 @@ program
         'The URL of the API to connect with (e.g. "https://jungle4.greymass.com")',
         process.env.WHARFKIT_URL
     )
-    .action(generateContract)
+    .action(generateContractFromParams)
 
 program.parse()

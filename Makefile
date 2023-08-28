@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 SRC_FILES := $(shell find src -name '*.ts')
+TEST_FILES := $(shell find test/tests -name '*.ts')
+MOCHA_OPTS := -u tdd -r ts-node/register -r tsconfig-paths/register --extension ts
 BIN := ./node_modules/.bin
 
 lib: ${SRC_FILES} package.json tsconfig.json node_modules rollup.config.js
@@ -11,8 +13,8 @@ test: node_modules
 		${BIN}/mocha ${MOCHA_OPTS} ${TEST_FILES} --no-timeout --grep '$(grep)'
 
 .PHONY: test_generate
-test_generate: node_modules clean dist
-	node dist/cli.js generate eosio.token -u https://jungle4.greymass.com
+test_generate: node_modules clean lib
+	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com
 
 .PHONY: check
 check: node_modules
