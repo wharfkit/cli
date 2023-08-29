@@ -153,9 +153,17 @@ export async function generateContract(contractName, abi) {
             ts.NodeFlags.None
         )
 
-        const options = await prettier.resolveConfig(process.cwd())
-
-        return prettier.format(printer.printFile(sourceFile), options)
+        return prettier.format(printer.printFile(sourceFile), {
+            arrowParens: 'always',
+            bracketSpacing: false,
+            endOfLine: 'lf',
+            printWidth: 100,
+            semi: false,
+            singleQuote: true,
+            tabWidth: 4,
+            trailingComma: 'es5',
+            parser: 'typescript',
+        })
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
