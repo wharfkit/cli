@@ -8,20 +8,35 @@ import {generateActionNamesInterface, generateActionsNamespace} from './interfac
 import {generateTableMap} from './maps'
 import {generateNamespace, generateNamespaceName} from './namespace'
 import {generateStructClasses} from './structs'
-import {APIClient} from '@wharfkit/antelope'
+import {ABIDef, APIClient} from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
 
 interface CommandOptions {
     url: string
     file?: string
+    json?: string
 }
 
-export async function generateContractFromCommand(contractName, {url, file}: CommandOptions) {
-    const apiClient = new APIClient({url})
-    const contractKit = new ContractKit({client: apiClient})
+export async function generateContractFromCommand(contractName, {url, file, json}: CommandOptions) {
+    let abi: ABIDef | undefined
 
-    log(`Fetching ABI for ${contractName}...`)
+    if (json) {
+        log(`Loading ABI from ${json}...`)
+
+        const abiString = fs.readFileSync(json, 'utf8')
+        abi = JSON.parse(abiString)
+    } else {
+        log(`Fetching ABI for ${contractName}...`)
+    }
+    const apiClient = new APIClient({url})
+    const contractKit = new ContractKit({client: apiClient}, {
+        abis: abi ? [{
+            name: contractName,
+            abi,
+        }] : undefined
+    })
+
     const contract = await contractKit.load(contractName)
 
     log(`Generating Contract helpers for ${contractName}...`)
