@@ -1,6 +1,8 @@
+import {assert} from 'chai'
+
 import {ABI, APIClient, Name} from '@wharfkit/antelope'
 import {makeClient} from '@wharfkit/mock-data'
-import {assert} from 'chai'
+
 import fs from 'fs'
 import {Contract} from '@wharfkit/contract'
 

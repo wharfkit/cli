@@ -25,10 +25,12 @@ export async function generateContractFromCommand(contractName, {url, file, json
         log(`Loading ABI from ${json}...`)
 
         const abiString = fs.readFileSync(json, 'utf8')
+
         abi = JSON.parse(abiString)
     } else {
         log(`Fetching ABI for ${contractName}...`)
     }
+
     const apiClient = new APIClient({url})
     const contractKit = new ContractKit({client: apiClient}, {
         abis: abi ? [{
