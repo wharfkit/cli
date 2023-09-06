@@ -56,7 +56,7 @@ export namespace EosioMsig {
             proposer: NameType
             proposal_name: NameType
             level: Types.PermissionLevel
-            proposal_hash: Checksum256Type
+            proposal_hash?: Checksum256Type
         }
         export interface Cancel {
             proposer: NameType
@@ -128,8 +128,8 @@ export namespace EosioMsig {
             proposal_name!: Name
             @Struct.field(PermissionLevel)
             level!: PermissionLevel
-            @Struct.field(Checksum256)
-            proposal_hash!: Checksum256
+            @Struct.field(Checksum256, {optional: true})
+            proposal_hash?: Checksum256
         }
         @Struct.type('cancel')
         export class Cancel extends Struct {
@@ -183,8 +183,8 @@ export namespace EosioMsig {
             proposal_name!: Name
             @Struct.field(Bytes)
             packed_transaction!: Bytes
-            @Struct.field(TimePoint)
-            earliest_exec_time!: TimePoint
+            @Struct.field(TimePoint, {optional: true})
+            earliest_exec_time?: TimePoint
         }
         @Struct.type('transaction')
         export class Transaction extends Struct {

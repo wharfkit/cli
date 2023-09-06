@@ -1,11 +1,12 @@
 import {ABI} from '@wharfkit/session'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
-import {extractDecorator, findInternalType, generateStructClassName} from './helpers'
+import {extractDecorator, findInternalType, generateStructClassName, parseType} from './helpers'
 
 interface FieldType {
     name: string
     type: string
+    optional: boolean
 }
 
 interface StructData {
@@ -36,7 +37,8 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
             for (const field of struct.fields) {
                 fields.push({
                     name: capitalize(field.name),
-                    type: field.type,
+                    type: parseType(field.type),
+                    optional: field.type.endsWith('?') || field.type.endsWith('$'),
                 })
             }
 
@@ -88,7 +90,6 @@ export function generateField(
     const fieldName = field.name.toLowerCase()
 
     const isArray = field.type.endsWith('[]')
-    const isOptional = field.type.endsWith('?')
 
     // Start with the main type argument
     const decoratorArguments: (ts.ObjectLiteralExpression | ts.StringLiteral | ts.Identifier)[] = [
@@ -107,7 +108,7 @@ export function generateField(
         )
     }
 
-    if (isOptional) {
+    if (field.optional) {
         optionsProps.push(
             ts.factory.createPropertyAssignment(
                 ts.factory.createIdentifier('optional'),
@@ -148,7 +149,7 @@ export function generateField(
         decorators,
         ts.factory.createIdentifier(fieldName),
         ts.factory.createToken(
-            isOptional ? ts.SyntaxKind.QuestionToken : ts.SyntaxKind.ExclamationToken
+            field.optional ? ts.SyntaxKind.QuestionToken : ts.SyntaxKind.ExclamationToken
         ),
         typeNode,
         undefined // initializer

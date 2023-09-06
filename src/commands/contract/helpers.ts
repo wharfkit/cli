@@ -243,7 +243,7 @@ export function extractDecorator(type: string): {type: string; decorator?: strin
     return {type}
 }
 
-function parseType(type: string): string {
+export function parseType(type: string): string {
     return type.replace('$', '')
 }
 

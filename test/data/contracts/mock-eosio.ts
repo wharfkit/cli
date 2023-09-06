@@ -275,7 +275,7 @@ export namespace Eosio {
         export interface Deleteauth {
             account: NameType
             permission: NameType
-            authorized_by: NameType
+            authorized_by?: NameType
         }
         export interface Deposit {
             owner: NameType
@@ -305,7 +305,7 @@ export namespace Eosio {
             code: NameType
             type: NameType
             requirement: NameType
-            authorized_by: NameType
+            authorized_by?: NameType
         }
         export interface Mvfrsavings {
             owner: NameType
@@ -389,7 +389,7 @@ export namespace Eosio {
         export interface Setabi {
             account: NameType
             abi: BytesType
-            memo: string
+            memo?: string
         }
         export interface Setacctcpu {
             account: NameType
@@ -414,7 +414,7 @@ export namespace Eosio {
             vmtype: UInt8Type
             vmversion: UInt8Type
             code: BytesType
-            memo: string
+            memo?: string
         }
         export interface Setinflation {
             annual_rate: Int64Type
@@ -447,7 +447,7 @@ export namespace Eosio {
             account: NameType
             code: NameType
             type: NameType
-            authorized_by: NameType
+            authorized_by?: NameType
         }
         export interface Unregprod {
             producer: NameType
@@ -463,7 +463,7 @@ export namespace Eosio {
             permission: NameType
             parent: NameType
             auth: Types.Authority
-            authorized_by: NameType
+            authorized_by?: NameType
         }
         export interface Updaterex {
             owner: NameType
@@ -650,8 +650,8 @@ export namespace Eosio {
         }
         @Struct.type('blockchain_parameters_v1')
         export class BlockchainParametersV1 extends Struct {
-            @Struct.field(UInt32)
-            max_action_return_value_size!: UInt32
+            @Struct.field(UInt32, {optional: true})
+            max_action_return_value_size?: UInt32
         }
         @Struct.type('buyram')
         export class Buyram extends Struct {
@@ -795,8 +795,8 @@ export namespace Eosio {
             account!: Name
             @Struct.field(Name)
             permission!: Name
-            @Struct.field(Name)
-            authorized_by!: Name
+            @Struct.field(Name, {optional: true})
+            authorized_by?: Name
         }
         @Struct.type('deposit')
         export class Deposit extends Struct {
@@ -916,8 +916,8 @@ export namespace Eosio {
             type!: Name
             @Struct.field(Name)
             requirement!: Name
-            @Struct.field(Name)
-            authorized_by!: Name
+            @Struct.field(Name, {optional: true})
+            authorized_by?: Name
         }
         @Struct.type('mvfrsavings')
         export class Mvfrsavings extends Struct {
@@ -1075,8 +1075,8 @@ export namespace Eosio {
             last_claim_time!: TimePoint
             @Struct.field(UInt16)
             location!: UInt16
-            @Struct.field(BlockSigningAuthorityV0)
-            producer_authority!: BlockSigningAuthorityV0
+            @Struct.field(BlockSigningAuthorityV0, {optional: true})
+            producer_authority?: BlockSigningAuthorityV0
         }
         @Struct.type('producer_info2')
         export class ProducerInfo2 extends Struct {
@@ -1289,8 +1289,8 @@ export namespace Eosio {
             account!: Name
             @Struct.field(Bytes)
             abi!: Bytes
-            @Struct.field('string')
-            memo!: string
+            @Struct.field('string', {optional: true})
+            memo?: string
         }
         @Struct.type('setacctcpu')
         export class Setacctcpu extends Struct {
@@ -1334,8 +1334,8 @@ export namespace Eosio {
             vmversion!: UInt8
             @Struct.field(Bytes)
             code!: Bytes
-            @Struct.field('string')
-            memo!: string
+            @Struct.field('string', {optional: true})
+            memo?: string
         }
         @Struct.type('setinflation')
         export class Setinflation extends Struct {
@@ -1392,8 +1392,8 @@ export namespace Eosio {
             code!: Name
             @Struct.field(Name)
             type!: Name
-            @Struct.field(Name)
-            authorized_by!: Name
+            @Struct.field(Name, {optional: true})
+            authorized_by?: Name
         }
         @Struct.type('unregprod')
         export class Unregprod extends Struct {
@@ -1421,8 +1421,8 @@ export namespace Eosio {
             parent!: Name
             @Struct.field(Authority)
             auth!: Authority
-            @Struct.field(Name)
-            authorized_by!: Name
+            @Struct.field(Name, {optional: true})
+            authorized_by?: Name
         }
         @Struct.type('updaterex')
         export class Updaterex extends Struct {
