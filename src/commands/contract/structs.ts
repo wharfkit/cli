@@ -198,7 +198,7 @@ function findFieldStructType(
     const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
 
     if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
-        return ts.factory.createStringLiteral(fieldTypeString)
+        return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
     }
 
     return ts.factory.createIdentifier(fieldTypeString)
@@ -224,4 +224,13 @@ function findFieldStructTypeString(
     }
 
     return fieldType
+}
+
+
+function formatFieldString(typeString: string): string {
+    if (typeString === 'boolean') {
+        return 'bool'
+    }
+
+    return typeString
 }

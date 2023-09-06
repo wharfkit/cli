@@ -775,7 +775,7 @@ export namespace Eosio {
             stake_net_quantity!: Asset
             @Struct.field(Asset)
             stake_cpu_quantity!: Asset
-            @Struct.field('boolean')
+            @Struct.field('bool')
             transfer!: boolean
         }
         @Struct.type('delegated_bandwidth')
@@ -1065,7 +1065,7 @@ export namespace Eosio {
             total_votes!: Float64
             @Struct.field(PublicKey)
             producer_key!: PublicKey
-            @Struct.field('boolean')
+            @Struct.field('bool')
             is_active!: boolean
             @Struct.field('string')
             url!: string
@@ -1129,7 +1129,7 @@ export namespace Eosio {
         export class Regproxy extends Struct {
             @Struct.field(Name)
             proxy!: Name
-            @Struct.field('boolean')
+            @Struct.field('bool')
             isproxy!: boolean
         }
         @Struct.type('rentcpu')
@@ -1211,7 +1211,7 @@ export namespace Eosio {
             stake_change!: Asset
             @Struct.field(TimePoint)
             order_time!: TimePoint
-            @Struct.field('boolean')
+            @Struct.field('bool')
             is_open!: boolean
         }
         @Struct.type('rex_pool')
@@ -1468,7 +1468,7 @@ export namespace Eosio {
             last_vote_weight!: Float64
             @Struct.field(Float64)
             proxied_vote_weight!: Float64
-            @Struct.field('boolean')
+            @Struct.field('bool')
             is_proxy!: boolean
             @Struct.field(UInt32)
             flags1!: UInt32
