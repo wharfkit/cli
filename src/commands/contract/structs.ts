@@ -1,4 +1,4 @@
-import {ABI} from '@wharfkit/session'
+import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
 import {extractDecorator, findInternalType, generateStructClassName, parseType} from './helpers'

@@ -1,5 +1,5 @@
 import * as Antelope from '@wharfkit/antelope'
-import {ABI} from '@wharfkit/antelope'
+import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 
 const ANTELOPE_CLASSES: string[] = []

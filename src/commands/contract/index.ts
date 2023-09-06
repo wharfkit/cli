@@ -1,6 +1,8 @@
+import {ESLint} from 'eslint'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 import * as fs from 'fs'
+
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
@@ -8,7 +10,8 @@ import {generateActionNamesInterface, generateActionsNamespace} from './interfac
 import {generateTableMap} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
-import {ABIDef, APIClient} from '@wharfkit/antelope'
+import type {ABIDef} from '@wharfkit/antelope'
+import {APIClient} from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
 
@@ -163,17 +166,10 @@ export async function generateContract(contractName, abi) {
             ts.NodeFlags.None
         )
 
-        return prettier.format(printer.printFile(sourceFile), {
-            arrowParens: 'always',
-            bracketSpacing: false,
-            endOfLine: 'lf',
-            printWidth: 100,
-            semi: false,
-            singleQuote: true,
-            tabWidth: 4,
-            trailingComma: 'es5',
-            parser: 'typescript',
-        })
+        const lintedCode = await runLint(printer.printFile(sourceFile))
+        const formattedCode = runPrettier(lintedCode)
+
+        return formattedCode
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
@@ -187,4 +183,45 @@ function log(message, level: logLevel = 'debug') {
     if (level === 'info' || process.env.WHARFKIT_DEBUG) {
         process.stdout.write(`${message}\n`)
     }
+}
+
+async function runLint(codeText: string) {
+    const eslint = new ESLint({
+        fix: true,
+        useEslintrc: false,
+        overrideConfig: {
+            extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+            plugins: ['@typescript-eslint'],
+            rules: {
+                '@typescript-eslint/consistent-type-imports': 'error',
+            },
+            parser: '@typescript-eslint/parser',
+            parserOptions: {
+                ecmaVersion: 2021,
+                sourceType: 'module',
+            },
+            env: {
+                es2022: true,
+                node: true,
+            },
+        },
+    })
+
+    const formattedCode = await eslint.lintText(codeText)
+
+    return formattedCode[0].output
+}
+
+function runPrettier(codeText: string) {
+    return prettier.format(codeText, {
+        arrowParens: 'always',
+        bracketSpacing: false,
+        endOfLine: 'lf',
+        printWidth: 100,
+        semi: false,
+        singleQuote: true,
+        tabWidth: 4,
+        trailingComma: 'es5',
+        parser: 'typescript',
+    })
 }

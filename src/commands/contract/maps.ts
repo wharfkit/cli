@@ -1,4 +1,4 @@
-import {ABI} from '@wharfkit/antelope'
+import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {findAbiType} from './helpers'
 

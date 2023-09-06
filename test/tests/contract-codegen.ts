@@ -75,8 +75,8 @@ suite('codegen', async function () {
         for (const contractKey of Object.keys(contracts)) {
             for (const testType of Object.keys(contracts[contractKey])) {
                 test(`Testing contract ${contractKey} (${testType})`, function () {
-                    const testNamespace = contracts[contractKey]
-                    const testContract = testNamespace.Contract
+                    const testModule = contracts[contractKey]
+                    const testContract = testModule.Contract
                     const testContractInstance = new testContract({client})
 
                     // Run generic contract tests
@@ -85,7 +85,7 @@ suite('codegen', async function () {
                     function assertRewardsContract(contract) {
                         assert.instanceOf(contract, Contract)
                         assert.instanceOf(contract.abi, ABI)
-                        assert.isTrue(contract.abi.equals(testNamespace.abi))
+                        assert.isTrue(contract.abi.equals(testModule.abi))
                         assert.instanceOf(contract.account, Name)
                         assert.instanceOf(contract.client, APIClient)
                     }
@@ -95,7 +95,7 @@ suite('codegen', async function () {
                     const c1 = new testContract({client})
                     assertRewardsContract(c1)
 
-                    const c2 = new testContract({client, abi: testNamespace.abi})
+                    const c2 = new testContract({client, abi: testModule.abi})
                     assertRewardsContract(c2)
 
                     const c3 = new testContract({client, account: 'teamgreymass'})
@@ -109,16 +109,16 @@ suite('codegen', async function () {
 
                     const c5 = new testContract({
                         client,
-                        abi: testNamespace.abi,
+                        abi: testModule.abi,
                         account: 'teamgreymass',
                     })
                     assertRewardsContract(c5)
 
-                    assert.throws(() => new testContract({abi: testNamespace.abi}))
+                    assert.throws(() => new testContract({abi: testModule.abi}))
                     assert.throws(
                         () =>
                             new testContract({
-                                abi: testNamespace.abi,
+                                abi: testModule.abi,
                                 account: 'teamgreymass',
                             })
                     )
