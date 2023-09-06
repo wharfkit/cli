@@ -6,7 +6,7 @@ import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap} from './maps'
-import {generateNamespace, generateNamespaceName} from './namespace'
+import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
 import {ABIDef, APIClient} from '@wharfkit/antelope'
 
@@ -32,12 +32,19 @@ export async function generateContractFromCommand(contractName, {url, file, json
     }
 
     const apiClient = new APIClient({url})
-    const contractKit = new ContractKit({client: apiClient}, {
-        abis: abi ? [{
-            name: contractName,
-            abi,
-        }] : undefined
-    })
+    const contractKit = new ContractKit(
+        {client: apiClient},
+        {
+            abis: abi
+                ? [
+                      {
+                          name: contractName,
+                          abi,
+                      },
+                  ]
+                : undefined,
+        }
+    )
 
     const contract = await contractKit.load(contractName)
 

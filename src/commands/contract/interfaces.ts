@@ -36,9 +36,7 @@ export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclarat
         return ts.factory.createPropertySignature(
             undefined,
             field.name.toLowerCase(),
-            field.optional
-                ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
-                : undefined,
+            field.optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
             typeReferenceNode
         )
     })

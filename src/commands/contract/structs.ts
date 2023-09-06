@@ -227,7 +227,6 @@ function findFieldStructTypeString(
     return fieldType
 }
 
-
 function formatFieldString(typeString: string): string {
     if (typeString === 'boolean') {
         return 'bool'
