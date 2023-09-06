@@ -75,8 +75,6 @@ export async function generateContract(contractName, abi) {
             '@wharfkit/antelope'
         )
 
-        const namespaceName = generateNamespaceName(contractName)
-
         const importContractStatement = generateImportStatement(
             ['ActionOptions', 'Contract as BaseContract', 'ContractArgs', 'PartialBy'],
             '@wharfkit/contract'
@@ -142,29 +140,17 @@ export async function generateContract(contractName, abi) {
 
         const tableMap = generateTableMap(abi)
 
-        const exportStatement = ts.factory.createExportAssignment(
-            undefined,
-            false,
-            ts.factory.createIdentifier(namespaceName)
-        )
-
-        // Generate types namespace
-        const namespaceDeclaration = generateNamespace(namespaceName, [
-            abiBlobField,
-            abiField,
-            classDeclaration,
-            actionNamesInterface,
-            actionsNamespace,
-            generateNamespace('Types', structDeclarations),
-            tableMap,
-        ])
-
         const sourceFile = ts.factory.createSourceFile(
             [
                 importAntelopeStatement,
                 importContractStatement,
-                namespaceDeclaration,
-                exportStatement,
+                abiBlobField,
+                abiField,
+                classDeclaration,
+                actionNamesInterface,
+                actionsNamespace,
+                generateNamespace('Types', structDeclarations),
+                tableMap,
             ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None

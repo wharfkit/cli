@@ -6,10 +6,10 @@ import {makeClient} from '@wharfkit/mock-data'
 import fs from 'fs'
 import {Contract} from '@wharfkit/contract'
 
-import Eosio from '$test/data/contracts/mock-eosio'
-import EosioMsig from '$test/data/contracts/mock-eosio.msig'
-import EosioToken from '$test/data/contracts/mock-eosio.token'
-import RewardsGm from '$test/data/contracts/mock-rewards.gm'
+import * as Eosio from '$test/data/contracts/mock-eosio'
+import * as EosioMsig from '$test/data/contracts/mock-eosio.msig'
+import * as EosioToken from '$test/data/contracts/mock-eosio.token'
+import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
 
 import {generateCodegenContract, removeCodegenContracts} from '$test/utils/codegen'
 import {runGenericContractTests} from './helpers/generic'
@@ -53,11 +53,13 @@ suite('codegen', async function () {
                 const mock = fs
                     .readFileSync(`test/data/contracts/mock-${testCase}.ts`)
                     .toString('utf-8')
+
                 // Push source file in for comparison
                 sources.push({
                     mock,
                     generated: generated.text,
                 })
+
                 // Push contract class for testing
                 contracts[testCase] = generated.import
             }
@@ -73,7 +75,7 @@ suite('codegen', async function () {
         for (const contractKey of Object.keys(contracts)) {
             for (const testType of Object.keys(contracts[contractKey])) {
                 test(`Testing contract ${contractKey} (${testType})`, function () {
-                    const testNamespace = contracts[contractKey].default
+                    const testNamespace = contracts[contractKey]
                     const testContract = testNamespace.Contract
                     const testContractInstance = new testContract({client})
 
