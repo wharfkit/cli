@@ -14,9 +14,14 @@ interface StructData {
     fields: FieldType[]
 }
 
+interface TypeAlias {
+    new_type_name: string
+    type: string
+}
+
 export function generateStructClasses(abi) {
     const structs = getActionFieldFromAbi(abi)
-    const orderedStructs = orderStructs(structs)
+    const orderedStructs = orderStructs(structs, abi.types)
 
     const structMembers: ts.ClassDeclaration[] = []
 
@@ -156,11 +161,11 @@ export function generateField(
     )
 }
 
-function orderStructs(structs) {
+function orderStructs(structs, typeAliases: TypeAlias[] = []) {
     const orderedStructs: StructData[] = []
 
     for (const struct of structs) {
-        orderedStructs.push(...findDependencies(struct, structs))
+        orderedStructs.push(...findDependencies(struct, structs, typeAliases))
         orderedStructs.push(struct)
     }
 
@@ -169,20 +174,30 @@ function orderStructs(structs) {
     })
 }
 
-function findDependencies(struct: StructData, allStructs: StructData[]): StructData[] {
+function findDependencies(
+    struct: StructData,
+    allStructs: StructData[],
+    typeAliases: TypeAlias[]
+): StructData[] {
     const dependencies: StructData[] = []
 
     const structNames = allStructs.map((struct) => struct.structName)
 
     for (const field of struct.fields) {
-        const {type: fieldType} = extractDecorator(field.type)
+        let {type: fieldType} = extractDecorator(field.type)
 
-        if (structNames.includes(fieldType.toLowerCase())) {
+        fieldType = fieldType.toLowerCase()
+
+        const typeAlias = typeAliases.find(
+            (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType
+        )
+
+        if (!typeAlias && structNames.includes(fieldType)) {
             const dependencyStruct = allStructs.find(
                 (struct) => struct.structName === fieldType.toLowerCase()
             )
             if (dependencyStruct) {
-                dependencies.push(...findDependencies(dependencyStruct, allStructs))
+                dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
                 dependencies.push(dependencyStruct)
             }
         }
