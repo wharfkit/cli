@@ -4,12 +4,20 @@ The @wharfkit command line tool.
 
 ## Installation
 
-This command line tool currently requires nodejs (version 18+) to be installed.
+This command line tool currently requires the use of nodejs version 18 or above (due to its usage of built-in fetch).
 
-You can then install the command line utility globally with the following command:
+It can be run using `npx`:
 
 ```bash
+npx @wharfkit/cli help
+```
+
+or installed globally and run as `wharfkit`:
+
+```
 npm install -g @wharfkit/cli
+
+wharfkit help
 ```
 
 ## Usage
@@ -35,13 +43,13 @@ Commands:
 The cli tool is capable of generating Typescript code based on a deployed smart contract for use in your application.
 
 ```bash
-wharfkit generate [options] <account>
+npx @wharfkit/cli generate [options] <account>
 ```
 
 To generate the code for the `eosio.token` contract on the Jungle 4 testnet:
 
 ```bash
-wharfkit generate -u https://jungle4.greymass.com eosio.token 
+npx @wharfkit/cli generate -u https://jungle4.greymass.com eosio.token 
 ```
 
 This will output the code directly into the console window similar to [this example code](https://github.com/wharfkit/cli/blob/master/test/data/contracts/mock-eosio.token.ts). 
@@ -49,13 +57,13 @@ This will output the code directly into the console window similar to [this exam
 If you'd prefer to save this as a file, use the `-f` flag followed by a filename:
 
 ```bash
-wharfkit generate -u https://jungle4.greymass.com eosio.token -f tokencontract.ts
+npx @wharfkit/cli generate -u https://jungle4.greymass.com eosio.token -f tokencontract.ts
 ```
 
 To see a full list of options for the `generate` command, run the `help` command against it:
 
 ```
-wharfkit help generate
+npx @wharfkit/cli help generate
 ```
 
 ---
