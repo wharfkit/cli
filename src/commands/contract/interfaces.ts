@@ -1,4 +1,4 @@
-import {ABI} from '@wharfkit/antelope'
+import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
 import {findExternalType} from './helpers'
@@ -36,9 +36,7 @@ export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclarat
         return ts.factory.createPropertySignature(
             undefined,
             field.name.toLowerCase(),
-            field.type.includes('?')
-                ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
-                : undefined,
+            field.optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
             typeReferenceNode
         )
     })

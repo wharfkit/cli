@@ -2,7 +2,7 @@ import {Action, Asset, Bytes, Name, PermissionLevel, Serializer, Struct} from '@
 import {makeClient} from '@wharfkit/mock-data'
 import {assert} from 'chai'
 
-import RewardsGm from '$test/data/contracts/mock-rewards.gm'
+import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
 import {PlaceholderName, PlaceholderPermission} from '@wharfkit/signing-request'
 import {Table, TableRowCursor} from '@wharfkit/contract'
 

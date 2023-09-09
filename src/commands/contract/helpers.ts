@@ -1,5 +1,5 @@
 import * as Antelope from '@wharfkit/antelope'
-import {ABI} from '@wharfkit/antelope'
+import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 
 const ANTELOPE_CLASSES: string[] = []
@@ -243,7 +243,7 @@ export function extractDecorator(type: string): {type: string; decorator?: strin
     return {type}
 }
 
-function parseType(type: string): string {
+export function parseType(type: string): string {
     return type.replace('$', '')
 }
 

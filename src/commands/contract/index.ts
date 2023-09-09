@@ -1,13 +1,16 @@
+import {ESLint} from 'eslint'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 import * as fs from 'fs'
+
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap} from './maps'
-import {generateNamespace, generateNamespaceName} from './namespace'
+import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
+import type {ABIDef} from '@wharfkit/antelope'
 import {APIClient} from '@wharfkit/antelope'
 
 const printer = ts.createPrinter()
@@ -15,13 +18,37 @@ const printer = ts.createPrinter()
 interface CommandOptions {
     url: string
     file?: string
+    json?: string
 }
 
-export async function generateContractFromCommand(contractName, {url, file}: CommandOptions) {
-    const apiClient = new APIClient({url})
-    const contractKit = new ContractKit({client: apiClient})
+export async function generateContractFromCommand(contractName, {url, file, json}: CommandOptions) {
+    let abi: ABIDef | undefined
 
-    log(`Fetching ABI for ${contractName}...`)
+    if (json) {
+        log(`Loading ABI from ${json}...`)
+
+        const abiString = fs.readFileSync(json, 'utf8')
+
+        abi = JSON.parse(abiString)
+    } else {
+        log(`Fetching ABI for ${contractName}...`)
+    }
+
+    const apiClient = new APIClient({url})
+    const contractKit = new ContractKit(
+        {client: apiClient},
+        {
+            abis: abi
+                ? [
+                      {
+                          name: contractName,
+                          abi,
+                      },
+                  ]
+                : undefined,
+        }
+    )
+
     const contract = await contractKit.load(contractName)
 
     log(`Generating Contract helpers for ${contractName}...`)
@@ -57,8 +84,6 @@ export async function generateContract(contractName, abi) {
             antelopeImports,
             '@wharfkit/antelope'
         )
-
-        const namespaceName = generateNamespaceName(contractName)
 
         const importContractStatement = generateImportStatement(
             ['ActionOptions', 'Contract as BaseContract', 'ContractArgs', 'PartialBy'],
@@ -125,45 +150,26 @@ export async function generateContract(contractName, abi) {
 
         const tableMap = generateTableMap(abi)
 
-        const exportStatement = ts.factory.createExportAssignment(
-            undefined,
-            false,
-            ts.factory.createIdentifier(namespaceName)
-        )
-
-        // Generate types namespace
-        const namespaceDeclaration = generateNamespace(namespaceName, [
-            abiBlobField,
-            abiField,
-            classDeclaration,
-            actionNamesInterface,
-            actionsNamespace,
-            generateNamespace('Types', structDeclarations),
-            tableMap,
-        ])
-
         const sourceFile = ts.factory.createSourceFile(
             [
                 importAntelopeStatement,
                 importContractStatement,
-                namespaceDeclaration,
-                exportStatement,
+                abiBlobField,
+                abiField,
+                classDeclaration,
+                actionNamesInterface,
+                actionsNamespace,
+                generateNamespace('Types', structDeclarations),
+                tableMap,
             ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None
         )
 
-        return prettier.format(printer.printFile(sourceFile), {
-            arrowParens: 'always',
-            bracketSpacing: false,
-            endOfLine: 'lf',
-            printWidth: 100,
-            semi: false,
-            singleQuote: true,
-            tabWidth: 4,
-            trailingComma: 'es5',
-            parser: 'typescript',
-        })
+        const lintedCode = await runLint(printer.printFile(sourceFile))
+        const formattedCode = runPrettier(lintedCode)
+
+        return formattedCode
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
@@ -177,4 +183,45 @@ function log(message, level: logLevel = 'debug') {
     if (level === 'info' || process.env.WHARFKIT_DEBUG) {
         process.stdout.write(`${message}\n`)
     }
+}
+
+async function runLint(codeText: string) {
+    const eslint = new ESLint({
+        fix: true,
+        useEslintrc: false,
+        overrideConfig: {
+            extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
+            plugins: ['@typescript-eslint'],
+            rules: {
+                '@typescript-eslint/consistent-type-imports': 'error',
+            },
+            parser: '@typescript-eslint/parser',
+            parserOptions: {
+                ecmaVersion: 2021,
+                sourceType: 'module',
+            },
+            env: {
+                es2022: true,
+                node: true,
+            },
+        },
+    })
+
+    const formattedCode = await eslint.lintText(codeText)
+
+    return formattedCode[0].output
+}
+
+function runPrettier(codeText: string) {
+    return prettier.format(codeText, {
+        arrowParens: 'always',
+        bracketSpacing: false,
+        endOfLine: 'lf',
+        printWidth: 100,
+        semi: false,
+        singleQuote: true,
+        tabWidth: 4,
+        trailingComma: 'es5',
+        parser: 'typescript',
+    })
 }

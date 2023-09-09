@@ -1,11 +1,12 @@
-import {ABI} from '@wharfkit/session'
+import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
-import {extractDecorator, findInternalType, generateStructClassName} from './helpers'
+import {extractDecorator, findInternalType, generateStructClassName, parseType} from './helpers'
 
 interface FieldType {
     name: string
     type: string
+    optional: boolean
 }
 
 interface StructData {
@@ -13,9 +14,14 @@ interface StructData {
     fields: FieldType[]
 }
 
+interface TypeAlias {
+    new_type_name: string
+    type: string
+}
+
 export function generateStructClasses(abi) {
     const structs = getActionFieldFromAbi(abi)
-    const orderedStructs = orderStructs(structs)
+    const orderedStructs = orderStructs(structs, abi.types)
 
     const structMembers: ts.ClassDeclaration[] = []
 
@@ -36,7 +42,8 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
             for (const field of struct.fields) {
                 fields.push({
                     name: capitalize(field.name),
-                    type: field.type,
+                    type: parseType(field.type),
+                    optional: field.type.endsWith('?') || field.type.endsWith('$'),
                 })
             }
 
@@ -88,7 +95,6 @@ export function generateField(
     const fieldName = field.name.toLowerCase()
 
     const isArray = field.type.endsWith('[]')
-    const isOptional = field.type.endsWith('?')
 
     // Start with the main type argument
     const decoratorArguments: (ts.ObjectLiteralExpression | ts.StringLiteral | ts.Identifier)[] = [
@@ -107,7 +113,7 @@ export function generateField(
         )
     }
 
-    if (isOptional) {
+    if (field.optional) {
         optionsProps.push(
             ts.factory.createPropertyAssignment(
                 ts.factory.createIdentifier('optional'),
@@ -148,18 +154,18 @@ export function generateField(
         decorators,
         ts.factory.createIdentifier(fieldName),
         ts.factory.createToken(
-            isOptional ? ts.SyntaxKind.QuestionToken : ts.SyntaxKind.ExclamationToken
+            field.optional ? ts.SyntaxKind.QuestionToken : ts.SyntaxKind.ExclamationToken
         ),
         typeNode,
         undefined // initializer
     )
 }
 
-function orderStructs(structs) {
+function orderStructs(structs, typeAliases: TypeAlias[] = []) {
     const orderedStructs: StructData[] = []
 
     for (const struct of structs) {
-        orderedStructs.push(...findDependencies(struct, structs))
+        orderedStructs.push(...findDependencies(struct, structs, typeAliases))
         orderedStructs.push(struct)
     }
 
@@ -168,20 +174,30 @@ function orderStructs(structs) {
     })
 }
 
-function findDependencies(struct: StructData, allStructs: StructData[]): StructData[] {
+function findDependencies(
+    struct: StructData,
+    allStructs: StructData[],
+    typeAliases: TypeAlias[]
+): StructData[] {
     const dependencies: StructData[] = []
 
     const structNames = allStructs.map((struct) => struct.structName)
 
     for (const field of struct.fields) {
-        const {type: fieldType} = extractDecorator(field.type)
+        let {type: fieldType} = extractDecorator(field.type)
 
-        if (structNames.includes(fieldType.toLowerCase())) {
+        fieldType = fieldType.toLowerCase()
+
+        const typeAlias = typeAliases.find(
+            (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType
+        )
+
+        if (!typeAlias && structNames.includes(fieldType)) {
             const dependencyStruct = allStructs.find(
                 (struct) => struct.structName === fieldType.toLowerCase()
             )
             if (dependencyStruct) {
-                dependencies.push(...findDependencies(dependencyStruct, allStructs))
+                dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
                 dependencies.push(dependencyStruct)
             }
         }
@@ -198,7 +214,7 @@ function findFieldStructType(
     const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
 
     if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
-        return ts.factory.createStringLiteral(fieldTypeString)
+        return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
     }
 
     return ts.factory.createIdentifier(fieldTypeString)
@@ -224,4 +240,12 @@ function findFieldStructTypeString(
     }
 
     return fieldType
+}
+
+function formatFieldString(typeString: string): string {
+    if (typeString === 'boolean') {
+        return 'bool'
+    }
+
+    return typeString
 }
