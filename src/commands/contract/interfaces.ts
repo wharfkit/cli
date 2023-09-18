@@ -71,10 +71,6 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
 function findParamTypeString(typeString: string, namespace: string | null, abi: ABI.Def): string {
     const fieldType = findExternalType(typeString, abi, namespace ? namespace : undefined)
 
-    if (typeString === 'ATTRIBUTE_MAP') {
-        console.log({typeString, fieldType})
-    }
-
     if (fieldType === 'Symbol') {
         return 'Asset.SymbolType'
     }
