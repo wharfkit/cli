@@ -17,14 +17,17 @@ export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
     for (const struct of abi.structs) {
         for (const field of struct.fields) {
-            const fieldTypeIsStruct = abi.structs.find((abiStruct) => abiStruct.name === field.type)
+            const type = parseType(field.type)
+            const fieldTypeIsStruct = abi.structs.find((abiStruct) => abiStruct.name === type)
 
             // We don't need to import any core classes if the field type is a struct
             if (fieldTypeIsStruct) {
                 continue
             }
 
-            const coreClass = findCoreClass(field.type)
+            const aliasType = findAliasType(field.type, abi)
+
+            const coreClass = findCoreClass(type) || (aliasType && findCoreClass(parseType(aliasType)))
 
             if (coreClass) {
                 coreImports.push(coreClass)
@@ -179,7 +182,6 @@ function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
 
 function findVariantType(
     typeString: string,
-    namespace: string | null,
     abi: ABI.Def
 ): string | undefined {
     const abiVariant = abi.variants.find(
@@ -202,7 +204,7 @@ export function findAbiType(type: string, abi: ABI.Def, typeNamespace = ''): str
         typeString = aliasType
     }
 
-    const variantType = findVariantType(typeString, typeNamespace, abi)
+    const variantType = findVariantType(typeString, abi)
 
     if (variantType) {
         typeString = variantType
@@ -243,8 +245,9 @@ export function extractDecorator(type: string): {type: string; decorator?: strin
     return {type}
 }
 
+
 export function parseType(type: string): string {
-    return type.replace('$', '')
+    return extractDecorator(type.replace('$', '')).type
 }
 
 export function capitalize(string) {
