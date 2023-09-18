@@ -25,15 +25,15 @@
         "url": "https://github.com/wharfkit/cli/issues"
     },
     "dependencies": {
-        "@wharfkit/antelope": "^0.7.3",
-        "@wharfkit/contract": "^0.4.2",
+        "@wharfkit/antelope": "^0.9.1",
+        "@wharfkit/contract": "^0.4.3",
         "commander": "^11.0.0",
         "eslint": "^8.48.0",
         "prettier": "^2.2.1",
         "typescript": "^4.9.5"
     },
     "resolutions": {
-        "@wharfkit/antelope": "^0.7.3"
+        "@wharfkit/antelope": "^0.9.1"
     },
     "devDependencies": {
         "@babel/core": "^7.22.10",
