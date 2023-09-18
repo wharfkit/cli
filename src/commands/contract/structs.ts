@@ -66,7 +66,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
     const members: ts.ClassElement[] = []
 
     for (const field of struct.fields) {
-        members.push(generateField(field, null, abi))
+        members.push(generateField(field, undefined, abi))
     }
 
     return ts.factory.createClassDeclaration(
@@ -89,7 +89,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
 
 export function generateField(
     field: FieldType,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): ts.PropertyDeclaration {
     const fieldName = field.name.toLowerCase()
@@ -208,7 +208,7 @@ function findDependencies(
 
 function findFieldStructType(
     typeString: string,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral {
     const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
@@ -222,7 +222,7 @@ function findFieldStructType(
 
 function findFieldStructTypeString(
     typeString: string,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): string {
     const fieldType = findInternalType(typeString, namespace, abi)
