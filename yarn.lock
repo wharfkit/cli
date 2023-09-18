@@ -697,15 +697,16 @@
     pako "^2.0.4"
     tslib "^2.1.0"
 
-"@wharfkit/antelope@^0.7.3":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@wharfkit/antelope/-/antelope-0.7.3.tgz#408f6c587f4f5990d4b55596c10be2e976798641"
-  integrity sha512-pyUmuXUpLQh1RVpJVIcbVUHTwV/DQ+MI0nlfWDBHIICdYf6XidZtQmaHB7JEXiFzlS8T7S9Xc5VOTOQU8dnl3Q==
+"@wharfkit/antelope@^0.7.3", "@wharfkit/antelope@^0.8.0", "@wharfkit/antelope@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@wharfkit/antelope/-/antelope-0.9.1.tgz#ff6cfbb6f3c4e373407764cfce44a539dbb521ae"
+  integrity sha512-yL3qEV0emqz/L3PX+kckYJIFOU42eLroq6kkKUi/i2NW7zNw6Dw7vqhoPTztklVRqKHf7/sfab4Fve+KRmP4SQ==
   dependencies:
     bn.js "^4.11.9"
     brorand "^1.1.0"
     elliptic "^6.5.4"
     hash.js "^1.0.0"
+    pako "^2.1.0"
     tslib "^2.0.3"
 
 "@wharfkit/common@^1.1.0":
@@ -715,13 +716,13 @@
   dependencies:
     tslib "^2.1.0"
 
-"@wharfkit/contract@^0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-0.4.2.tgz#cec2ca9585bf1c63b9458089cbd0388b727b800f"
-  integrity sha512-jSnxaaIy8ZyXljfO2DrR7ytG7VFZX6ml8b6tncZE7GvkPpEt3zEfR3YJmUfYCvbwJTn5Zk6/EWtIl5YTrEaxOA==
+"@wharfkit/contract@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-0.4.3.tgz#086ee80ae4b87b14a4d8674fa1f53983a9cc8817"
+  integrity sha512-TjsuUdk9Ep3PJdzp8im4Pw+yDHzF0o7+IReIm5Q6FHe9DWh8HgexETR8VsgzB43bmvKvIUrMZReFRb70wB3P9w==
   dependencies:
     "@wharfkit/abicache" "^1.1.1"
-    "@wharfkit/antelope" "^0.7.3"
+    "@wharfkit/antelope" "^0.8.0"
     "@wharfkit/signing-request" "^3.0.0"
     tslib "^2.1.0"
 
@@ -2205,7 +2206,7 @@ package-hash@^4.0.0:
     lodash.flattendeep "^4.4.0"
     release-zalgo "^1.0.0"
 
-pako@^2.0.4:
+pako@^2.0.4, pako@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/pako/-/pako-2.1.0.tgz#266cc37f98c7d883545d11335c00fbd4062c9a86"
   integrity sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==
