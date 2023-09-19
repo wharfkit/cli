@@ -236,7 +236,7 @@ function findFieldStructType(
     ).type
 
     if (fieldTypeString.includes(' | ')) {
-        return ts.factory.createStringLiteral('any')
+        return ts.factory.createIdentifier('Variant')
     }
 
     if (['string', 'boolean', 'number'].includes(fieldTypeString)) {

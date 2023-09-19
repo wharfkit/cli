@@ -31,6 +31,10 @@ export function getCoreImports(abi: ABI.Def) {
 
             const {type} = findAbiType(field.type, abi)
 
+            if (type.includes(' | ')) {
+                coreImports.push('Variant')
+            }
+
             type.split(' | ').forEach((typeString) => {
                 const coreClass = findCoreClass(typeString)
 

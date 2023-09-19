@@ -24,6 +24,7 @@ import {
     UInt32,
     UInt64,
     UInt8,
+    Variant,
 } from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy} from '@wharfkit/contract'
 import {Contract as BaseContract} from '@wharfkit/contract'
@@ -460,7 +461,7 @@ export namespace Types {
     export class PairStringATOMICATTRIBUTE extends Struct {
         @Struct.field('string')
         key!: string
-        @Struct.field('any')
+        @Struct.field(Variant)
         value!:
             | Int8
             | Int16
