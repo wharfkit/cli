@@ -41,10 +41,10 @@ suite('codegen', async function () {
             mock: RewardsGm,
             generated: null,
         },
-        // 'atomicassets': {
-        //     mock: AtomicAssets,
-        //     generated: null,
-        // }
+        atomicassets: {
+            mock: AtomicAssets,
+            generated: null,
+        },
     }
 
     // Source code
@@ -133,6 +133,6 @@ suite('codegen', async function () {
         }
     })
     teardown(() => {
-        // removeCodegenContracts()
+        removeCodegenContracts()
     })
 })
