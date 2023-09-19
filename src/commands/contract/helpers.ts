@@ -16,36 +16,36 @@ export const ANTELOPE_CLASS_MAPPINGS = {
 export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
     for (const struct of abi.structs) {
+        const structIsActionParams = !!abi.actions.find((action) => action.type === struct.name)
+
         for (const field of struct.fields) {
-            const type = cleanupType(field.type)
-            const fieldTypeIsStruct = abi.structs.find((abiStruct) => abiStruct.name === type)
+            const { type } = findAbiType(field.type, abi)
+
+            const fieldTypeIsStruct = abi.structs.find((abiStruct) => abiStruct.name === field.type)
 
             // We don't need to import any core classes if the field type is a struct
             if (fieldTypeIsStruct) {
                 continue
             }
 
-            const aliasType = findAliasType(type, abi)
-
-            const coreClass =
-                findCoreClass(type) || (aliasType && findCoreClass(cleanupType(aliasType)))
-
-            if (coreClass) {
-                coreImports.push(coreClass)
-            }
-
-            const structIsActionParams = !!abi.actions.find((action) => action.type === struct.name)
-
-            // We don't need to action types unless the struct is an action param
-            if (!structIsActionParams) {
-                continue
-            }
-
-            const coreType = findCoreType(field.type)
-
-            if (coreType) {
-                coreImports.push(coreType)
-            }
+            type.split(' | ').forEach((typeString) => {
+                const coreClass = findCoreClass(typeString)
+                    
+                if (coreClass) {
+                    coreImports.push(coreClass)
+                }
+    
+                // We don't need to add action types unless the struct is an action param
+                if (!structIsActionParams) {
+                    return
+                }
+    
+                const coreType = findCoreType(typeString)
+    
+                if (coreType) {
+                    coreImports.push(coreType)
+                }
+            })
         }
     }
 
@@ -126,7 +126,7 @@ export function findCoreClass(type: string): string | undefined {
         return ANTELOPE_CLASS_MAPPINGS[type]
     }
 
-    const parsedType = parseType(type).split('_').join('')
+    const parsedType = parseType(type).split('_').join('').toLowerCase()
 
     return (
         ANTELOPE_CLASSES.find((antelopeClass) => parsedType === antelopeClass.toLowerCase()) ||
@@ -181,7 +181,7 @@ function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
     return alias?.type
 }
 
-function findVariantType(typeString: string, abi: ABI.Def): string | undefined {
+function findVariantType(typeString: string, abi: ABI.Def, typeNamespace: string, context: string): string | undefined {
     const abiVariant = abi.variants.find(
         (variant) => variant.name.toLowerCase() === typeString.toLowerCase()
     )
@@ -190,14 +190,21 @@ function findVariantType(typeString: string, abi: ABI.Def): string | undefined {
         return
     }
 
-    return abiVariant.types.join(' | ')
+    return abiVariant.types.map(type => {
+        if (context === 'external') {
+            return findExternalType(type, typeNamespace, abi)
+        } else {
+            return findInternalType(type, typeNamespace, abi)
+        }
+    }).join(' | ')
 }
 
 export function findAbiType(
     type: string,
     abi: ABI.Def,
-    typeNamespace = ''
-): {type: string; decorator?: string} | undefined {
+    typeNamespace = '',
+    context= 'internal'
+): {type: string; decorator?: string} {
     let typeString = parseType(type)
 
     const aliasType = findAliasType(typeString, abi)
@@ -210,10 +217,10 @@ export function findAbiType(
     const {decorator} = extractDecorator(typeString)
     typeString = extractedType
 
-    const variantType = findVariantType(typeString, abi)
+    const variantType = findVariantType(typeString, abi, typeNamespace, context)
 
     if (variantType) {
-        typeString = variantType
+        return { type: variantType, decorator }
     }
 
     const abiType = abi.structs.find((abiType) => abiType.name === typeString)?.name
@@ -221,16 +228,18 @@ export function findAbiType(
     if (abiType) {
         return {type: `${typeNamespace}${generateStructClassName(abiType)}`, decorator}
     }
+
+    return {type: typeString, decorator}
 }
 
-export function findExternalType(type: string, abi: ABI.Def, typeNamespace?: string): string {
-    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
+export function findExternalType(type: string, typeNamespace = '', abi: ABI.Def): string {
+    const {type: typeString, decorator} = findType(type, abi, typeNamespace, 'external')
 
     return `${findCoreType(typeString) || capitalize(typeString)}${decorator === '[]' ? '[]' : ''}`
 }
 
-function findType(type: string, abi: ABI.Def, typeNamespace?: string) {
-    return findAbiType(type, abi, typeNamespace) || extractDecorator(type)
+function findType(type: string, abi: ABI.Def, typeNamespace?: string, context = 'internal') {
+    return findAbiType(type, abi, typeNamespace, context)
 }
 
 const decorators = ['?', '[]']
@@ -251,7 +260,7 @@ export function cleanupType(type: string): string {
 }
 
 export function parseType(type: string): string {
-    return type.replace('$', '')
+    return type.replace('$', '').split(' ').join('')
 }
 
 export function capitalize(string) {

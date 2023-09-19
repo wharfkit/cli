@@ -83,7 +83,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
                 ),
             ]),
         ], // heritageClauses
-        members // Pass the members array
+        members
     )
 }
 
@@ -138,11 +138,24 @@ export function generateField(
         ),
     ]
 
-    let typeNode: ts.ArrayTypeNode | ts.TypeReferenceNode
+    let typeReferenceNode: ts.TypeReferenceNode | ts.UnionTypeNode
 
-    const typeReferenceNode = ts.factory.createTypeReferenceNode(
-        findFieldStructTypeString(field.type, namespace, abi)
-    )
+    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
+
+    if (structTypeString.includes(' | ')) {
+        typeReferenceNode = ts.factory.createUnionTypeNode(
+            structTypeString.split(' | ').map((type) => {
+                return ts.factory.createTypeReferenceNode(
+                    ts.factory.createIdentifier(type),
+                    undefined
+                )
+            })
+        )
+    } else {
+        typeReferenceNode = ts.factory.createTypeReferenceNode(structTypeString)
+    }
+
+    let typeNode: ts.ArrayTypeNode | ts.TypeReferenceNode | ts.UnionTypeNode
 
     if (isArray) {
         typeNode = ts.factory.createArrayTypeNode(typeReferenceNode)
@@ -212,6 +225,10 @@ function findFieldStructType(
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral {
     const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
+
+    if (fieldTypeString.includes(' | ')) {
+        return ts.factory.createStringLiteral('any')
+    }
 
     if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
