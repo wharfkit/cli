@@ -152,10 +152,10 @@ export function generateField(
             })
         )
     } else {
-        typeReferenceNode = ts.factory.createTypeReferenceNode(structTypeString)
+        typeReferenceNode = ts.factory.createTypeReferenceNode(extractDecorator(structTypeString).type)
     }
 
-    let typeNode: ts.ArrayTypeNode | ts.TypeReferenceNode | ts.UnionTypeNode
+    let typeNode: ts.TypeNode
 
     if (isArray) {
         typeNode = ts.factory.createArrayTypeNode(typeReferenceNode)
@@ -194,25 +194,29 @@ function findDependencies(
 ): StructData[] {
     const dependencies: StructData[] = []
 
-    const structNames = allStructs.map((struct) => struct.structName)
-
     for (const field of struct.fields) {
-        let {type: fieldType} = extractDecorator(field.type)
+        const {type: fieldType} = extractDecorator(field.type)
 
-        fieldType = fieldType.toLowerCase()
-
-        const typeAlias = typeAliases.find(
-            (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType
+        let dependencyStruct = allStructs.find(
+            (struct) => struct.structName === fieldType.toLowerCase()
         )
 
-        if (!typeAlias && structNames.includes(fieldType)) {
-            const dependencyStruct = allStructs.find(
-                (struct) => struct.structName === fieldType.toLowerCase()
+        if (!dependencyStruct) {
+            const typeAlias = typeAliases.find(
+                (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType.toLowerCase()
             )
-            if (dependencyStruct) {
-                dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
-                dependencies.push(dependencyStruct)
-            }
+
+            const typeAliasString =  typeAlias && extractDecorator(typeAlias.type).type
+    
+            dependencyStruct = typeAliasString ? allStructs.find(
+                (struct) => 
+                    (struct.structName.toLowerCase() === typeAliasString.toLowerCase())
+            ) : undefined
+        }
+
+        if (dependencyStruct) {
+            dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
+            dependencies.push(dependencyStruct)
         }
     }
 
@@ -224,7 +228,7 @@ function findFieldStructType(
     namespace: string | undefined,
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral {
-    const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
+    const fieldTypeString = extractDecorator(findFieldStructTypeString(typeString, namespace, abi)).type
 
     if (fieldTypeString.includes(' | ')) {
         return ts.factory.createStringLiteral('any')

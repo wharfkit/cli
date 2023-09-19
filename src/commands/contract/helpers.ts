@@ -149,23 +149,28 @@ export function findInternalType(
     typeNamespace: string | undefined,
     abi: ABI.Def
 ): string {
-    const {type: typeString} = findType(type, abi, typeNamespace)
+    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
 
-    return formatInternalType(typeString, typeNamespace, abi)
+    return formatInternalType(typeString, typeNamespace, abi, decorator)
 }
 
 function formatInternalType(
     typeString: string,
-    namespace: string | undefined,
-    abi: ABI.Def
+    namespace = '',
+    abi: ABI.Def,
+    decorator = ''
 ): string {
     const structNames = abi.structs.map((struct) => struct.name.toLowerCase())
 
+    let type
+
     if (structNames.includes(typeString.toLowerCase())) {
-        return `${namespace ? `${namespace}` : ''}${generateStructClassName(typeString)}`
+        type = `${namespace}${generateStructClassName(typeString)}`
     } else {
-        return findCoreClass(typeString) || capitalize(typeString)
+        type = findCoreClass(typeString) || capitalize(typeString)
     }
+
+    return `${type}${decorator}`
 }
 
 export function generateStructClassName(name) {
@@ -213,9 +218,9 @@ export function findAbiType(
         typeString = aliasType
     }
 
-    const {type: extractedType} = extractDecorator(typeString)
-    const {decorator} = extractDecorator(typeString)
-    typeString = extractedType
+    const extractDecoratorResponse = extractDecorator(typeString)
+    typeString = extractDecoratorResponse.type
+    const decorator = extractDecoratorResponse.decorator
 
     const variantType = findVariantType(typeString, abi, typeNamespace, context)
 

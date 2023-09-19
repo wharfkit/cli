@@ -456,6 +456,35 @@ export namespace Types {
         @Struct.field(ExtendedSymbol, {array: true})
         supported_tokens!: ExtendedSymbol[]
     }
+    @Struct.type('pair_string_ATOMIC_ATTRIBUTE')
+    export class PairStringATOMICATTRIBUTE extends Struct {
+        @Struct.field('string')
+        key!: string
+        @Struct.field('any')
+        value!:
+            | Int8
+            | Int16
+            | Int32
+            | Int64
+            | UInt8
+            | UInt16
+            | UInt32
+            | UInt64
+            | Float32
+            | Float64
+            | string
+            | Bytes
+            | Int16[]
+            | Int32[]
+            | Int64[]
+            | UInt8[]
+            | UInt16[]
+            | UInt32[]
+            | UInt64[]
+            | Float32[]
+            | Float64[]
+            | string[]
+    }
     @Struct.type('createcol')
     export class Createcol extends Struct {
         @Struct.field(Name)
@@ -471,7 +500,7 @@ export namespace Types {
         @Struct.field(Float64)
         market_fee!: Float64
         @Struct.field(PairStringATOMICATTRIBUTE)
-        data!: PairStringATOMICATTRIBUTE
+        data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('createoffer')
     export class Createoffer extends Struct {
@@ -512,7 +541,7 @@ export namespace Types {
         @Struct.field(UInt32)
         max_supply!: UInt32
         @Struct.field(PairStringATOMICATTRIBUTE)
-        immutable_data!: PairStringATOMICATTRIBUTE
+        immutable_data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('declineoffer')
     export class Declineoffer extends Struct {
@@ -570,9 +599,9 @@ export namespace Types {
         @Struct.field(Asset, {array: true})
         backed_tokens!: Asset[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        old_immutable_data!: PairStringATOMICATTRIBUTE
+        old_immutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        old_mutable_data!: PairStringATOMICATTRIBUTE
+        old_mutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(Name)
         asset_ram_payer!: Name
     }
@@ -591,13 +620,13 @@ export namespace Types {
         @Struct.field(Name)
         new_asset_owner!: Name
         @Struct.field(PairStringATOMICATTRIBUTE)
-        immutable_data!: PairStringATOMICATTRIBUTE
+        immutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        mutable_data!: PairStringATOMICATTRIBUTE
+        mutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(Asset, {array: true})
         backed_tokens!: Asset[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        immutable_template_data!: PairStringATOMICATTRIBUTE
+        immutable_template_data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('lognewoffer')
     export class Lognewoffer extends Struct {
@@ -631,7 +660,7 @@ export namespace Types {
         @Struct.field(UInt32)
         max_supply!: UInt32
         @Struct.field(PairStringATOMICATTRIBUTE)
-        immutable_data!: PairStringATOMICATTRIBUTE
+        immutable_data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('logsetdata')
     export class Logsetdata extends Struct {
@@ -640,9 +669,9 @@ export namespace Types {
         @Struct.field(UInt64)
         asset_id!: UInt64
         @Struct.field(PairStringATOMICATTRIBUTE)
-        old_data!: PairStringATOMICATTRIBUTE
+        old_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        new_data!: PairStringATOMICATTRIBUTE
+        new_data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('logtransfer')
     export class Logtransfer extends Struct {
@@ -670,9 +699,9 @@ export namespace Types {
         @Struct.field(Name)
         new_asset_owner!: Name
         @Struct.field(PairStringATOMICATTRIBUTE)
-        immutable_data!: PairStringATOMICATTRIBUTE
+        immutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(PairStringATOMICATTRIBUTE)
-        mutable_data!: PairStringATOMICATTRIBUTE
+        mutable_data!: PairStringATOMICATTRIBUTE[]
         @Struct.field(Asset, {array: true})
         tokens_to_back!: Asset[]
     }
@@ -692,35 +721,6 @@ export namespace Types {
         memo!: string
         @Struct.field(Name)
         ram_payer!: Name
-    }
-    @Struct.type('pair_string_ATOMIC_ATTRIBUTE')
-    export class PairStringATOMICATTRIBUTE extends Struct {
-        @Struct.field('string')
-        key!: string
-        @Struct.field('any')
-        value!:
-            | Int8
-            | Int16
-            | Int32
-            | Int64
-            | UInt8
-            | UInt16
-            | UInt32
-            | UInt64
-            | Float32
-            | Float64
-            | string
-            | Bytes
-            | Int16
-            | Int32
-            | Int64
-            | UInt8
-            | UInt16
-            | UInt32
-            | UInt64
-            | Float32
-            | Float64
-            | string
     }
     @Struct.type('payofferram')
     export class Payofferram extends Struct {
@@ -759,14 +759,14 @@ export namespace Types {
         @Struct.field(UInt64)
         asset_id!: UInt64
         @Struct.field(PairStringATOMICATTRIBUTE)
-        new_mutable_data!: PairStringATOMICATTRIBUTE
+        new_mutable_data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('setcoldata')
     export class Setcoldata extends Struct {
         @Struct.field(Name)
         collection_name!: Name
         @Struct.field(PairStringATOMICATTRIBUTE)
-        data!: PairStringATOMICATTRIBUTE
+        data!: PairStringATOMICATTRIBUTE[]
     }
     @Struct.type('setmarketfee')
     export class Setmarketfee extends Struct {

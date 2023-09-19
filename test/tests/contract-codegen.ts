@@ -133,6 +133,6 @@ suite('codegen', async function () {
         }
     })
     teardown(() => {
-        removeCodegenContracts()
+        // removeCodegenContracts()
     })
 })
