@@ -66,7 +66,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
     const members: ts.ClassElement[] = []
 
     for (const field of struct.fields) {
-        members.push(generateField(field, null, abi))
+        members.push(generateField(field, undefined, abi))
     }
 
     return ts.factory.createClassDeclaration(
@@ -83,13 +83,13 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
                 ),
             ]),
         ], // heritageClauses
-        members // Pass the members array
+        members
     )
 }
 
 export function generateField(
     field: FieldType,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): ts.PropertyDeclaration {
     const fieldName = field.name.toLowerCase()
@@ -138,11 +138,26 @@ export function generateField(
         ),
     ]
 
-    let typeNode: ts.ArrayTypeNode | ts.TypeReferenceNode
+    let typeReferenceNode: ts.TypeReferenceNode | ts.UnionTypeNode
 
-    const typeReferenceNode = ts.factory.createTypeReferenceNode(
-        findFieldStructTypeString(field.type, namespace, abi)
-    )
+    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
+
+    if (structTypeString.includes(' | ')) {
+        typeReferenceNode = ts.factory.createUnionTypeNode(
+            structTypeString.split(' | ').map((type) => {
+                return ts.factory.createTypeReferenceNode(
+                    ts.factory.createIdentifier(type),
+                    undefined
+                )
+            })
+        )
+    } else {
+        typeReferenceNode = ts.factory.createTypeReferenceNode(
+            extractDecorator(structTypeString).type
+        )
+    }
+
+    let typeNode: ts.TypeNode
 
     if (isArray) {
         typeNode = ts.factory.createArrayTypeNode(typeReferenceNode)
@@ -181,25 +196,30 @@ function findDependencies(
 ): StructData[] {
     const dependencies: StructData[] = []
 
-    const structNames = allStructs.map((struct) => struct.structName)
-
     for (const field of struct.fields) {
-        let {type: fieldType} = extractDecorator(field.type)
+        const {type: fieldType} = extractDecorator(field.type)
 
-        fieldType = fieldType.toLowerCase()
-
-        const typeAlias = typeAliases.find(
-            (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType
+        let dependencyStruct = allStructs.find(
+            (struct) => struct.structName === fieldType.toLowerCase()
         )
 
-        if (!typeAlias && structNames.includes(fieldType)) {
-            const dependencyStruct = allStructs.find(
-                (struct) => struct.structName === fieldType.toLowerCase()
+        if (!dependencyStruct) {
+            const typeAlias = typeAliases.find(
+                (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType.toLowerCase()
             )
-            if (dependencyStruct) {
-                dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
-                dependencies.push(dependencyStruct)
-            }
+
+            const typeAliasString = typeAlias && extractDecorator(typeAlias.type).type
+
+            dependencyStruct = typeAliasString
+                ? allStructs.find(
+                      (struct) => struct.structName.toLowerCase() === typeAliasString.toLowerCase()
+                  )
+                : undefined
+        }
+
+        if (dependencyStruct) {
+            dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
+            dependencies.push(dependencyStruct)
         }
     }
 
@@ -208,10 +228,16 @@ function findDependencies(
 
 function findFieldStructType(
     typeString: string,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral {
-    const fieldTypeString = findFieldStructTypeString(typeString, namespace, abi)
+    const fieldTypeString = extractDecorator(
+        findFieldStructTypeString(typeString, namespace, abi)
+    ).type
+
+    if (fieldTypeString.includes(' | ')) {
+        return ts.factory.createIdentifier('Variant')
+    }
 
     if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
@@ -222,7 +248,7 @@ function findFieldStructType(
 
 function findFieldStructTypeString(
     typeString: string,
-    namespace: string | null,
+    namespace: string | undefined,
     abi: ABI.Def
 ): string {
     const fieldType = findInternalType(typeString, namespace, abi)

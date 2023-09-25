@@ -1,4 +1,4 @@
-import {Action, Name} from '@wharfkit/antelope'
+import {Action, Name, UInt64} from '@wharfkit/antelope'
 import {assert} from 'chai'
 
 import type {ActionDataType, Contract} from '@wharfkit/contract'
@@ -32,6 +32,13 @@ export function getMockParams(contract: Contract): ActionDataType {
             return {
                 account: 'foo',
                 weight: 1,
+            }
+        }
+        case 'atomicassets': {
+            return {
+                asset_id: '12345',
+                new_owner: 'new_owner_account',
+                offer_id: UInt64.from(54321),
             }
         }
         default: {

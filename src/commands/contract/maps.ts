@@ -7,7 +7,7 @@ export function generateTableMap(abi: ABI.Def): ts.VariableStatement {
     const tableProperties = abi.tables.map((table) =>
         ts.factory.createPropertyAssignment(
             JSON.stringify(table.name),
-            ts.factory.createIdentifier(findAbiType(table.type, abi, 'Types.') || table.type)
+            ts.factory.createIdentifier(findAbiType(table.type, abi, 'Types.')?.type || table.type)
         )
     )
 

@@ -3,7 +3,7 @@
         "path": "https://eos.greymass.com/v1/chain/get_table_rows",
         "params": {
             "method": "POST",
-            "body": "{\"table\":\"users\",\"code\":\"rewards.gm\",\"scope\":\"rewards.gm\",\"limit\":1,\"index_position\":\"primary\",\"key_type\":\"name\",\"json\":false}"
+            "body": "{\"table\":\"users\",\"code\":\"rewards.gm\",\"scope\":\"rewards.gm\",\"limit\":1,\"key_type\":\"name\",\"json\":false}"
         }
     },
     "status": 200,

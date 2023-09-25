@@ -10,6 +10,7 @@ import * as Eosio from '$test/data/contracts/mock-eosio'
 import * as EosioMsig from '$test/data/contracts/mock-eosio.msig'
 import * as EosioToken from '$test/data/contracts/mock-eosio.token'
 import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
+import * as AtomicAssets from '$test/data/contracts/mock-atomicassets'
 
 import {generateCodegenContract, removeCodegenContracts} from '$test/utils/codegen'
 import {runGenericContractTests} from './helpers/generic'
@@ -38,6 +39,10 @@ suite('codegen', async function () {
         },
         'rewards.gm': {
             mock: RewardsGm,
+            generated: null,
+        },
+        atomicassets: {
+            mock: AtomicAssets,
             generated: null,
         },
     }
