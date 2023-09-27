@@ -239,7 +239,7 @@ function findFieldStructType(
         return ts.factory.createIdentifier('Variant')
     }
 
-    if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
+    if (['string', 'boolean', 'number'].includes(fieldTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
     }
 

@@ -15,6 +15,8 @@ export const ANTELOPE_CLASS_MAPPINGS = {
 
 export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
+    const coreTypes: string[] = []
+
     for (const struct of abi.structs) {
         const structIsActionParams = !!abi.actions.find((action) => action.type === struct.name)
 
@@ -33,10 +35,16 @@ export function getCoreImports(abi: ABI.Def) {
 
             if (type.includes(' | ')) {
                 coreImports.push('Variant')
-            }
 
-            type.split(' | ').forEach((typeString) => {
-                const coreClass = findCoreClass(typeString)
+                type.split(' | ').forEach((typeString) => {
+                    const coreType = findCoreClass(typeString)
+
+                    if (coreType) {
+                        coreTypes.push(coreType)
+                    }
+                })
+            } else {
+                const coreClass = findCoreClass(type)
 
                 if (coreClass) {
                     coreImports.push(coreClass)
@@ -44,19 +52,24 @@ export function getCoreImports(abi: ABI.Def) {
 
                 // We don't need to add action types unless the struct is an action param
                 if (!structIsActionParams) {
-                    return
+                    continue
                 }
 
-                const coreType = findCoreType(typeString)
+                const coreType = findCoreType(type)
 
                 if (coreType) {
-                    coreImports.push(coreType)
+                    coreTypes.push(coreType)
                 }
-            })
+            }
         }
     }
 
-    return coreImports.filter((value, index, self) => self.indexOf(value) === index)
+    return {
+        classes: coreImports.filter((value, index, self) => self.indexOf(value) === index),
+        types: coreTypes
+            .filter((value, index, self) => self.indexOf(value) === index)
+            .filter((type) => !coreImports.includes(type)),
+    }
 }
 
 export function generateClassDeclaration(
@@ -92,11 +105,11 @@ export function generateClassDeclaration(
     return classDeclaration
 }
 
-export function generateImportStatement(classes, path): ts.ImportDeclaration {
+export function generateImportStatement(classes, path, type = false): ts.ImportDeclaration {
     return ts.factory.createImportDeclaration(
         undefined, // modifiers
         ts.factory.createImportClause(
-            false, // isTypeOnly
+            type, // isTypeOnly
             undefined, // name
             ts.factory.createNamedImports(
                 classes.map((className) =>
@@ -210,12 +223,16 @@ function findVariantType(
     return abiVariant.types
         .map((type) => {
             if (context === 'external') {
-                return findExternalType(type, typeNamespace, abi)
+                return parseVariantSubType(findExternalType(type, typeNamespace, abi))
             } else {
-                return findInternalType(type, typeNamespace, abi)
+                return parseVariantSubType(findInternalType(type, typeNamespace, abi))
             }
         })
         .join(' | ')
+}
+
+function parseVariantSubType(type: string): string {
+    return type.replace('String', 'string').replace('Number', 'number').replace('Bool', 'boolean')
 }
 
 export function findAbiType(
