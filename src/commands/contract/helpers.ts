@@ -146,7 +146,7 @@ export function findCoreClass(type: string): string | undefined {
         return ANTELOPE_CLASS_MAPPINGS[type]
     }
 
-    const parsedType = parseType(type).split('_').join('').toLowerCase()
+    const parsedType = parseType(trim(type)).split('_').join('').toLowerCase()
 
     return (
         ANTELOPE_CLASSES.find((antelopeClass) => parsedType === antelopeClass.toLowerCase()) ||
@@ -201,7 +201,7 @@ export function generateStructClassName(name) {
 }
 
 function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
-    const { type: typeStringWithoutDecorator, decorator } = extractDecorator(typeString)
+    const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
     const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
 
     return alias?.type && `${alias?.type}${decorator || ''}`
@@ -224,16 +224,12 @@ function findVariantType(
     return abiVariant.types
         .map((type) => {
             if (context === 'external') {
-                return parseVariantSubType(findExternalType(type, typeNamespace, abi))
+                return parseType(findExternalType(type, typeNamespace, abi))
             } else {
-                return parseVariantSubType(findInternalType(type, typeNamespace, abi))
+                return parseType(findInternalType(type, typeNamespace, abi))
             }
         })
         .join(' | ')
-}
-
-function parseVariantSubType(type: string): string {
-    return type.replace('String', 'string').replace('Number', 'number').replace('Bool', 'boolean')
 }
 
 export function findAbiType(
@@ -242,7 +238,7 @@ export function findAbiType(
     typeNamespace = '',
     context = 'internal'
 ): {type: string; decorator?: string} {
-    let typeString = parseType(type)
+    let typeString = parseType(trim(type))
 
     const aliasType = findAliasType(typeString, abi)
 
@@ -293,11 +289,33 @@ export function extractDecorator(type: string): {type: string; decorator?: strin
 }
 
 export function cleanupType(type: string): string {
-    return extractDecorator(parseType(type)).type
+    return extractDecorator(parseType(trim(type))).type
 }
 
 export function parseType(type: string): string {
-    return type.replace('$', '').split(' ').join('')
+    type = type.replace('$', '')
+
+    if (type === 'String') {
+        return 'string'
+    }
+
+    if (type === 'String[]') {
+        return 'string[]'
+    }
+
+    if (type === 'Boolean') {
+        return 'boolean'
+    }
+
+    if (type === 'Boolean[]') {
+        return 'boolean[]'
+    }
+
+    return type
+}
+
+function trim(string: string) {
+    return string.replace(/\s/g, '')
 }
 
 export function capitalize(string) {

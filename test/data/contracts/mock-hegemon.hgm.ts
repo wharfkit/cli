@@ -305,7 +305,7 @@ export namespace ActionParams {
     export interface Addterrain {
         id: UInt64Type
         type: string
-        map_asset_urls: String[]
+        map_asset_urls: string[]
         background_asset_url: string
         building_slots: UInt8Type
         effects: UInt64Type[]
@@ -708,8 +708,8 @@ export namespace Types {
         id!: UInt64
         @Struct.field('string')
         type!: string
-        @Struct.field('String', {array: true})
-        map_asset_urls!: String[]
+        @Struct.field('string', {array: true})
+        map_asset_urls!: string[]
         @Struct.field('string')
         background_asset_url!: string
         @Struct.field(UInt8)
@@ -1700,8 +1700,8 @@ export namespace Types {
         id!: UInt64
         @Struct.field('string')
         type!: string
-        @Struct.field('String', {array: true})
-        map_asset_urls!: String[]
+        @Struct.field('string', {array: true})
+        map_asset_urls!: string[]
         @Struct.field('string')
         background_asset_url!: string
         @Struct.field(UInt8)

@@ -49,7 +49,7 @@ suite('codegen', async function () {
         'hegemon.hgm': {
             mock: Hegemon,
             generated: null,
-        }
+        },
     }
 
     // Source code

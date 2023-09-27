@@ -45,7 +45,7 @@ export function getMockParams(contract: Contract): ActionDataType {
             return {
                 gameasset_id: UInt64.from(98765),
                 tile_id: UInt64.from(56789),
-                owner: 'owner_account_name'
+                owner: 'owner_account_name',
             }
         }
         default: {
