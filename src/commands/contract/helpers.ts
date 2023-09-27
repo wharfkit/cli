@@ -201,9 +201,10 @@ export function generateStructClassName(name) {
 }
 
 function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
-    const alias = abi.types.find((type) => type.new_type_name === typeString)
+    const { type: typeStringWithoutDecorator, decorator } = extractDecorator(typeString)
+    const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
 
-    return alias?.type
+    return alias?.type && `${alias?.type}${decorator || ''}`
 }
 
 function findVariantType(

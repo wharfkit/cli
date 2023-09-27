@@ -217,6 +217,14 @@ function findDependencies(
                 : undefined
         }
 
+        const alreadyIncluded = dependencies.some(
+            (struct) => struct.structName === dependencyStruct?.structName
+        )
+
+        if (alreadyIncluded || dependencyStruct?.structName === struct.structName) {
+            continue
+        }
+
         if (dependencyStruct) {
             dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
             dependencies.push(dependencyStruct)
