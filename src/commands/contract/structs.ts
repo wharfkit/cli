@@ -217,6 +217,14 @@ function findDependencies(
                 : undefined
         }
 
+        const alreadyIncluded = dependencies.some(
+            (struct) => struct.structName === dependencyStruct?.structName
+        )
+
+        if (alreadyIncluded || dependencyStruct?.structName === struct.structName) {
+            continue
+        }
+
         if (dependencyStruct) {
             dependencies.push(...findDependencies(dependencyStruct, allStructs, typeAliases))
             dependencies.push(dependencyStruct)
@@ -239,7 +247,7 @@ function findFieldStructType(
         return ts.factory.createIdentifier('Variant')
     }
 
-    if (['string', 'boolean', 'number'].includes(fieldTypeString)) {
+    if (['string', 'string[]', 'boolean', 'boolean[]'].includes(fieldTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
     }
 
@@ -265,7 +273,7 @@ function findFieldStructTypeString(
         return 'Asset.Symbol'
     }
 
-    return fieldType
+    return parseType(fieldType)
 }
 
 function formatFieldString(typeString: string): string {
@@ -273,5 +281,5 @@ function formatFieldString(typeString: string): string {
         return 'bool'
     }
 
-    return typeString
+    return parseType(typeString)
 }

@@ -41,6 +41,13 @@ export function getMockParams(contract: Contract): ActionDataType {
                 offer_id: UInt64.from(54321),
             }
         }
+        case 'hegemon.hgm': {
+            return {
+                gameasset_id: UInt64.from(98765),
+                tile_id: UInt64.from(56789),
+                owner: 'owner_account_name',
+            }
+        }
         default: {
             throw new Error(`getMockParams not implemented for ${contract.account}`)
         }

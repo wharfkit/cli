@@ -1,7 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
-import {findExternalType} from './helpers'
+import {findExternalType, parseType} from './helpers'
 import {getActionFieldFromAbi} from './structs'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
@@ -75,13 +75,17 @@ function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): 
         return 'Asset.SymbolType'
     }
 
+    if (fieldType === 'Symbol[]') {
+        return 'Asset.SymbolType[]'
+    }
+
+    if (fieldType === 'Bool[]') {
+        return 'boolean[]'
+    }
+
     if (fieldType === 'Bool') {
         return 'boolean'
     }
 
-    if (['String', 'Boolean', 'Number'].includes(fieldType)) {
-        return fieldType.toLowerCase()
-    }
-
-    return fieldType
+    return parseType(fieldType)
 }

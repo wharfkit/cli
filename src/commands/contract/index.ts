@@ -1,4 +1,3 @@
-import {ESLint} from 'eslint'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 import * as fs from 'fs'
@@ -66,27 +65,31 @@ export async function generateContractFromCommand(contractName, {url, file, json
 
 export async function generateContract(contractName, abi) {
     try {
-        const allAntelopeImports = [
-            'ABI',
-            'Action',
-            'Blob',
-            'Struct',
-            'Name',
-            ...getCoreImports(abi),
-        ]
-        const antelopeImports = allAntelopeImports.filter(
-            (item, index) => allAntelopeImports.indexOf(item) === index
+        const {classes, types} = getCoreImports(abi)
+
+        const allAntelopeTypeImports = ['Action', ...types]
+
+        const importAntelopeTypesStatement = generateImportStatement(
+            cleanupImports(allAntelopeTypeImports),
+            '@wharfkit/antelope',
+            true
         )
 
-        antelopeImports.sort()
+        const allAntelopeClassImports = ['ABI', 'Blob', 'Struct', 'Name', ...classes]
 
-        const importAntelopeStatement = generateImportStatement(
-            antelopeImports,
+        const importAntelopeClassesStatement = generateImportStatement(
+            cleanupImports(allAntelopeClassImports),
             '@wharfkit/antelope'
         )
 
-        const importContractStatement = generateImportStatement(
-            ['ActionOptions', 'Contract as BaseContract', 'ContractArgs', 'PartialBy'],
+        const importContractTypesStatement = generateImportStatement(
+            ['ActionOptions', 'ContractArgs', 'PartialBy'],
+            '@wharfkit/contract',
+            true
+        )
+
+        const importContractClassStatement = generateImportStatement(
+            ['Contract as BaseContract'],
             '@wharfkit/contract'
         )
 
@@ -152,8 +155,10 @@ export async function generateContract(contractName, abi) {
 
         const sourceFile = ts.factory.createSourceFile(
             [
-                importAntelopeStatement,
-                importContractStatement,
+                importAntelopeTypesStatement,
+                importAntelopeClassesStatement,
+                importContractTypesStatement,
+                importContractClassStatement,
                 abiBlobField,
                 abiField,
                 classDeclaration,
@@ -166,10 +171,7 @@ export async function generateContract(contractName, abi) {
             ts.NodeFlags.None
         )
 
-        const lintedCode = await runLint(printer.printFile(sourceFile))
-        const formattedCode = runPrettier(lintedCode)
-
-        return formattedCode
+        return runPrettier(printer.printFile(sourceFile))
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
@@ -185,33 +187,6 @@ function log(message, level: logLevel = 'debug') {
     }
 }
 
-async function runLint(codeText: string) {
-    const eslint = new ESLint({
-        fix: true,
-        useEslintrc: false,
-        overrideConfig: {
-            extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-            plugins: ['@typescript-eslint'],
-            rules: {
-                '@typescript-eslint/consistent-type-imports': 'error',
-            },
-            parser: '@typescript-eslint/parser',
-            parserOptions: {
-                ecmaVersion: 2021,
-                sourceType: 'module',
-            },
-            env: {
-                es2022: true,
-                node: true,
-            },
-        },
-    })
-
-    const formattedCode = await eslint.lintText(codeText)
-
-    return formattedCode[0].output
-}
-
 function runPrettier(codeText: string) {
     return prettier.format(codeText, {
         arrowParens: 'always',
@@ -224,4 +199,12 @@ function runPrettier(codeText: string) {
         trailingComma: 'es5',
         parser: 'typescript',
     })
+}
+
+function cleanupImports(imports: string[]) {
+    imports = imports.filter((item, index) => imports.indexOf(item) === index)
+
+    imports.sort()
+
+    return imports
 }
