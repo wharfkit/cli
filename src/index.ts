@@ -19,13 +19,13 @@ program
 program
     .command('account')
     .description('Create a new account with an optional public key')
-    .option('-c, --chain <chain>', 'The chain to create the account on. Defaults to "jungle4".')
+    .option('-c, --chain [chain]', 'The chain to create the account on. Defaults to "jungle4".')
     .option(
-        '-n, --name <accountName>',
+        '-n, --name [name]',
         'Account name for the new account. Must end with ".gm". If not provided, a random name is generated.'
     )
     .option(
-        '-k, --key <publicKey>',
+        '-k, --key [key]',
         'Public key for the new account. If not provided, keys are generated.'
     )
     .action(createAccountFromCommand)

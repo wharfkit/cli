@@ -1,10 +1,11 @@
+import type {PublicKeyType} from '@wharfkit/antelope'
 import {APIClient, KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
 import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
 import {log} from '../../utils'
 
 interface CommandOptions {
-    publicKey?: string
-    accountName?: NameType
+    key?: PublicKeyType
+    name?: NameType
     chain?: ChainIndices
 }
 
@@ -30,25 +31,23 @@ export async function createAccountFromCommand(options: CommandOptions) {
     // Default to "jungle4" if no chain option is provided
     const chainUrl = `http://${chainIndex.toLowerCase()}.greymass.com`
 
-    if (options.accountName) {
-        if (!String(options.accountName).endsWith('.gm')) {
+    if (options.name) {
+        if (!String(options.name).endsWith('.gm')) {
             log('Account name must end with ".gm"', 'info')
             return
         }
 
-        if (
-            options.accountName &&
-            (String(options.accountName).length > 12 || String(options.accountName).length < 3)
-        ) {
+        if (options.name && (String(options.name).length > 12 || String(options.name).length < 3)) {
             log('Account name must be between 3 and 12 characters long', 'info')
             return
         }
 
-        const accountNameExists = await checkAccountNameExists(options.accountName, chainUrl)
+        const accountNameExists =
+            options.name && (await checkAccountNameExists(options.name, chainUrl))
 
         if (accountNameExists) {
             log(
-                `Account name "${options.accountName}" is already taken. Please choose another name.`,
+                `Account name "${options.name}" is already taken. Please choose another name.`,
                 'info'
             )
             return
@@ -56,12 +55,12 @@ export async function createAccountFromCommand(options: CommandOptions) {
     }
 
     // Generate a random account name if not provided
-    const accountName = options.accountName || generateRandomAccountName()
+    const accountName = options.name || generateRandomAccountName()
 
     try {
         // Check if a public key is provided in the options
-        if (options.publicKey) {
-            publicKey = options.publicKey
+        if (options.key) {
+            publicKey = String(options.key)
         } else {
             // Generate a new private key if none is provided
             privateKey = PrivateKey.generate(KeyType.K1)
