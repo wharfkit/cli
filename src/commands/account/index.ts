@@ -1,4 +1,4 @@
-import {APIClient, KeyType, PrivateKey, type NameType} from '@wharfkit/antelope'
+import {APIClient, KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
 import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
 import {log} from '../../utils'
 
