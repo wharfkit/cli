@@ -1,7 +1,9 @@
 import type {PublicKeyType} from '@wharfkit/antelope'
-import {APIClient, KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
+import {KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
 import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
-import {log} from '../../utils'
+import fetch from 'node-fetch'
+
+import {log, makeClient} from '../../utils'
 
 interface CommandOptions {
     key?: PublicKeyType
@@ -113,7 +115,7 @@ function generateRandomAccountName(): string {
 }
 
 async function checkAccountNameExists(accountName: NameType, chainUrl: string): Promise<boolean> {
-    const client = new APIClient({url: chainUrl})
+    const client = makeClient(chainUrl)
 
     try {
         const account = await client.v1.chain.get_account(accountName)

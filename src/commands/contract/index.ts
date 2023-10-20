@@ -2,16 +2,16 @@ import * as prettier from 'prettier'
 import * as ts from 'typescript'
 import * as fs from 'fs'
 
+import type {ABIDef} from '@wharfkit/antelope'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
+
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
-import type {ABIDef} from '@wharfkit/antelope'
-import {APIClient} from '@wharfkit/antelope'
-import {log} from '../../utils'
+import {log, makeClient} from '../../utils'
 
 const printer = ts.createPrinter()
 
@@ -34,9 +34,8 @@ export async function generateContractFromCommand(contractName, {url, file, json
         log(`Fetching ABI for ${contractName}...`)
     }
 
-    const apiClient = new APIClient({url})
     const contractKit = new ContractKit(
-        {client: apiClient},
+        {client: makeClient(url)},
         {
             abis: abi
                 ? [
