@@ -2,8 +2,8 @@ import { Command } from 'commander';
 
 import { version } from '../package.json';
 import { generateContractFromCommand } from './commands/contract';
-import { generateKeysFromCommand } from './commands/keys';
-import { createAccountFromCommand } from './commands/account';
+import { generateKeysFromCommand } from './commands/keys/index';
+import { createAccountFromCommand } from './commands/account/index';
 
 const program = new Command();
 
@@ -14,16 +14,18 @@ program
 
 // 1. Command to generate keys
 program
-    .command('generate keys')
+    .command('generate-keys')
     .description('Generate a new set of public and private keys')
-    .action(createAccountFromCommand);
+    .action(generateKeysFromCommand);
 
 // 2. Command to create an account
 program
-    .command('create account')
+    .command('make-account')
     .description('Create a new account with an optional public key')
+    .option('--chain <chain>', 'The chain to create the account on. Defaults to "jungle4".')
+    .option('--account-name <accountName>', 'Account name for the new account. Must end with ".gm". If not provided, a random name is generated.')
     .option('--public-key <publicKey>', 'Public key for the new account. If not provided, keys are generated.')
-    .action(generateKeysFromCommand);
+    .action(createAccountFromCommand);
 
 // 3. Existing command to generate a contract
 program

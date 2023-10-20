@@ -1,8 +1,27 @@
-import { Bytes, KeyType, PrivateKey } from "@wharfkit/antelope";
+import { PrivateKey, KeyType } from '@wharfkit/antelope';
+import { Chains, type ChainIndices } from '@wharfkit/common';
 
-export async function createAccountFromCommand(options: any) {
+
+interface CommandOptions {
+    publicKey?: string;
+    accountName?: string;
+    chain?: ChainIndices;
+}
+
+export async function createAccountFromCommand(options: CommandOptions) {
     let publicKey;
     let privateKey;
+
+    // Generate a random account name if not provided
+    const accountName = options.accountName || generateRandomAccountName();
+
+    if (!accountName.endsWith('.gm')) {
+        console.error('Account name must end with ".gm"');
+        return;
+    }
+
+    // Default to "jungle4" if no chain option is provided
+    const chainUrl = `http://${options.chain?.toLowerCase() || "jungle4"}.greymass.com`;
 
     try {
         // Check if a public key is provided in the options
@@ -12,41 +31,35 @@ export async function createAccountFromCommand(options: any) {
             // Generate a new private key if none is provided
             privateKey = PrivateKey.generate(KeyType.K1);
             // Derive the corresponding public key
-            publicKey = privateKey.toPublicKey().toString();
+            publicKey = String(privateKey.toPublic());
         }
 
-        // Prepare the data for the POST request to Sextant
+        // Prepare the data for the POST request
         const data = {
-            account: 'eosio',
-            permission: 'active',
-            public_key: publicKey
+            accountName: accountName,
+            activeKey: publicKey,
+            ownerKey: publicKey,
+            network: (options.chain && Chains[options.chain]) || "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d"
         };
 
-        // Convert the data object to a Buffer
-        const requestBodyInBytes = Buffer.from(JSON.stringify(data), 'utf8');
-
-        // Generate the signature for the request body
-        const signature = generateSignatureForBody(requestBodyInBytes);
-
-        // Make the POST request to Sextant to create the account
-        const response = await fetch(`${SEXTANT_URL}/v1/chain/account`, {
+        // Make the POST request to create the account
+        const response = await fetch(`${chainUrl}/account/create`, {
             method: 'POST',
             headers: {
-                'X-Request-Sig': signature,
                 'Content-Type': 'application/json',
             },
-            body: requestBodyInBytes.toString('utf8'),
+            body: JSON.stringify(data),
         });
 
-        const responseData = await response.json();
-
-        if (responseData.success) {
+        if (response.status === 201) {
             console.log('Account created successfully!');
+            console.log(`Account Name: ${accountName}`)
             if (privateKey) { // Only print the private key if it was generated
                 console.log(`Private Key: ${privateKey.toString()}`);
             }
             console.log(`Public Key: ${publicKey}`);
         } else {
+            const responseData = await response.json();
             console.error('Failed to create account:', responseData.message || responseData.reason);
         }
     } catch (error: unknown) {
@@ -54,16 +67,12 @@ export async function createAccountFromCommand(options: any) {
     }
 }
 
-function generateSignatureForBody(bodyBytes) {
-    if (!SEXTANT_KEY_PADDING) {
-        throw Error('Missing Sextant API key.');
+function generateRandomAccountName(): string {
+    // Generate a random 12-character account name using the allowed characters for EOSIO
+    const characters = 'abcdefghijklmnopqrstuvwxyz12345';
+    let result = '';
+    for (let i = 0; i < 9; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-
-    const deobfuscated = SEXTANT_KEY_PADDING.split(', ')
-        .slice(4)
-        .map((b, i) => b ^ (42 * i));
-
-    const privateKey = new PrivateKey(KeyType.K1, Bytes.from(deobfuscated));
-
-    return privateKey.signMessage(bodyBytes).toString();
+    return `${result}.gm`;
 }
