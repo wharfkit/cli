@@ -1,27 +1,51 @@
-import { PrivateKey, KeyType } from '@wharfkit/antelope';
-import { Chains, type ChainIndices } from '@wharfkit/common';
+import { PrivateKey, KeyType, NameType, APIClient } from '@wharfkit/antelope';
+import { Chains, type ChainIndices, type ChainDefinition } from '@wharfkit/common';
 
 
 interface CommandOptions {
     publicKey?: string;
-    accountName?: string;
+    accountName?: NameType;
     chain?: ChainIndices;
 }
+
+const supportedChains = ['Jungle4']
 
 export async function createAccountFromCommand(options: CommandOptions) {
     let publicKey;
     let privateKey;
 
-    // Generate a random account name if not provided
-    const accountName = options.accountName || generateRandomAccountName();
-
-    if (!accountName.endsWith('.gm')) {
-        console.error('Account name must end with ".gm"');
+    if (options.chain && !supportedChains.includes(options.chain)) {
+        console.error(`Unsupported chain "${options.chain}". Supported chains are: ${supportedChains.join(', ')}`);
         return;
     }
 
+    const chainIndex: ChainIndices = options.chain || 'Jungle4';
+    const chainDefinition: ChainDefinition = Chains[chainIndex];
+
     // Default to "jungle4" if no chain option is provided
-    const chainUrl = `http://${options.chain?.toLowerCase() || "jungle4"}.greymass.com`;
+    const chainUrl = `http://${chainIndex.toLowerCase()}.greymass.com`;
+
+    if (options.accountName) {
+        if (!String(options.accountName).endsWith('.gm')) {
+            console.error('Account name must end with ".gm"');
+            return;
+        }
+    
+        if (options.accountName && (String(options.accountName).length > 12 || String(options.accountName).length < 3)) {
+            console.error('Account name must be between 3 and 12 characters long');
+            return;
+        }
+
+        const accountNameExists = await checkAccountNameExists(options.accountName, chainUrl);
+
+        if (accountNameExists) {
+            console.error(`Account name "${options.accountName}" is already taken. Please choose another name.`);
+            return;
+        }
+    }
+
+    // Generate a random account name if not provided
+    const accountName = options.accountName || generateRandomAccountName();
 
     try {
         // Check if a public key is provided in the options
@@ -39,7 +63,7 @@ export async function createAccountFromCommand(options: CommandOptions) {
             accountName: accountName,
             activeKey: publicKey,
             ownerKey: publicKey,
-            network: (options.chain && Chains[options.chain]) || "73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d"
+            network: chainDefinition.id,
         };
 
         // Make the POST request to create the account
@@ -68,11 +92,31 @@ export async function createAccountFromCommand(options: CommandOptions) {
 }
 
 function generateRandomAccountName(): string {
-    // Generate a random 12-character account name using the allowed characters for EOSIO
+    // Generate a random 12-character account name using the allowed characters for Antelope accounts
     const characters = 'abcdefghijklmnopqrstuvwxyz12345';
     let result = '';
     for (let i = 0; i < 9; i++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return `${result}.gm`;
+}
+
+
+
+async function checkAccountNameExists(accountName: NameType, chainUrl: string): Promise<boolean> {
+    const client = new APIClient({ url: chainUrl });
+
+    try {
+        const account = await client.v1.chain.get_account(accountName);
+
+        return !!account?.account_name;
+    } catch (error: unknown) {
+        const errorMessage = (error as { message: string }).message;
+
+        if (errorMessage.includes('Account not found')) {
+            return false;
+        }
+        
+        throw Error(`Error checking if account name exists: ${errorMessage}`);
+    }
 }

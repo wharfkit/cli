@@ -20,7 +20,7 @@ program
 
 // 2. Command to create an account
 program
-    .command('make-account')
+    .command('create-account')
     .description('Create a new account with an optional public key')
     .option('--chain <chain>', 'The chain to create the account on. Defaults to "jungle4".')
     .option('--account-name <accountName>', 'Account name for the new account. Must end with ".gm". If not provided, a random name is generated.')
