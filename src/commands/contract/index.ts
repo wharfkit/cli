@@ -11,6 +11,7 @@ import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
 import type {ABIDef} from '@wharfkit/antelope'
 import {APIClient} from '@wharfkit/antelope'
+import {log} from '../../utils'
 
 const printer = ts.createPrinter()
 
@@ -176,14 +177,6 @@ export async function generateContract(contractName, abi) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
         throw e
-    }
-}
-
-type logLevel = 'info' | 'debug'
-
-function log(message, level: logLevel = 'debug') {
-    if (level === 'info' || process.env.WHARFKIT_DEBUG) {
-        process.stdout.write(`${message}\n`)
     }
 }
 
