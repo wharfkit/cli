@@ -11,21 +11,21 @@ program.version(version).name('wharfkit').description('Wharf Command Line Utilit
 
 // 1. Command to generate keys
 program
-    .command('generate-keys')
+    .command('keys')
     .description('Generate a new set of public and private keys')
     .action(generateKeysFromCommand)
 
 // 2. Command to create an account
 program
-    .command('create-account')
+    .command('account')
     .description('Create a new account with an optional public key')
-    .option('--chain <chain>', 'The chain to create the account on. Defaults to "jungle4".')
+    .option('-c, --chain <chain>', 'The chain to create the account on. Defaults to "jungle4".')
     .option(
-        '--account-name <accountName>',
+        '-n, --name <accountName>',
         'Account name for the new account. Must end with ".gm". If not provided, a random name is generated.'
     )
     .option(
-        '--public-key <publicKey>',
+        '-k, --key <publicKey>',
         'Public key for the new account. If not provided, keys are generated.'
     )
     .action(createAccountFromCommand)
