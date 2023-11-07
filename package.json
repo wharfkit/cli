@@ -25,16 +25,16 @@
         "url": "https://github.com/wharfkit/cli/issues"
     },
     "dependencies": {
-        "@wharfkit/antelope": "^0.9.1",
-        "@wharfkit/common": "^1.1.0",
-        "@wharfkit/contract": "^0.4.3",
+        "@wharfkit/antelope": "^1.0.0",
+        "@wharfkit/common": "^1.2.0",
+        "@wharfkit/contract": "^1.0.0",
         "commander": "^11.0.0",
         "node-fetch": "^2.6.1",
         "prettier": "^2.2.1",
         "typescript": "^4.9.5"
     },
     "resolutions": {
-        "@wharfkit/antelope": "^0.9.1"
+        "@wharfkit/antelope": "^1.0.0"
     },
     "devDependencies": {
         "@babel/core": "^7.22.10",
