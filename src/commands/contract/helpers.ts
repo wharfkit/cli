@@ -1,6 +1,7 @@
 import * as Antelope from '@wharfkit/antelope'
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
+import {capitalizeName} from '../../utils'
 
 const ANTELOPE_CLASSES: string[] = []
 Object.keys(Antelope).map((key) => {
@@ -185,19 +186,12 @@ function formatInternalType(
     let type
 
     if (structNames.includes(typeString.toLowerCase())) {
-        type = `${namespace}${generateStructClassName(typeString)}`
+        type = `${namespace}${capitalizeName(typeString)}`
     } else {
         type = findCoreClass(typeString) || capitalize(typeString)
     }
 
     return `${type}${decorator}`
-}
-
-export function generateStructClassName(name) {
-    return name
-        .split('_')
-        .map((word) => capitalize(word))
-        .join('')
 }
 
 function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
@@ -259,7 +253,7 @@ export function findAbiType(
     const abiType = abi.structs.find((abiType) => abiType.name === typeString)?.name
 
     if (abiType) {
-        return {type: `${typeNamespace}${generateStructClassName(abiType)}`, decorator}
+        return {type: `${typeNamespace}${capitalizeName(abiType)}`, decorator}
     }
 
     return {type: typeString, decorator}

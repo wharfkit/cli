@@ -1,7 +1,8 @@
 import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
-import {extractDecorator, findInternalType, generateStructClassName, parseType} from './helpers'
+import {extractDecorator, findInternalType, parseType} from './helpers'
+import {capitalizeName} from '../../utils'
 
 interface FieldType {
     name: string
@@ -73,7 +74,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
         isExport
             ? [...decorators, ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
             : decorators,
-        ts.factory.createIdentifier(generateStructClassName(struct.structName)),
+        ts.factory.createIdentifier(capitalizeName(struct.structName)),
         undefined, // typeParameters
         [
             ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
