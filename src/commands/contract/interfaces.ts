@@ -1,18 +1,20 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
-import {capitalize} from '@wharfkit/contract'
 import {findExternalType, parseType} from './helpers'
 import {getActionFieldFromAbi} from './structs'
+import {capitalizeName} from '../../utils'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
     const members = abi.actions.map((action) => {
         const actionName = String(action.name)
-        const actionNameCapitalized = capitalize(actionName)
+        const actionNameKey = actionName.includes('.') ? `'${actionName}'` : actionName
+
+        const actionNameCapitalized = capitalizeName(actionName)
 
         return ts.factory.createPropertySignature(
             undefined,
-            actionName,
+            actionNameKey,
             undefined,
             ts.factory.createTypeReferenceNode(`ActionParams.${actionNameCapitalized}`)
         )
@@ -43,7 +45,7 @@ export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclarat
 
     return ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        capitalize(actionStruct.structName),
+        capitalizeName(actionStruct.structName),
         undefined,
         undefined,
         members
