@@ -196,6 +196,8 @@ function runPrettier(codeText: string) {
 function cleanupImports(imports: string[]) {
     imports = imports.filter((item, index) => imports.indexOf(item) === index)
 
+    console.log({ imports })
+
     imports.sort()
 
     return imports

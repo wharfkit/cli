@@ -149,6 +149,10 @@ export function findCoreClass(type: string): string | undefined {
 
     const parsedType = parseType(trim(type)).split('_').join('').toLowerCase()
 
+    if (parsedType === 'symbol') {
+        return 'Asset'
+    }
+
     return (
         ANTELOPE_CLASSES.find((antelopeClass) => parsedType === antelopeClass.toLowerCase()) ||
         ANTELOPE_CLASSES.find(
