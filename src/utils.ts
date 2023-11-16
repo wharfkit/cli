@@ -21,3 +21,9 @@ export function capitalizeName(text: string) {
         .map((part) => capitalize(part))
         .join('')
 }
+
+export function formatClassName(name: string) {
+    return name
+        .split(/[._]/)
+        .join('')
+}

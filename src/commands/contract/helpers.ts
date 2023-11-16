@@ -1,7 +1,7 @@
 import * as Antelope from '@wharfkit/antelope'
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
-import {capitalizeName} from '../../utils'
+import {capitalizeName, formatClassName} from '../../utils'
 
 const ANTELOPE_CLASSES: string[] = []
 Object.keys(Antelope).map((key) => {
@@ -190,7 +190,7 @@ function formatInternalType(
     let type
 
     if (structNames.includes(typeString.toLowerCase())) {
-        type = `${namespace}${capitalizeName(typeString)}`
+        type = `${namespace}${formatClassName(typeString)}`
     } else {
         type = findCoreClass(typeString) || capitalize(typeString)
     }
