@@ -201,19 +201,19 @@ function findDependencies(
         const {type: fieldType} = extractDecorator(field.type)
 
         let dependencyStruct = allStructs.find(
-            (struct) => struct.structName === fieldType.toLowerCase()
+            (struct) => struct.structName === fieldType
         )
 
         if (!dependencyStruct) {
             const typeAlias = typeAliases.find(
-                (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType.toLowerCase()
+                (typeAlias) => typeAlias.new_type_name === fieldType
             )
 
             const typeAliasString = typeAlias && extractDecorator(typeAlias.type).type
 
             dependencyStruct = typeAliasString
                 ? allStructs.find(
-                      (struct) => struct.structName.toLowerCase() === typeAliasString.toLowerCase()
+                      (struct) => struct.structName === typeAliasString
                   )
                 : undefined
         }
