@@ -16,7 +16,7 @@ export function generateTableMap(abi: ABI.Def): ts.VariableStatement {
 
     // Declare the variable
     return ts.factory.createVariableStatement(
-        undefined,
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createVariableDeclarationList(
             [
                 ts.factory.createVariableDeclaration(
