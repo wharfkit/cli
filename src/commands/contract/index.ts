@@ -93,7 +93,7 @@ export async function generateContract(contractName, abi) {
             '@wharfkit/contract'
         )
 
-        const {classDeclaration} = await generateContractClass(contractName, abi)
+        const {classDeclaration, actionsTypeAlias, tablesTypeAlias} = await generateContractClass(contractName, abi)
 
         const actionNamesInterface = generateActionNamesInterface(abi)
 
@@ -161,6 +161,8 @@ export async function generateContract(contractName, abi) {
                 importContractClassStatement,
                 abiBlobField,
                 abiField,
+                actionsTypeAlias,
+                tablesTypeAlias,
                 classDeclaration,
                 actionNamesInterface,
                 actionsNamespace,
