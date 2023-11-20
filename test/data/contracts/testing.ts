@@ -13,8 +13,8 @@ export class Contract extends BaseContract {
             account: Name.from('eosio'),
         })
     }
-    table<T extends keyof TableType>(name: NameType, scope?: NameType): Table<TableType[T]> {
-        return super.table<TableType[T]>(name, scope, TableMap[name as string])
+    table<T extends keyof typeof TableMap>(name: T, scope?: NameType): Table<(typeof TableMap)[T]> {
+        return super.table<(typeof TableMap)[T]>(name, scope, TableMap[name])
     }
 }
 
@@ -28,9 +28,6 @@ export namespace Types {
     }
 }
 
-interface TableType {
-    abihash: Types.abi_hash
-}
 const TableMap = {
     abihash: Types.abi_hash,
 }
