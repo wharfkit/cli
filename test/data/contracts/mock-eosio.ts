@@ -43,6 +43,34 @@ export const abi = ABI.from(abiBlob)
 
 type RowType<T> = T extends keyof TableType ? TableType[T] : any;
 
+type tables =
+| 'abihash'
+| 'bidrefunds'
+| 'blockinfo'
+| 'cpuloan'
+| 'delband'
+| 'global'
+| 'global2'
+| 'global3'
+| 'global4'
+| 'namebids'
+| 'netloan'
+| 'powup.order'
+| 'powup.state'
+| 'producers'
+| 'producers2'
+| 'rammarket'
+| 'refunds'
+| 'retbuckets'
+| 'rexbal'
+| 'rexfund'
+| 'rexpool'
+| 'rexqueue'
+| 'rexretpool'
+| 'userres'
+| 'voters'
+| 'limitauthchg'
+
 export class Contract extends BaseContract {
     constructor(args: PartialBy<ContractArgs, 'abi' | 'account'>) {
         super({
@@ -119,33 +147,7 @@ export class Contract extends BaseContract {
         return super.action(name, data, options)
     }
     table<
-        T extends
-            | 'abihash'
-            | 'bidrefunds'
-            | 'blockinfo'
-            | 'cpuloan'
-            | 'delband'
-            | 'global'
-            | 'global2'
-            | 'global3'
-            | 'global4'
-            | 'namebids'
-            | 'netloan'
-            | 'powup.order'
-            | 'powup.state'
-            | 'producers'
-            | 'producers2'
-            | 'rammarket'
-            | 'refunds'
-            | 'retbuckets'
-            | 'rexbal'
-            | 'rexfund'
-            | 'rexpool'
-            | 'rexqueue'
-            | 'rexretpool'
-            | 'userres'
-            | 'voters'
-            | 'limitauthchg'
+        T extends tables  
     >(name: T, scope?: NameType) {
         return super.table<RowType<T>>(name, scope, TableMap[name])
     }
@@ -1527,6 +1529,8 @@ interface TableType {
     producers: Types.producer_info
     producers2: Types.producer_info2
     rammarket: Types.exchange_state
+    'powup.order': Types.powerup_order
+    'powup.state': Types.powerup_state
     refunds: Types.refund_request
     retbuckets: Types.rex_return_buckets
     rexbal: Types.rex_balance
