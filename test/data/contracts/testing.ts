@@ -13,8 +13,8 @@ export class Contract extends BaseContract {
             account: Name.from('eosio'),
         })
     }
-    table<T extends keyof typeof TableMap>(name: T, scope?: NameType): Table<(typeof TableMap)[T]> {
-        return super.table<(typeof TableMap)[T]>(name, scope, TableMap[name])
+    table(name: NameType, scope?: NameType) {
+        return super.table<Types.abi_hash>(name, scope, Types.abi_hash) as Table<Types.abi_hash>
     }
 }
 
@@ -26,10 +26,6 @@ export namespace Types {
         @Struct.field(Checksum256)
         hash!: Checksum256
     }
-}
-
-const TableMap = {
-    abihash: Types.abi_hash,
 }
 
 const contract = new Contract({client: new APIClient({url: 'https://eos.greymass.com'})})
