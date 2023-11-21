@@ -27,7 +27,7 @@
     "dependencies": {
         "@wharfkit/antelope": "^1.0.0",
         "@wharfkit/common": "^1.2.0",
-        "@wharfkit/contract": "^1.0.0",
+        "@wharfkit/contract": "^1.1.0-rc1",
         "commander": "^11.0.0",
         "node-fetch": "^2.6.1",
         "prettier": "^2.2.1",
