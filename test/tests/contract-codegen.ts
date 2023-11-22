@@ -14,6 +14,11 @@ import * as AtomicAssets from '$test/data/contracts/mock-atomicassets'
 import * as Hegemon from '$test/data/contracts/mock-hegemon.hgm'
 import * as Boid from '$test/data/contracts/mock-boid'
 
+const contract = new Eosio.Contract({ client: makeClient('https://eos.greymass.com') })
+contract.table('blockinfo').get().then((data) => {
+    console.log(data)
+})
+
 import {generateCodegenContract, removeCodegenContracts} from '$test/utils/codegen'
 import {runGenericContractTests} from './helpers/generic'
 

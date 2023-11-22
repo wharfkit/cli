@@ -59,11 +59,7 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
         export: true,
     })
 
-    const actionsTypeAlias = generateActionsTypeAlias(abi)
-
-    const tablesTypeAlias = generateTablesTypeAlias(abi)
-
-    return {classDeclaration, actionsTypeAlias, tablesTypeAlias}
+    return {classDeclaration}
 }
 
 function generateConstructorFunction(contractName): ts.ExpressionStatement {
@@ -222,36 +218,4 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
         undefined,
         methodBody
     )
-}
-
-export function generateActionsTypeAlias(abi: ABI.Def): ts.TypeAliasDeclaration {
-    const unionType = ts.factory.createUnionTypeNode(
-        abi.actions.map((action) =>
-            ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(String(action.name)))
-        )
-    );
-
-    return ts.factory.createTypeAliasDeclaration(
-        undefined, // decorators
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        'actions', // name
-        undefined, // type parameters
-        unionType // type
-    );
-}
-
-export function generateTablesTypeAlias(abi: ABI.Def): ts.TypeAliasDeclaration {
-    const unionType = ts.factory.createUnionTypeNode(
-        abi.tables.map((table) =>
-            ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(String(table.name)))
-        )
-    );
-
-    return ts.factory.createTypeAliasDeclaration(
-        undefined, // decorators
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        'tables', // name
-        undefined, // type parameters
-        unionType // type
-    );
 }

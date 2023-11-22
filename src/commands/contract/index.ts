@@ -8,10 +8,11 @@ import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
-import {generateTableMap} from './maps'
+import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
 import {log, makeClient} from '../../utils'
+import { generateActionsTypeAlias, generateRowType, generateTablesTypeAlias } from './types'
 
 const printer = ts.createPrinter()
 
@@ -93,7 +94,7 @@ export async function generateContract(contractName, abi) {
             '@wharfkit/contract'
         )
 
-        const {classDeclaration, actionsTypeAlias, tablesTypeAlias} = await generateContractClass(contractName, abi)
+        const {classDeclaration} = await generateContractClass(contractName, abi)
 
         const actionNamesInterface = generateActionNamesInterface(abi)
 
@@ -152,6 +153,11 @@ export async function generateContract(contractName, abi) {
         )
 
         const tableMap = generateTableMap(abi)
+        const tableTypes = generateTableTypesInterface(abi)
+        
+        const tablesTypeAlias = generateTablesTypeAlias()
+        const actionsTypeAlias = generateActionsTypeAlias()
+        const rowTypeAlias = generateRowType()
 
         const sourceFile = ts.factory.createSourceFile(
             [
@@ -168,6 +174,8 @@ export async function generateContract(contractName, abi) {
                 actionsNamespace,
                 generateNamespace('Types', structDeclarations),
                 tableMap,
+                tableTypes,
+                rowTypeAlias,
             ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None

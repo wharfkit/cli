@@ -66,15 +66,15 @@ suite('functionality', function () {
                 assert.instanceOf(table, Table)
 
                 const config = await table.get()
-                assert.instanceOf(config, RewardsGm.Types.Config)
+                assert.instanceOf(config, RewardsGm.Types.config)
 
                 const cursor = await table.first(1)
                 assert.instanceOf(cursor, TableRowCursor)
                 const result = await cursor.next()
-                assert.instanceOf(result[0], RewardsGm.Types.Config)
+                assert.instanceOf(result[0], RewardsGm.Types.config)
 
                 const user = await contract.table('users').get()
-                assert.instanceOf(user, RewardsGm.Types.UserRow)
+                assert.instanceOf(user, RewardsGm.Types.user_row)
             })
         })
     })
