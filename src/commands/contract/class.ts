@@ -168,7 +168,7 @@ export function generateTableMethod(): ts.MethodDeclaration {
         ts.factory.createIdentifier('T'),
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableNames')),
         undefined
-    );
+    )
 
     // Create the parameters for the method
     const nameParameter = ts.factory.createParameterDeclaration(
@@ -179,7 +179,7 @@ export function generateTableMethod(): ts.MethodDeclaration {
         undefined,
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
         undefined
-    );
+    )
 
     const scopeParameter = ts.factory.createParameterDeclaration(
         undefined,
@@ -189,13 +189,14 @@ export function generateTableMethod(): ts.MethodDeclaration {
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('NameType')),
         undefined
-    );
+    )
 
     // Create the method return type 'Table<RowType<T>>'
-    const returnType = ts.factory.createTypeReferenceNode(
-        ts.factory.createIdentifier('Table'),
-        [ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('RowType'), [ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T'))])]
-    );
+    const returnType = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Table'), [
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('RowType'), [
+            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
+        ]),
+    ])
 
     // Generate the function body
     const methodBody = ts.factory.createBlock(
@@ -219,7 +220,7 @@ export function generateTableMethod(): ts.MethodDeclaration {
             ),
         ],
         true
-    );
+    )
 
     // Create the method declaration
     const methodDeclaration = ts.factory.createMethodDeclaration(
@@ -232,7 +233,7 @@ export function generateTableMethod(): ts.MethodDeclaration {
         [nameParameter, scopeParameter], // parameters
         returnType, // return type
         methodBody // body
-    );
+    )
 
-    return methodDeclaration;
+    return methodDeclaration
 }
