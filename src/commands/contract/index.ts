@@ -84,7 +84,7 @@ export async function generateContract(contractName, abi) {
         )
 
         const importContractTypesStatement = generateImportStatement(
-            ['ActionOptions', 'ContractArgs', 'PartialBy'],
+            ['ActionOptions', 'ContractArgs', 'PartialBy', 'Table'],
             '@wharfkit/contract',
             true
         )

@@ -46,7 +46,7 @@ export function generateTablesTypeAlias(): ts.TypeAliasDeclaration {
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
         undefined, // decorators
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        ts.factory.createIdentifier('tables'), // name
+        ts.factory.createIdentifier('TableNames'), // name
         [], // type parameters
         keyofTableTypes // type
     )
@@ -65,7 +65,7 @@ export function generateActionsTypeAlias(): ts.TypeAliasDeclaration {
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
         undefined, // decorators
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        ts.factory.createIdentifier('actions'), // name
+        ts.factory.createIdentifier('ActionNames'), // name
         [], // type parameters
         keyofActionNameParams // type
     )
