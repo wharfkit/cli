@@ -167,8 +167,6 @@ export async function generateContract(contractName, abi) {
                 importContractClassStatement,
                 abiBlobField,
                 abiField,
-                actionsTypeAlias,
-                tablesTypeAlias,
                 classDeclaration,
                 actionNamesInterface,
                 actionsNamespace,
@@ -176,6 +174,8 @@ export async function generateContract(contractName, abi) {
                 tableMap,
                 tableTypes,
                 rowTypeAlias,
+                actionsTypeAlias,
+                tablesTypeAlias,
             ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None
