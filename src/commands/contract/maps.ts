@@ -33,14 +33,16 @@ export function generateTableMap(abi: ABI.Def): ts.VariableStatement {
 
 export function generateTableTypesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate interface members
-    const members = abi.tables.map((table) => 
+    const members = abi.tables.map((table) =>
         ts.factory.createPropertySignature(
             undefined,
             JSON.stringify(table.name),
             undefined,
-            ts.factory.createTypeReferenceNode(findAbiType(table.type, abi, 'Types.')?.type || table.type)
+            ts.factory.createTypeReferenceNode(
+                findAbiType(table.type, abi, 'Types.')?.type || table.type
+            )
         )
-    );
+    )
 
     // Create the interface declaration
     const interfaceDeclaration = ts.factory.createInterfaceDeclaration(
@@ -50,8 +52,7 @@ export function generateTableTypesInterface(abi: ABI.Def): ts.InterfaceDeclarati
         undefined,
         undefined,
         members
-    );
+    )
 
-    return interfaceDeclaration;
+    return interfaceDeclaration
 }
-

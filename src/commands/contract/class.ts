@@ -42,13 +42,13 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
     classMembers.push(constructorMember)
 
     if (abi.actions.length) {
-        const actionMethod = generateActionMethod(abi)
+        const actionMethod = generateActionMethod()
 
         classMembers.push(actionMethod)
     }
 
     if (abi.tables.length) {
-        const tableMethod = generateTableMethod(abi)
+        const tableMethod = generateTableMethod()
 
         classMembers.push(tableMethod)
     }
@@ -93,7 +93,7 @@ function generateConstructorFunction(contractName): ts.ExpressionStatement {
     )
 }
 
-function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
+function generateActionMethod(): ts.MethodDeclaration {
     const typeParameter = ts.factory.createTypeParameterDeclaration(
         undefined,
         'T',
@@ -161,7 +161,7 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     )
 }
 
-function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
+function generateTableMethod(): ts.MethodDeclaration {
     const typeParameter = ts.factory.createTypeParameterDeclaration(
         undefined,
         'T',

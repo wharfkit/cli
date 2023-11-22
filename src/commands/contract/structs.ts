@@ -200,21 +200,15 @@ function findDependencies(
     for (const field of struct.fields) {
         const {type: fieldType} = extractDecorator(field.type)
 
-        let dependencyStruct = allStructs.find(
-            (struct) => struct.structName === fieldType
-        )
+        let dependencyStruct = allStructs.find((struct) => struct.structName === fieldType)
 
         if (!dependencyStruct) {
-            const typeAlias = typeAliases.find(
-                (typeAlias) => typeAlias.new_type_name === fieldType
-            )
+            const typeAlias = typeAliases.find((typeAlias) => typeAlias.new_type_name === fieldType)
 
             const typeAliasString = typeAlias && extractDecorator(typeAlias.type).type
 
             dependencyStruct = typeAliasString
-                ? allStructs.find(
-                      (struct) => struct.structName === typeAliasString
-                  )
+                ? allStructs.find((struct) => struct.structName === typeAliasString)
                 : undefined
         }
 

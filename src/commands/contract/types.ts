@@ -1,4 +1,4 @@
-import * as ts from 'typescript';
+import * as ts from 'typescript'
 
 export function generateRowType(): ts.TypeAliasDeclaration {
     // Create the type parameter 'T'
@@ -7,18 +7,21 @@ export function generateRowType(): ts.TypeAliasDeclaration {
         ts.factory.createIdentifier('T'),
         undefined,
         undefined
-    );
+    )
 
     // Create the conditional type 'T extends keyof TableTypes ? TableTypes[T] : any'
     const conditionalType = ts.factory.createConditionalTypeNode(
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
-        ts.factory.createTypeOperatorNode(ts.SyntaxKind.KeyOfKeyword, ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes'))),
+        ts.factory.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes'))
+        ),
         ts.factory.createIndexedAccessTypeNode(
             ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes')),
             ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T'))
         ),
         ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
-    );
+    )
 
     // Create the type alias declaration 'type RowType<T> = ...'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
@@ -27,17 +30,17 @@ export function generateRowType(): ts.TypeAliasDeclaration {
         ts.factory.createIdentifier('RowType'),
         [typeParameter],
         conditionalType
-    );
+    )
 
-    return typeAliasDeclaration;
+    return typeAliasDeclaration
 }
 
 export function generateTablesTypeAlias(): ts.TypeAliasDeclaration {
     // Create the 'keyof TableTypes' type
     const keyofTableTypes = ts.factory.createTypeOperatorNode(
-        ts.SyntaxKind.KeyOfKeyword, 
+        ts.SyntaxKind.KeyOfKeyword,
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes'))
-    );
+    )
 
     // Create the type alias declaration 'type tables = keyof TableTypes'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
@@ -46,9 +49,9 @@ export function generateTablesTypeAlias(): ts.TypeAliasDeclaration {
         ts.factory.createIdentifier('tables'), // name
         [], // type parameters
         keyofTableTypes // type
-    );
+    )
 
-    return typeAliasDeclaration;
+    return typeAliasDeclaration
 }
 
 export function generateActionsTypeAlias(): ts.TypeAliasDeclaration {
@@ -56,7 +59,7 @@ export function generateActionsTypeAlias(): ts.TypeAliasDeclaration {
     const keyofActionNameParams = ts.factory.createTypeOperatorNode(
         ts.SyntaxKind.KeyOfKeyword,
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('ActionNameParams'))
-    );
+    )
 
     // Create the type alias declaration 'type actions = keyof ActionNameParams'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
@@ -65,7 +68,7 @@ export function generateActionsTypeAlias(): ts.TypeAliasDeclaration {
         ts.factory.createIdentifier('actions'), // name
         [], // type parameters
         keyofActionNameParams // type
-    );
+    )
 
-    return typeAliasDeclaration;
+    return typeAliasDeclaration
 }

@@ -12,7 +12,7 @@ import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
 import {log, makeClient} from '../../utils'
-import { generateActionsTypeAlias, generateRowType, generateTablesTypeAlias } from './types'
+import {generateActionsTypeAlias, generateRowType, generateTablesTypeAlias} from './types'
 
 const printer = ts.createPrinter()
 
@@ -154,7 +154,7 @@ export async function generateContract(contractName, abi) {
 
         const tableMap = generateTableMap(abi)
         const tableTypes = generateTableTypesInterface(abi)
-        
+
         const tablesTypeAlias = generateTablesTypeAlias()
         const actionsTypeAlias = generateActionsTypeAlias()
         const rowTypeAlias = generateRowType()
