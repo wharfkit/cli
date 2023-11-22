@@ -2,7 +2,7 @@ import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
 import {capitalize} from '@wharfkit/contract'
 import {extractDecorator, findInternalType, parseType} from './helpers'
-import {capitalizeName} from '../../utils'
+import {formatClassName} from '../../utils'
 
 interface FieldType {
     name: string
@@ -74,7 +74,7 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
         isExport
             ? [...decorators, ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
             : decorators,
-        ts.factory.createIdentifier(capitalizeName(struct.structName)),
+        ts.factory.createIdentifier(formatClassName(struct.structName)),
         undefined, // typeParameters
         [
             ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
@@ -200,21 +200,15 @@ function findDependencies(
     for (const field of struct.fields) {
         const {type: fieldType} = extractDecorator(field.type)
 
-        let dependencyStruct = allStructs.find(
-            (struct) => struct.structName === fieldType.toLowerCase()
-        )
+        let dependencyStruct = allStructs.find((struct) => struct.structName === fieldType)
 
         if (!dependencyStruct) {
-            const typeAlias = typeAliases.find(
-                (typeAlias) => typeAlias.new_type_name.toLowerCase() === fieldType.toLowerCase()
-            )
+            const typeAlias = typeAliases.find((typeAlias) => typeAlias.new_type_name === fieldType)
 
             const typeAliasString = typeAlias && extractDecorator(typeAlias.type).type
 
             dependencyStruct = typeAliasString
-                ? allStructs.find(
-                      (struct) => struct.structName.toLowerCase() === typeAliasString.toLowerCase()
-                  )
+                ? allStructs.find((struct) => struct.structName === typeAliasString)
                 : undefined
         }
 

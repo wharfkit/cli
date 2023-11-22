@@ -42,13 +42,13 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
     classMembers.push(constructorMember)
 
     if (abi.actions.length) {
-        const actionMethod = generateActionMethod(abi)
+        const actionMethod = generateActionMethod()
 
         classMembers.push(actionMethod)
     }
 
     if (abi.tables.length) {
-        const tableMethod = generateTableMethod(abi)
+        const tableMethod = generateTableMethod()
 
         classMembers.push(tableMethod)
     }
@@ -93,17 +93,11 @@ function generateConstructorFunction(contractName): ts.ExpressionStatement {
     )
 }
 
-function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
+function generateActionMethod(): ts.MethodDeclaration {
     const typeParameter = ts.factory.createTypeParameterDeclaration(
         undefined,
         'T',
-        ts.factory.createUnionTypeNode(
-            abi.actions.map((action) =>
-                ts.factory.createLiteralTypeNode(
-                    ts.factory.createStringLiteral(String(action.name))
-                )
-            )
-        )
+        ts.factory.createTypeReferenceNode('ActionNames')
     )
 
     // 3. Create the function parameters.
@@ -167,37 +161,44 @@ function generateActionMethod(abi: ABI.Def): ts.MethodDeclaration {
     )
 }
 
-function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
+export function generateTableMethod(): ts.MethodDeclaration {
+    // Create the generic type parameter 'T' with a constraint to 'tables'
     const typeParameter = ts.factory.createTypeParameterDeclaration(
         undefined,
-        'T',
-        ts.factory.createUnionTypeNode(
-            abi.tables.map((table) =>
-                ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(String(table.name)))
-            )
-        )
+        ts.factory.createIdentifier('T'),
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableNames')),
+        undefined
     )
 
-    // 3. Create the function parameters.
+    // Create the parameters for the method
     const nameParameter = ts.factory.createParameterDeclaration(
         undefined,
         undefined,
-        'name',
         undefined,
-        ts.factory.createTypeReferenceNode('T'),
+        ts.factory.createIdentifier('name'),
+        undefined,
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
         undefined
     )
 
     const scopeParameter = ts.factory.createParameterDeclaration(
         undefined,
         undefined,
-        'scope',
+        undefined,
+        ts.factory.createIdentifier('scope'),
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-        ts.factory.createTypeReferenceNode('NameType'),
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('NameType')),
         undefined
     )
 
-    // 4. Generate the function body.
+    // Create the method return type 'Table<RowType<T>>'
+    const returnType = ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Table'), [
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('RowType'), [
+            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
+        ]),
+    ])
+
+    // Generate the function body
     const methodBody = ts.factory.createBlock(
         [
             ts.factory.createReturnStatement(
@@ -210,7 +211,10 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
                     [
                         ts.factory.createIdentifier('name'),
                         ts.factory.createIdentifier('scope'),
-                        ts.factory.createIdentifier('TableMap[name]'),
+                        ts.factory.createElementAccessExpression(
+                            ts.factory.createIdentifier('TableMap'),
+                            ts.factory.createIdentifier('name')
+                        ),
                     ]
                 )
             ),
@@ -218,14 +222,18 @@ function generateTableMethod(abi: ABI.Def): ts.MethodDeclaration {
         true
     )
 
-    return ts.factory.createMethodDeclaration(
-        undefined,
-        undefined,
-        'table',
-        undefined,
-        [typeParameter],
-        [nameParameter, scopeParameter],
-        undefined,
-        methodBody
+    // Create the method declaration
+    const methodDeclaration = ts.factory.createMethodDeclaration(
+        undefined, // decorators
+        undefined, // modifiers
+        undefined, // asterisk token
+        ts.factory.createIdentifier('table'), // method name
+        undefined, // question token
+        [typeParameter], // type parameters
+        [nameParameter, scopeParameter], // parameters
+        returnType, // return type
+        methodBody // body
     )
+
+    return methodDeclaration
 }

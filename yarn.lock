@@ -673,10 +673,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@wharfkit/contract@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-1.0.0.tgz#dd1da288ad1eddb439053b9289646199a7c14a43"
-  integrity sha512-l9EefsV6SNQnqcQjjRE2PCWEG70I/PHRifIdyvupjiMRKkbzOuE/efBlM9ch9tWXn3p8N5ydKw7frJa1mk1DtA==
+"@wharfkit/contract@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-1.1.1.tgz#2e96476fac45d06684f90b2a54b3cac39e71c760"
+  integrity sha512-WN6tzVuuacpzD8yo4uZZPdniXk9Q+ZGkBtUQ+mbeOQaEzrsnncOrHJlck20nmSb/EC8ij1EG0xlhnyhKjnvSYQ==
   dependencies:
     "@wharfkit/abicache" "^1.2.0"
     "@wharfkit/antelope" "^1.0.0"

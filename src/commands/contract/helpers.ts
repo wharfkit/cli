@@ -1,7 +1,7 @@
 import * as Antelope from '@wharfkit/antelope'
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
-import {capitalizeName} from '../../utils'
+import {formatClassName} from '../../utils'
 
 const ANTELOPE_CLASSES: string[] = []
 Object.keys(Antelope).map((key) => {
@@ -38,14 +38,14 @@ export function getCoreImports(abi: ABI.Def) {
                 coreImports.push('Variant')
 
                 type.split(' | ').forEach((typeString) => {
-                    const coreType = findCoreClass(typeString)
+                    const coreType = findCoreClassImport(typeString)
 
                     if (coreType) {
                         coreTypes.push(coreType)
                     }
                 })
             } else {
-                const coreClass = findCoreClass(type)
+                const coreClass = findCoreClassImport(type)
 
                 if (coreClass) {
                     coreImports.push(coreClass)
@@ -71,6 +71,14 @@ export function getCoreImports(abi: ABI.Def) {
             .filter((value, index, self) => self.indexOf(value) === index)
             .filter((type) => !coreImports.includes(type)),
     }
+}
+
+export function findCoreClassImport(type: string) {
+    if (type === 'symbol') {
+        return 'Asset'
+    }
+
+    return findCoreClass(type)
 }
 
 export function generateClassDeclaration(
@@ -186,7 +194,7 @@ function formatInternalType(
     let type
 
     if (structNames.includes(typeString.toLowerCase())) {
-        type = `${namespace}${capitalizeName(typeString)}`
+        type = `${namespace}${formatClassName(typeString)}`
     } else {
         type = findCoreClass(typeString) || capitalize(typeString)
     }
@@ -253,7 +261,7 @@ export function findAbiType(
     const abiType = abi.structs.find((abiType) => abiType.name === typeString)?.name
 
     if (abiType) {
-        return {type: `${typeNamespace}${capitalizeName(abiType)}`, decorator}
+        return {type: `${typeNamespace}${formatClassName(abiType)}`, decorator}
     }
 
     return {type: typeString, decorator}

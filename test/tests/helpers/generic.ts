@@ -48,6 +48,14 @@ export function getMockParams(contract: Contract): ActionDataType {
                 owner: 'owner_account_name',
             }
         }
+        case 'boid': {
+            return {
+                boid_id: 'foo',
+                owners: ['foo'],
+                sponsors: ['foo'],
+                keys: ['PUB_K1_6RrvujLQN1x5Tacbep1KAk8zzKpSThAQXBCKYFfGUYeACcSRFs'],
+            }
+        }
         default: {
             throw new Error(`getMockParams not implemented for ${contract.account}`)
         }
