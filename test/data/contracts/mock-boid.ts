@@ -1,11 +1,7 @@
 import type {
     Action,
     BytesType,
-    Float64,
-    Int16,
     Int32Type,
-    Int64,
-    Int8,
     NameType,
     PublicKeyType,
     SignatureType,
@@ -20,7 +16,11 @@ import {
     Blob,
     Bytes,
     Float32,
+    Float64,
+    Int16,
     Int32,
+    Int64,
+    Int8,
     Name,
     PublicKey,
     Signature,
@@ -349,6 +349,55 @@ export namespace ActionParams {
     }
 }
 export namespace Types {
+    @Variant.type('AtomicValue', [
+        Int8,
+        Int16,
+        Int32,
+        Int64,
+        UInt8,
+        UInt16,
+        UInt32,
+        UInt64,
+        Float32,
+        Float64,
+        'string',
+        {type: Int8, array: true},
+        {type: Int16, array: true},
+        {type: Int32, array: true},
+        {type: Int64, array: true},
+        Bytes,
+        {type: UInt16, array: true},
+        {type: UInt32, array: true},
+        {type: UInt64, array: true},
+        {type: Float32, array: true},
+        {type: Float64, array: true},
+        'string[]',
+    ])
+    export class AtomicValue extends Struct {
+        value!:
+            | Int8
+            | Int16
+            | Int32
+            | Int64
+            | UInt8
+            | UInt16
+            | UInt32
+            | UInt64
+            | Float32
+            | Float64
+            | string
+            | Int8[]
+            | Int16[]
+            | Int32[]
+            | Int64[]
+            | Bytes
+            | UInt16[]
+            | UInt32[]
+            | UInt64[]
+            | Float32[]
+            | Float64[]
+            | string[]
+    }
     @Struct.type('AccountAuth')
     export class AccountAuth extends Struct {
         @Struct.field(PublicKey, {array: true})
@@ -468,30 +517,8 @@ export namespace Types {
     export class AtomicAttribute extends Struct {
         @Struct.field('string')
         key!: string
-        @Struct.field(Variant)
-        value!:
-            | Int8
-            | Int16
-            | Int32
-            | Int64
-            | UInt8
-            | UInt16
-            | UInt32
-            | UInt64
-            | Float32
-            | Float64
-            | string
-            | Int8[]
-            | Int16[]
-            | Int32[]
-            | Int64[]
-            | Bytes
-            | UInt16[]
-            | UInt32[]
-            | UInt64[]
-            | Float32[]
-            | Float64[]
-            | string[]
+        @Struct.field(AtomicValue)
+        value!: AtomicValue
     }
     @Struct.type('AtomicFormat')
     export class AtomicFormat extends Struct {

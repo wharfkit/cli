@@ -1,15 +1,9 @@
 import type {
     Action,
     AssetType,
-    Bytes,
-    Float32,
     Float64Type,
-    Int16,
     Int32Type,
-    Int64,
-    Int8,
     NameType,
-    UInt16,
     UInt32Type,
     UInt64Type,
 } from '@wharfkit/antelope'
@@ -17,10 +11,16 @@ import {
     ABI,
     Asset,
     Blob,
+    Bytes,
+    Float32,
     Float64,
+    Int16,
     Int32,
+    Int64,
+    Int8,
     Name,
     Struct,
+    UInt16,
     UInt32,
     UInt64,
     UInt8,
@@ -283,6 +283,58 @@ export namespace ActionParams {
     }
 }
 export namespace Types {
+    @Variant.type(
+        'variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC',
+        [
+            Int8,
+            Int16,
+            Int32,
+            Int64,
+            UInt8,
+            UInt16,
+            UInt32,
+            UInt64,
+            Float32,
+            Float64,
+            'string',
+            Bytes,
+            {type: Int16, array: true},
+            {type: Int32, array: true},
+            {type: Int64, array: true},
+            {type: UInt8, array: true},
+            {type: UInt16, array: true},
+            {type: UInt32, array: true},
+            {type: UInt64, array: true},
+            {type: Float32, array: true},
+            {type: Float64, array: true},
+            'string[]',
+        ]
+    )
+    export class variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC extends Struct {
+        value!:
+            | Int8
+            | Int16
+            | Int32
+            | Int64
+            | UInt8
+            | UInt16
+            | UInt32
+            | UInt64
+            | Float32
+            | Float64
+            | string
+            | Bytes
+            | Int16[]
+            | Int32[]
+            | Int64[]
+            | UInt8[]
+            | UInt16[]
+            | UInt32[]
+            | UInt64[]
+            | Float32[]
+            | Float64[]
+            | string[]
+    }
     @Struct.type('FORMAT')
     export class FORMAT extends Struct {
         @Struct.field('string')
@@ -418,30 +470,10 @@ export namespace Types {
     export class pair_string_ATOMIC_ATTRIBUTE extends Struct {
         @Struct.field('string')
         key!: string
-        @Struct.field(Variant)
-        value!:
-            | Int8
-            | Int16
-            | Int32
-            | Int64
-            | UInt8
-            | UInt16
-            | UInt32
-            | UInt64
-            | Float32
-            | Float64
-            | string
-            | Bytes
-            | Int16[]
-            | Int32[]
-            | Int64[]
-            | UInt8[]
-            | UInt16[]
-            | UInt32[]
-            | UInt64[]
-            | Float32[]
-            | Float64[]
-            | string[]
+        @Struct.field(
+            variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
+        )
+        value!: variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
     }
     @Struct.type('createcol')
     export class createcol extends Struct {

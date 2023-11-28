@@ -33,6 +33,7 @@ import {
     UInt64,
     UInt8,
     VarUInt,
+    Variant,
 } from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy, Table} from '@wharfkit/contract'
 import {Contract as BaseContract} from '@wharfkit/contract'
@@ -265,7 +266,7 @@ export namespace ActionParams {
     }
     export interface Regproducer2 {
         producer: NameType
-        producer_authority: Types.block_signing_authority_v0
+        producer_authority: Types.variant_block_signing_authority_v0
         url: string
         location: UInt16Type
     }
@@ -402,6 +403,24 @@ export namespace ActionParams {
     }
 }
 export namespace Types {
+    @Struct.type('key_weight')
+    export class key_weight extends Struct {
+        @Struct.field(PublicKey)
+        key!: PublicKey
+        @Struct.field(UInt16)
+        weight!: UInt16
+    }
+    @Struct.type('block_signing_authority_v0')
+    export class block_signing_authority_v0 extends Struct {
+        @Struct.field(UInt32)
+        threshold!: UInt32
+        @Struct.field(key_weight, {array: true})
+        keys!: key_weight[]
+    }
+    @Variant.type('variant_block_signing_authority_v0', [block_signing_authority_v0])
+    export class variant_block_signing_authority_v0 extends Struct {
+        value!: block_signing_authority_v0
+    }
     @Struct.type('abi_hash')
     export class abi_hash extends Struct {
         @Struct.field(Name)
@@ -413,13 +432,6 @@ export namespace Types {
     export class activate extends Struct {
         @Struct.field(Checksum256)
         feature_digest!: Checksum256
-    }
-    @Struct.type('key_weight')
-    export class key_weight extends Struct {
-        @Struct.field(PublicKey)
-        key!: PublicKey
-        @Struct.field(UInt16)
-        weight!: UInt16
     }
     @Struct.type('permission_level')
     export class permission_level extends Struct {
@@ -517,13 +529,6 @@ export namespace Types {
         block_height!: UInt32
         @Struct.field(TimePoint)
         block_timestamp!: TimePoint
-    }
-    @Struct.type('block_signing_authority_v0')
-    export class block_signing_authority_v0 extends Struct {
-        @Struct.field(UInt32)
-        threshold!: UInt32
-        @Struct.field(key_weight, {array: true})
-        keys!: key_weight[]
     }
     @Struct.type('blockchain_parameters')
     export class blockchain_parameters extends Struct {
@@ -989,8 +994,8 @@ export namespace Types {
         last_claim_time!: TimePoint
         @Struct.field(UInt16)
         location!: UInt16
-        @Struct.field(block_signing_authority_v0, {optional: true})
-        producer_authority?: block_signing_authority_v0
+        @Struct.field(variant_block_signing_authority_v0, {optional: true})
+        producer_authority?: variant_block_signing_authority_v0
     }
     @Struct.type('producer_info2')
     export class producer_info2 extends Struct {
@@ -1032,8 +1037,8 @@ export namespace Types {
     export class regproducer2 extends Struct {
         @Struct.field(Name)
         producer!: Name
-        @Struct.field(block_signing_authority_v0)
-        producer_authority!: block_signing_authority_v0
+        @Struct.field(variant_block_signing_authority_v0)
+        producer_authority!: variant_block_signing_authority_v0
         @Struct.field('string')
         url!: string
         @Struct.field(UInt16)
