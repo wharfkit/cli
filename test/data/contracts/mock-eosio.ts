@@ -32,8 +32,8 @@ import {
     UInt32,
     UInt64,
     UInt8,
-    VarUInt,
     Variant,
+    VarUInt,
 } from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy, Table} from '@wharfkit/contract'
 import {Contract as BaseContract} from '@wharfkit/contract'

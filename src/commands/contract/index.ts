@@ -1,17 +1,18 @@
+import * as eslint from 'eslint'
+import * as fs from 'fs'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
-import * as fs from 'fs'
 
 import type {ABIDef} from '@wharfkit/antelope'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 
+import {log, makeClient} from '../../utils'
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
 import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
-import {log, makeClient} from '../../utils'
 import {generateActionsTypeAlias, generateRowType, generateTablesTypeAlias} from './types'
 
 const printer = ts.createPrinter()
@@ -189,8 +190,9 @@ export async function generateContract(contractName, abi) {
     }
 }
 
-function runPrettier(codeText: string) {
-    return prettier.format(codeText, {
+async function runPrettier(codeText: string): Promise<string> {
+    // First prettier and then eslint fix, cause prettier result cann't pass eslint check
+    const prettiered = prettier.format(codeText, {
         arrowParens: 'always',
         bracketSpacing: false,
         endOfLine: 'lf',
@@ -201,6 +203,10 @@ function runPrettier(codeText: string) {
         trailingComma: 'es5',
         parser: 'typescript',
     })
+
+    const linter = new eslint.ESLint({useEslintrc: true, fix: true})
+    const results = await linter.lintText(prettiered)
+    return results[0].output ? results[0].output : prettiered
 }
 
 function cleanupImports(imports: string[]) {
