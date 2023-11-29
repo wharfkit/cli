@@ -67,66 +67,66 @@ export namespace Types {
     @Struct.type('account')
     export class account extends Struct {
         @Struct.field(Asset)
-        balance!: Asset
+        Balance!: Asset
     }
     @Struct.type('close')
     export class close extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        Owner!: Name
         @Struct.field(Asset.Symbol)
-        symbol!: Asset.Symbol
+        Symbol!: Asset.Symbol
     }
     @Struct.type('create')
     export class create extends Struct {
         @Struct.field(Name)
-        issuer!: Name
+        Issuer!: Name
         @Struct.field(Asset)
-        maximum_supply!: Asset
+        Maximum_supply!: Asset
     }
     @Struct.type('currency_stats')
     export class currency_stats extends Struct {
         @Struct.field(Asset)
-        supply!: Asset
+        Supply!: Asset
         @Struct.field(Asset)
-        max_supply!: Asset
+        Max_supply!: Asset
         @Struct.field(Name)
-        issuer!: Name
+        Issuer!: Name
     }
     @Struct.type('issue')
     export class issue extends Struct {
         @Struct.field(Name)
-        to!: Name
+        To!: Name
         @Struct.field(Asset)
-        quantity!: Asset
+        Quantity!: Asset
         @Struct.field('string')
-        memo!: string
+        Memo!: string
     }
     @Struct.type('open')
     export class open extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        Owner!: Name
         @Struct.field(Asset.Symbol)
-        symbol!: Asset.Symbol
+        Symbol!: Asset.Symbol
         @Struct.field(Name)
-        ram_payer!: Name
+        Ram_payer!: Name
     }
     @Struct.type('retire')
     export class retire extends Struct {
         @Struct.field(Asset)
-        quantity!: Asset
+        Quantity!: Asset
         @Struct.field('string')
-        memo!: string
+        Memo!: string
     }
     @Struct.type('transfer')
     export class transfer extends Struct {
         @Struct.field(Name)
-        from!: Name
+        From!: Name
         @Struct.field(Name)
-        to!: Name
+        To!: Name
         @Struct.field(Asset)
-        quantity!: Asset
+        Quantity!: Asset
         @Struct.field('string')
-        memo!: string
+        Memo!: string
     }
 }
 export const TableMap = {

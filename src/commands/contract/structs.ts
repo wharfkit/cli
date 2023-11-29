@@ -166,7 +166,7 @@ export function generateField(
     namespace: string | undefined,
     abi: ABI.Def
 ): ts.PropertyDeclaration {
-    const fieldName = field.name.toLowerCase()
+    const fieldName = field.name
 
     const isArray = field.type.endsWith('[]')
 
