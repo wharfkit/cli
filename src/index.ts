@@ -37,6 +37,7 @@ program
     .argument('<account>', 'The account name of the contract (e.g. "eosio.token")')
     .option('-f, --file [filename]', 'The path where the generated file will be saved')
     .option('-j, --json [json]', 'The path to a JSON file containing the contract ABI')
+    .option('-e, --eslintrc [eslintrc]', 'The eslintrc file to use')
     .requiredOption(
         '-u, --url <url>',
         'The URL of the API to connect with (e.g. "https://jungle4.greymass.com")',

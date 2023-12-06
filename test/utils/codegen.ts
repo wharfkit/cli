@@ -9,7 +9,7 @@ export async function generateCodegenContract(contractName: string) {
     const abi = new ABI(JSON.parse(abiJson))
 
     // Generate the code
-    const generatedCode = await generateContract(contractName, abi)
+    const generatedCode = await generateContract(contractName, abi, './.eslintrc')
 
     // Create the tmp directory under the test directory if it does not exist
     if (!fs.existsSync('test/tmp')) {

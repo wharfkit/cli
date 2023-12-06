@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 
+import type {ABI} from '@wharfkit/session'
 import type {ABIDef} from '@wharfkit/antelope'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 
@@ -21,9 +22,13 @@ interface CommandOptions {
     url: string
     file?: string
     json?: string
+    eslintrc?: string
 }
 
-export async function generateContractFromCommand(contractName, {url, file, json}: CommandOptions) {
+export async function generateContractFromCommand(
+    contractName,
+    {url, file, json, eslintrc}: CommandOptions
+) {
     let abi: ABIDef | undefined
 
     if (json) {
@@ -53,7 +58,7 @@ export async function generateContractFromCommand(contractName, {url, file, json
     const contract = await contractKit.load(contractName)
 
     log(`Generating Contract helpers for ${contractName}...`)
-    const contractCode = await generateContract(contractName, contract.abi)
+    const contractCode = await generateContract(contractName, contract.abi, eslintrc)
 
     log(`Generated Contract helper class for ${contractName}...`)
     if (file) {
@@ -65,7 +70,7 @@ export async function generateContractFromCommand(contractName, {url, file, json
     }
 }
 
-export async function generateContract(contractName, abi) {
+export async function generateContract(contractName: string, abi: ABI, eslintrc?: string) {
     try {
         const {classes, types} = getCoreImports(abi)
 
@@ -182,7 +187,7 @@ export async function generateContract(contractName, abi) {
             ts.NodeFlags.None
         )
 
-        return runPrettier(printer.printFile(sourceFile))
+        return runPrettier(printer.printFile(sourceFile), eslintrc)
     } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`An error occurred while generating the contract code: ${e}`)
@@ -190,7 +195,7 @@ export async function generateContract(contractName, abi) {
     }
 }
 
-async function runPrettier(codeText: string): Promise<string> {
+async function runPrettier(codeText: string, eslintrc?: string): Promise<string> {
     // First prettier and then eslint fix, cause prettier result cann't pass eslint check
     const prettiered = prettier.format(codeText, {
         arrowParens: 'always',
@@ -204,7 +209,12 @@ async function runPrettier(codeText: string): Promise<string> {
         parser: 'typescript',
     })
 
-    const linter = new eslint.ESLint({useEslintrc: true, fix: true, baseConfig: {}})
+    const linter = new eslint.ESLint({
+        useEslintrc: false,
+        fix: true,
+        baseConfig: {},
+        overrideConfigFile: eslintrc ? eslintrc : null,
+    })
     const results = await linter.lintText(prettiered)
     return results[0].output ? results[0].output : prettiered
 }
