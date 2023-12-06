@@ -34,34 +34,35 @@ export function getCoreImports(abi: ABI.Def) {
 
             const {type} = findAbiType(field.type, abi)
 
-            if (type.includes(' | ')) {
-                coreImports.push('Variant')
+            const coreClass = findCoreClassImport(type)
 
-                type.split(' | ').forEach((typeString) => {
-                    const coreType = findCoreClassImport(typeString)
+            if (coreClass) {
+                coreImports.push(coreClass)
+            }
 
-                    if (coreType) {
-                        coreTypes.push(coreType)
-                    }
-                })
-            } else {
-                const coreClass = findCoreClassImport(type)
+            // We don't need to add action types unless the struct is an action param
+            if (!structIsActionParams) {
+                continue
+            }
 
+            const coreType = findCoreType(type)
+
+            if (coreType) {
+                coreTypes.push(coreType)
+            }
+        }
+    }
+
+    if (abi.variants.length != 0) {
+        coreImports.push('Variant')
+        for (const variant of abi.variants) {
+            variant.types.forEach((typeString) => {
+                const {type: abiType} = findAbiType(typeString, abi)
+                const coreClass = findCoreClassImport(abiType)
                 if (coreClass) {
                     coreImports.push(coreClass)
                 }
-
-                // We don't need to add action types unless the struct is an action param
-                if (!structIsActionParams) {
-                    continue
-                }
-
-                const coreType = findCoreType(type)
-
-                if (coreType) {
-                    coreTypes.push(coreType)
-                }
-            }
+            })
         }
     }
 
@@ -180,6 +181,7 @@ export function findInternalType(
 ): string {
     const {type: typeString, decorator} = findType(type, abi, typeNamespace)
 
+    // TODO: inside findType, namespace is prefixed, but format internal is doing the same
     return formatInternalType(typeString, typeNamespace, abi, decorator)
 }
 
@@ -189,7 +191,7 @@ function formatInternalType(
     abi: ABI.Def,
     decorator = ''
 ): string {
-    const structNames = abi.structs.map((struct) => struct.name.toLowerCase())
+    const structNames = [...abi.structs, ...abi.variants].map((struct) => struct.name.toLowerCase())
 
     let type
 
@@ -209,36 +211,10 @@ function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
     return alias?.type && `${alias?.type}${decorator || ''}`
 }
 
-function findVariantType(
-    typeString: string,
-    abi: ABI.Def,
-    typeNamespace: string,
-    context: string
-): string | undefined {
-    const abiVariant = abi.variants.find(
-        (variant) => variant.name.toLowerCase() === typeString.toLowerCase()
-    )
-
-    if (!abiVariant) {
-        return
-    }
-
-    return abiVariant.types
-        .map((type) => {
-            if (context === 'external') {
-                return parseType(findExternalType(type, typeNamespace, abi))
-            } else {
-                return parseType(findInternalType(type, typeNamespace, abi))
-            }
-        })
-        .join(' | ')
-}
-
 export function findAbiType(
     type: string,
     abi: ABI.Def,
-    typeNamespace = '',
-    context = 'internal'
+    typeNamespace = ''
 ): {type: string; decorator?: string} {
     let typeString = parseType(trim(type))
 
@@ -252,13 +228,9 @@ export function findAbiType(
     typeString = extractDecoratorResponse.type
     const decorator = extractDecoratorResponse.decorator
 
-    const variantType = findVariantType(typeString, abi, typeNamespace, context)
-
-    if (variantType) {
-        return {type: variantType, decorator}
-    }
-
-    const abiType = abi.structs.find((abiType) => abiType.name === typeString)?.name
+    const abiType = [...abi.structs, ...abi.variants].find(
+        (abiType) => abiType.name === typeString
+    )?.name
 
     if (abiType) {
         return {type: `${typeNamespace}${formatClassName(abiType)}`, decorator}
@@ -268,13 +240,13 @@ export function findAbiType(
 }
 
 export function findExternalType(type: string, typeNamespace = '', abi: ABI.Def): string {
-    const {type: typeString, decorator} = findType(type, abi, typeNamespace, 'external')
+    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
 
     return `${findCoreType(typeString) || capitalize(typeString)}${decorator === '[]' ? '[]' : ''}`
 }
 
-function findType(type: string, abi: ABI.Def, typeNamespace?: string, context = 'internal') {
-    return findAbiType(type, abi, typeNamespace, context)
+function findType(type: string, abi: ABI.Def, typeNamespace?: string) {
+    return findAbiType(type, abi, typeNamespace)
 }
 
 const decorators = ['?', '[]']

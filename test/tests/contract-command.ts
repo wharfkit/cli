@@ -82,4 +82,34 @@ suite('generateContractFromCommand', () => {
             'process.stdout.write should be called with generated contract code'
         )
     })
+
+    test('--eslintrc option uses the provided eslintrc', async function () {
+        try {
+            await generateContractFromCommand('someContractThatDoesntExist', {
+                url: 'http://eos.example-api.com',
+                json: './test/data/abis/rewards.gm.json',
+                eslintrc: './.eslintrc',
+            })
+        } catch (error) {
+            assert.fail(
+                `Error should not be thrown when valid eslintrc file is passed. Error: ${error}`
+            )
+        }
+    })
+
+    test("--eslintrc option throws an error when file doesn't exist", async function () {
+        try {
+            await generateContractFromCommand('someContract', {
+                url: 'http://eos.example-api.com',
+                json: './test/data/abis/rewards.gm.json',
+                eslintrc: './.does-not-exist-eslintrc',
+            })
+            assert.fail('Error should be thrown when eslintrc file does not exist.')
+        } catch (error) {
+            assert(
+                (error as unknown as Error).message.includes('no such file or directory'),
+                'Error should be thrown when eslintrc file does not exist.'
+            )
+        }
+    })
 })

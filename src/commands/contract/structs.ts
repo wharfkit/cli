@@ -13,6 +13,7 @@ interface FieldType {
 interface StructData {
     structName: string
     fields: FieldType[]
+    variant: boolean
 }
 
 interface TypeAlias {
@@ -27,14 +28,34 @@ export function generateStructClasses(abi) {
     const structMembers: ts.ClassDeclaration[] = []
 
     for (const struct of orderedStructs) {
-        structMembers.push(generateStruct(struct, abi, true))
+        if (struct.variant) {
+            structMembers.push(generateVariant(struct, abi, true))
+        } else {
+            structMembers.push(generateStruct(struct, abi, true))
+        }
     }
 
     return structMembers
 }
 
 export function getActionFieldFromAbi(abi: any): StructData[] {
-    const structTypes: {structName: string; fields: FieldType[]}[] = []
+    const structTypes: StructData[] = []
+
+    if (abi && abi.variants) {
+        for (const variant of abi.variants) {
+            structTypes.push({
+                structName: variant.name,
+                fields: variant.types.map((t) => {
+                    return {
+                        name: 'value',
+                        type: t,
+                        optional: false,
+                    }
+                }),
+                variant: true,
+            })
+        }
+    }
 
     if (abi && abi.structs) {
         for (const struct of abi.structs) {
@@ -48,11 +69,63 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
                 })
             }
 
-            structTypes.push({structName: struct.name, fields})
+            structTypes.push({structName: struct.name, fields, variant: false})
         }
     }
 
     return structTypes
+}
+
+export function generateVariant(variant, abi: any, isExport = false): ts.ClassDeclaration {
+    const decoratorArguments: (ts.ObjectLiteralExpression | ts.StringLiteral | ts.Identifier)[] =
+        variant.fields.map((field) => findVariantStructType(field.type, undefined, abi))
+
+    const decorators = [
+        ts.factory.createDecorator(
+            ts.factory.createCallExpression(
+                ts.factory.createIdentifier('Variant.type'),
+                undefined,
+                [
+                    ts.factory.createStringLiteral(variant.structName),
+                    ts.factory.createArrayLiteralExpression(decoratorArguments),
+                ]
+            )
+        ),
+    ]
+
+    const valueField = ts.factory.createPropertyDeclaration(
+        [],
+        ts.factory.createIdentifier('value'),
+        ts.factory.createToken(ts.SyntaxKind.ExclamationToken),
+        ts.factory.createUnionTypeNode(
+            variant.fields.map((field) => {
+                return ts.factory.createTypeReferenceNode(
+                    ts.factory.createIdentifier(
+                        findFieldStructTypeString(field.type, undefined, abi)
+                    ),
+                    undefined
+                )
+            })
+        ),
+        undefined
+    )
+
+    return ts.factory.createClassDeclaration(
+        isExport
+            ? [...decorators, ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
+            : decorators,
+        ts.factory.createIdentifier(formatClassName(variant.structName)),
+        undefined, // typeParameters
+        [
+            ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+                ts.factory.createExpressionWithTypeArguments(
+                    ts.factory.createIdentifier('Struct'),
+                    []
+                ),
+            ]),
+        ], // heritageClauses
+        [valueField]
+    )
 }
 
 export function generateStruct(struct, abi, isExport = false): ts.ClassDeclaration {
@@ -139,24 +212,11 @@ export function generateField(
         ),
     ]
 
-    let typeReferenceNode: ts.TypeReferenceNode | ts.UnionTypeNode
-
     const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
 
-    if (structTypeString.includes(' | ')) {
-        typeReferenceNode = ts.factory.createUnionTypeNode(
-            structTypeString.split(' | ').map((type) => {
-                return ts.factory.createTypeReferenceNode(
-                    ts.factory.createIdentifier(type),
-                    undefined
-                )
-            })
-        )
-    } else {
-        typeReferenceNode = ts.factory.createTypeReferenceNode(
-            extractDecorator(structTypeString).type
-        )
-    }
+    const typeReferenceNode = ts.factory.createTypeReferenceNode(
+        extractDecorator(structTypeString).type
+    )
 
     let typeNode: ts.TypeNode
 
@@ -229,6 +289,39 @@ function findDependencies(
     return dependencies
 }
 
+function findVariantStructType(
+    typeString: string,
+    namespace: string | undefined,
+    abi: ABI.Def
+): ts.Identifier | ts.StringLiteral | ts.ObjectLiteralExpression {
+    const variantTypeString = findFieldStructTypeString(typeString, namespace, abi)
+
+    if (['string', 'string[]', 'boolean', 'boolean[]'].includes(variantTypeString.toLowerCase())) {
+        return ts.factory.createStringLiteral(formatFieldString(variantTypeString))
+    }
+
+    const isArray = variantTypeString.endsWith('[]')
+    if (isArray) {
+        const optionsProps: ts.ObjectLiteralElementLike[] = []
+        optionsProps.push(
+            ts.factory.createPropertyAssignment(
+                ts.factory.createIdentifier('type'),
+                ts.factory.createIdentifier(extractDecorator(variantTypeString).type)
+            )
+        )
+        optionsProps.push(
+            ts.factory.createPropertyAssignment(
+                ts.factory.createIdentifier('array'),
+                ts.factory.createTrue()
+            )
+        )
+
+        const optionsObject = ts.factory.createObjectLiteralExpression(optionsProps)
+        return optionsObject
+    } else {
+        return ts.factory.createIdentifier(variantTypeString)
+    }
+}
 function findFieldStructType(
     typeString: string,
     namespace: string | undefined,
@@ -237,10 +330,6 @@ function findFieldStructType(
     const fieldTypeString = extractDecorator(
         findFieldStructTypeString(typeString, namespace, abi)
     ).type
-
-    if (fieldTypeString.includes(' | ')) {
-        return ts.factory.createIdentifier('Variant')
-    }
 
     if (['string', 'string[]', 'boolean', 'boolean[]'].includes(fieldTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
