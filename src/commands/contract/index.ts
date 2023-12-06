@@ -204,7 +204,7 @@ async function runPrettier(codeText: string): Promise<string> {
         parser: 'typescript',
     })
 
-    const linter = new eslint.ESLint({useEslintrc: true, fix: true})
+    const linter = new eslint.ESLint({useEslintrc: true, fix: true, baseConfig: {}})
     const results = await linter.lintText(prettiered)
     return results[0].output ? results[0].output : prettiered
 }
