@@ -11,7 +11,7 @@ export class Contract extends BaseContract {
         super({
             client: args.client,
             abi: abi,
-            account: Name.from('eosio.token'),
+            account: args.account || Name.from('eosio.token'),
         })
     }
     action<T extends ActionNames>(
