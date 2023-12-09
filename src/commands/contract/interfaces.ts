@@ -1,8 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
-import {findExternalType, parseType} from './helpers'
+import {findAbiStruct, findExternalType, parseType, removeDuplicateInterfaces} from './helpers'
 import {getActionFieldFromAbi} from './structs'
-import {capitalizeName} from '../../utils'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
@@ -10,13 +9,11 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
         const actionName = String(action.name)
         const actionNameKey = actionName.includes('.') ? `'${actionName}'` : actionName
 
-        const actionNameCapitalized = capitalizeName(actionName)
-
         return ts.factory.createPropertySignature(
             undefined,
             actionNameKey,
             undefined,
-            ts.factory.createTypeReferenceNode(`ActionParams.${actionNameCapitalized}`)
+            ts.factory.createTypeReferenceNode(`ActionParams.${actionName}`)
         )
     })
 
@@ -29,11 +26,28 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
     )
 }
 
-export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclaration {
-    const members = actionStruct.fields.map((field) => {
+export function generateActionInterface(struct, abi): { actionInterface: ts.InterfaceDeclaration, typeInterfaces: ts.InterfaceDeclaration[] } {
+    const typeInterfaces: ts.InterfaceDeclaration[] = []
+
+    const members = struct.fields.map((field) => {
         const typeReferenceNode = ts.factory.createTypeReferenceNode(
             findParamTypeString(field.type, 'Types.', abi)
         )
+
+        // We need to check for types and variants. We also need to add core types that may be used in structs that are
+        // used in action params (the check will have to recursivly look for those structs). Optionally, we can add all
+        // core types and have eslint remove them.
+        if (field.type === 'blockchain_parameters_v1') {
+            console.log({type: field.type})
+        }
+
+        const typeStruct = findAbiStruct(field.type, abi)
+
+        if (typeStruct) {
+            const interfaces = generateActionInterface(typeStruct, abi)
+            
+            typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
+        }
 
         return ts.factory.createPropertySignature(
             undefined,
@@ -43,29 +57,49 @@ export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclarat
         )
     })
 
-    return ts.factory.createInterfaceDeclaration(
+    const actionInterface = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        capitalizeName(actionStruct.structName),
+        struct.structName || struct.name,
         undefined,
         undefined,
         members
     )
+
+    return { actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces) }
 }
 
 export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
+    const typeInterfaces: ts.InterfaceDeclaration[] = []
+
     const interfaces = abi.actions.map((action) => {
         const actionStruct = actionStructsWithFields.find(
             (actionStructWithField) => actionStructWithField.structName === action.type
         )
-        return generateActionInterface(actionStruct, abi)
+
+        const interfaces = generateActionInterface(actionStruct, abi)
+
+        if (interfaces.actionInterface) {
+            typeInterfaces.push(...interfaces.typeInterfaces)
+        }
+            
+        return interfaces.actionInterface
     })
+
+    const actionParamsTypes = ts.factory.createModuleDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createIdentifier('Types'),
+        ts.factory.createModuleBlock(
+            removeDuplicateInterfaces(typeInterfaces)
+        ),
+        ts.NodeFlags.Namespace
+    )
 
     return ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
-        ts.factory.createModuleBlock(interfaces),
+        ts.factory.createModuleBlock([actionParamsTypes, ...interfaces]),
         ts.NodeFlags.Namespace
     )
 }

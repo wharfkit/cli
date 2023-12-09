@@ -211,6 +211,21 @@ function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
     return alias?.type && `${alias?.type}${decorator || ''}`
 }
 
+export function findAbiStruct(
+    type: string,
+    abi: ABI.Def,
+): ABI.Struct | undefined {
+    const extractDecoratorResponse = extractDecorator(type)
+    const typeString = extractDecoratorResponse.type
+    const decorator = extractDecoratorResponse.decorator
+
+    const abiStruct = abi.structs.find(
+        (abiType) => abiType.name === typeString
+    )
+
+    return abiStruct
+}
+
 export function findAbiType(
     type: string,
     abi: ABI.Def,
@@ -298,4 +313,18 @@ export function capitalize(string) {
     }
 
     return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function removeDuplicateInterfaces(interfaces: ts.InterfaceDeclaration[]): ts.InterfaceDeclaration[] {
+    const seen: string[] = [];
+
+    return interfaces.filter(interfaceDeclaration => {
+        const name = String(interfaceDeclaration.name.escapedText);
+
+        if (seen.includes(name)) {
+            return false;
+        }
+        seen.push(name);
+        return true;
+    });
 }
