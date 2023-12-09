@@ -373,7 +373,7 @@ export namespace Types {
         {type: Float64, array: true},
         'string[]',
     ])
-    export class AtomicValue extends Struct {
+    export class AtomicValue extends Variant {
         value!:
             | Int8
             | Int16

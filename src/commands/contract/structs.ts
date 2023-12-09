@@ -119,7 +119,7 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
         [
             ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
                 ts.factory.createExpressionWithTypeArguments(
-                    ts.factory.createIdentifier('Struct'),
+                    ts.factory.createIdentifier('Variant'),
                     []
                 ),
             ]),
