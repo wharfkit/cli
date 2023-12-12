@@ -3,6 +3,7 @@ import type {
     AssetType,
     BytesType,
     Checksum256Type,
+    Float64Type,
     Int64Type,
     NameType,
     PublicKeyType,
@@ -61,189 +62,255 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    activate: ActionParams.Activate
-    bidname: ActionParams.Bidname
-    bidrefund: ActionParams.Bidrefund
-    buyram: ActionParams.Buyram
-    buyrambytes: ActionParams.Buyrambytes
-    buyrex: ActionParams.Buyrex
-    canceldelay: ActionParams.Canceldelay
-    cfgpowerup: ActionParams.Cfgpowerup
-    claimrewards: ActionParams.Claimrewards
-    closerex: ActionParams.Closerex
-    cnclrexorder: ActionParams.Cnclrexorder
-    consolidate: ActionParams.Consolidate
-    defcpuloan: ActionParams.Defcpuloan
-    defnetloan: ActionParams.Defnetloan
-    delegatebw: ActionParams.Delegatebw
-    deleteauth: ActionParams.Deleteauth
-    deposit: ActionParams.Deposit
-    fundcpuloan: ActionParams.Fundcpuloan
-    fundnetloan: ActionParams.Fundnetloan
-    init: ActionParams.Init
-    limitauthchg: ActionParams.Limitauthchg
-    linkauth: ActionParams.Linkauth
-    mvfrsavings: ActionParams.Mvfrsavings
-    mvtosavings: ActionParams.Mvtosavings
-    newaccount: ActionParams.Newaccount
-    onblock: ActionParams.Onblock
-    onerror: ActionParams.Onerror
-    powerup: ActionParams.Powerup
-    powerupexec: ActionParams.Powerupexec
-    refund: ActionParams.Refund
-    regproducer: ActionParams.Regproducer
-    regproducer2: ActionParams.Regproducer2
-    regproxy: ActionParams.Regproxy
-    rentcpu: ActionParams.Rentcpu
-    rentnet: ActionParams.Rentnet
-    rexexec: ActionParams.Rexexec
-    rmvproducer: ActionParams.Rmvproducer
-    sellram: ActionParams.Sellram
-    sellrex: ActionParams.Sellrex
-    setabi: ActionParams.Setabi
-    setacctcpu: ActionParams.Setacctcpu
-    setacctnet: ActionParams.Setacctnet
-    setacctram: ActionParams.Setacctram
-    setalimits: ActionParams.Setalimits
-    setcode: ActionParams.Setcode
-    setinflation: ActionParams.Setinflation
-    setparams: ActionParams.Setparams
-    setpriv: ActionParams.Setpriv
-    setram: ActionParams.Setram
-    setramrate: ActionParams.Setramrate
-    setrex: ActionParams.Setrex
-    undelegatebw: ActionParams.Undelegatebw
-    unlinkauth: ActionParams.Unlinkauth
-    unregprod: ActionParams.Unregprod
-    unstaketorex: ActionParams.Unstaketorex
-    updateauth: ActionParams.Updateauth
-    updaterex: ActionParams.Updaterex
-    updtrevision: ActionParams.Updtrevision
-    voteproducer: ActionParams.Voteproducer
-    voteupdate: ActionParams.Voteupdate
-    wasmcfg: ActionParams.Wasmcfg
-    withdraw: ActionParams.Withdraw
+    activate: ActionParams.activate
+    bidname: ActionParams.bidname
+    bidrefund: ActionParams.bidrefund
+    buyram: ActionParams.buyram
+    buyrambytes: ActionParams.buyrambytes
+    buyrex: ActionParams.buyrex
+    canceldelay: ActionParams.canceldelay
+    cfgpowerup: ActionParams.cfgpowerup
+    claimrewards: ActionParams.claimrewards
+    closerex: ActionParams.closerex
+    cnclrexorder: ActionParams.cnclrexorder
+    consolidate: ActionParams.consolidate
+    defcpuloan: ActionParams.defcpuloan
+    defnetloan: ActionParams.defnetloan
+    delegatebw: ActionParams.delegatebw
+    deleteauth: ActionParams.deleteauth
+    deposit: ActionParams.deposit
+    fundcpuloan: ActionParams.fundcpuloan
+    fundnetloan: ActionParams.fundnetloan
+    init: ActionParams.init
+    limitauthchg: ActionParams.limitauthchg
+    linkauth: ActionParams.linkauth
+    mvfrsavings: ActionParams.mvfrsavings
+    mvtosavings: ActionParams.mvtosavings
+    newaccount: ActionParams.newaccount
+    onblock: ActionParams.onblock
+    onerror: ActionParams.onerror
+    powerup: ActionParams.powerup
+    powerupexec: ActionParams.powerupexec
+    refund: ActionParams.refund
+    regproducer: ActionParams.regproducer
+    regproducer2: ActionParams.regproducer2
+    regproxy: ActionParams.regproxy
+    rentcpu: ActionParams.rentcpu
+    rentnet: ActionParams.rentnet
+    rexexec: ActionParams.rexexec
+    rmvproducer: ActionParams.rmvproducer
+    sellram: ActionParams.sellram
+    sellrex: ActionParams.sellrex
+    setabi: ActionParams.setabi
+    setacctcpu: ActionParams.setacctcpu
+    setacctnet: ActionParams.setacctnet
+    setacctram: ActionParams.setacctram
+    setalimits: ActionParams.setalimits
+    setcode: ActionParams.setcode
+    setinflation: ActionParams.setinflation
+    setparams: ActionParams.setparams
+    setpriv: ActionParams.setpriv
+    setram: ActionParams.setram
+    setramrate: ActionParams.setramrate
+    setrex: ActionParams.setrex
+    undelegatebw: ActionParams.undelegatebw
+    unlinkauth: ActionParams.unlinkauth
+    unregprod: ActionParams.unregprod
+    unstaketorex: ActionParams.unstaketorex
+    updateauth: ActionParams.updateauth
+    updaterex: ActionParams.updaterex
+    updtrevision: ActionParams.updtrevision
+    voteproducer: ActionParams.voteproducer
+    voteupdate: ActionParams.voteupdate
+    wasmcfg: ActionParams.wasmcfg
+    withdraw: ActionParams.withdraw
 }
 export namespace ActionParams {
-    export interface Activate {
+    export namespace Types {
+        export interface permission_level {
+            actor: NameType
+            permission: NameType
+        }
+        export interface powerup_config {
+            net: Types.powerup_config_resource
+            cpu: Types.powerup_config_resource
+            powerup_days: UInt32Type
+            min_powerup_fee: AssetType
+        }
+        export interface powerup_config_resource {
+            current_weight_ratio: Int64Type
+            target_weight_ratio: Int64Type
+            assumed_stake_weight: Int64Type
+            target_timestamp: TimePointSec
+            exponent: Float64Type
+            decay_secs: UInt32Type
+            min_price: AssetType
+            max_price: AssetType
+        }
+        export interface authority {
+            threshold: UInt32Type
+            keys: Types.key_weight[]
+            accounts: Types.permission_level_weight[]
+            waits: Types.wait_weight[]
+        }
+        export interface key_weight {
+            key: PublicKeyType
+            weight: UInt16Type
+        }
+        export interface permission_level_weight {
+            permission: Types.permission_level
+            weight: UInt16Type
+        }
+        export interface wait_weight {
+            wait_sec: UInt32Type
+            weight: UInt16Type
+        }
+        export interface block_header {
+            timestamp: UInt32Type
+            producer: NameType
+            confirmed: UInt16Type
+            previous: Checksum256Type
+            transaction_mroot: Checksum256Type
+            action_mroot: Checksum256Type
+            schedule_version: UInt32Type
+            new_producers: Types.producer_schedule
+        }
+        export interface producer_schedule {
+            version: UInt32Type
+            producers: Types.producer_key[]
+        }
+        export interface producer_key {
+            producer_name: NameType
+            block_signing_key: PublicKeyType
+        }
+        export type regproducer2_producer_authority_variant = Types.block_signing_authority_v0
+        export interface block_signing_authority_v0 {
+            threshold: UInt32Type
+            keys: Types.key_weight[]
+        }
+        export interface blockchain_parameters_v1 {
+            max_action_return_value_size: UInt32Type
+        }
+    }
+    export interface activate {
         feature_digest: Checksum256Type
     }
-    export interface Bidname {
+    export interface bidname {
         bidder: NameType
         newname: NameType
         bid: AssetType
     }
-    export interface Bidrefund {
+    export interface bidrefund {
         bidder: NameType
         newname: NameType
     }
-    export interface Buyram {
+    export interface buyram {
         payer: NameType
         receiver: NameType
         quant: AssetType
     }
-    export interface Buyrambytes {
+    export interface buyrambytes {
         payer: NameType
         receiver: NameType
         bytes: UInt32Type
     }
-    export interface Buyrex {
+    export interface buyrex {
         from: NameType
         amount: AssetType
     }
-    export interface Canceldelay {
+    export interface canceldelay {
         canceling_auth: Types.permission_level
         trx_id: Checksum256Type
     }
-    export interface Cfgpowerup {
+    export interface cfgpowerup {
         args: Types.powerup_config
     }
-    export interface Claimrewards {
+    export interface claimrewards {
         owner: NameType
     }
-    export interface Closerex {
+    export interface closerex {
         owner: NameType
     }
-    export interface Cnclrexorder {
+    export interface cnclrexorder {
         owner: NameType
     }
-    export interface Consolidate {
+    export interface consolidate {
         owner: NameType
     }
-    export interface Defcpuloan {
+    export interface defcpuloan {
         from: NameType
         loan_num: UInt64Type
         amount: AssetType
     }
-    export interface Defnetloan {
+    export interface defnetloan {
         from: NameType
         loan_num: UInt64Type
         amount: AssetType
     }
-    export interface Delegatebw {
+    export interface delegatebw {
         from: NameType
         receiver: NameType
         stake_net_quantity: AssetType
         stake_cpu_quantity: AssetType
         transfer: boolean
     }
-    export interface Deleteauth {
+    export interface deleteauth {
         account: NameType
         permission: NameType
         authorized_by?: NameType
     }
-    export interface Deposit {
+    export interface deposit {
         owner: NameType
         amount: AssetType
     }
-    export interface Fundcpuloan {
+    export interface fundcpuloan {
         from: NameType
         loan_num: UInt64Type
         payment: AssetType
     }
-    export interface Fundnetloan {
+    export interface fundnetloan {
         from: NameType
         loan_num: UInt64Type
         payment: AssetType
     }
-    export interface Init {
+    export interface init {
         version: VarUIntType
         core: Asset.SymbolType
     }
-    export interface Limitauthchg {
+    export interface limitauthchg {
         account: NameType
         allow_perms: NameType[]
         disallow_perms: NameType[]
     }
-    export interface Linkauth {
+    export interface linkauth {
         account: NameType
         code: NameType
         type: NameType
         requirement: NameType
         authorized_by?: NameType
     }
-    export interface Mvfrsavings {
+    export interface mvfrsavings {
         owner: NameType
         rex: AssetType
     }
-    export interface Mvtosavings {
+    export interface mvtosavings {
         owner: NameType
         rex: AssetType
     }
-    export interface Newaccount {
+    export interface newaccount {
         creator: NameType
         name: NameType
         owner: Types.authority
         active: Types.authority
     }
-    export interface Onblock {
+    export interface onblock {
         header: Types.block_header
     }
-    export interface Onerror {
+    export interface onerror {
         sender_id: UInt128Type
         sent_trx: BytesType
     }
-    export interface Powerup {
+    export interface powerup {
         payer: NameType
         receiver: NameType
         days: UInt32Type
@@ -251,153 +318,153 @@ export namespace ActionParams {
         cpu_frac: Int64Type
         max_payment: AssetType
     }
-    export interface Powerupexec {
+    export interface powerupexec {
         user: NameType
         max: UInt16Type
     }
-    export interface Refund {
+    export interface refund {
         owner: NameType
     }
-    export interface Regproducer {
+    export interface regproducer {
         producer: NameType
         producer_key: PublicKeyType
         url: string
         location: UInt16Type
     }
-    export interface Regproducer2 {
+    export interface regproducer2 {
         producer: NameType
-        producer_authority: Types.variant_block_signing_authority_v0
+        producer_authority: Types.regproducer2_producer_authority_variant
         url: string
         location: UInt16Type
     }
-    export interface Regproxy {
+    export interface regproxy {
         proxy: NameType
         isproxy: boolean
     }
-    export interface Rentcpu {
+    export interface rentcpu {
         from: NameType
         receiver: NameType
         loan_payment: AssetType
         loan_fund: AssetType
     }
-    export interface Rentnet {
+    export interface rentnet {
         from: NameType
         receiver: NameType
         loan_payment: AssetType
         loan_fund: AssetType
     }
-    export interface Rexexec {
+    export interface rexexec {
         user: NameType
         max: UInt16Type
     }
-    export interface Rmvproducer {
+    export interface rmvproducer {
         producer: NameType
     }
-    export interface Sellram {
+    export interface sellram {
         account: NameType
         bytes: Int64Type
     }
-    export interface Sellrex {
+    export interface sellrex {
         from: NameType
         rex: AssetType
     }
-    export interface Setabi {
+    export interface setabi {
         account: NameType
         abi: BytesType
         memo?: string
     }
-    export interface Setacctcpu {
+    export interface setacctcpu {
         account: NameType
         cpu_weight?: Int64Type
     }
-    export interface Setacctnet {
+    export interface setacctnet {
         account: NameType
         net_weight?: Int64Type
     }
-    export interface Setacctram {
+    export interface setacctram {
         account: NameType
         ram_bytes?: Int64Type
     }
-    export interface Setalimits {
+    export interface setalimits {
         account: NameType
         ram_bytes: Int64Type
         net_weight: Int64Type
         cpu_weight: Int64Type
     }
-    export interface Setcode {
+    export interface setcode {
         account: NameType
         vmtype: UInt8Type
         vmversion: UInt8Type
         code: BytesType
         memo?: string
     }
-    export interface Setinflation {
+    export interface setinflation {
         annual_rate: Int64Type
         inflation_pay_factor: Int64Type
         votepay_factor: Int64Type
     }
-    export interface Setparams {
+    export interface setparams {
         params: Types.blockchain_parameters_v1
     }
-    export interface Setpriv {
+    export interface setpriv {
         account: NameType
         is_priv: UInt8Type
     }
-    export interface Setram {
+    export interface setram {
         max_ram_size: UInt64Type
     }
-    export interface Setramrate {
+    export interface setramrate {
         bytes_per_block: UInt16Type
     }
-    export interface Setrex {
+    export interface setrex {
         balance: AssetType
     }
-    export interface Undelegatebw {
+    export interface undelegatebw {
         from: NameType
         receiver: NameType
         unstake_net_quantity: AssetType
         unstake_cpu_quantity: AssetType
     }
-    export interface Unlinkauth {
+    export interface unlinkauth {
         account: NameType
         code: NameType
         type: NameType
         authorized_by?: NameType
     }
-    export interface Unregprod {
+    export interface unregprod {
         producer: NameType
     }
-    export interface Unstaketorex {
+    export interface unstaketorex {
         owner: NameType
         receiver: NameType
         from_net: AssetType
         from_cpu: AssetType
     }
-    export interface Updateauth {
+    export interface updateauth {
         account: NameType
         permission: NameType
         parent: NameType
         auth: Types.authority
         authorized_by?: NameType
     }
-    export interface Updaterex {
+    export interface updaterex {
         owner: NameType
     }
-    export interface Updtrevision {
+    export interface updtrevision {
         revision: UInt8Type
     }
-    export interface Voteproducer {
+    export interface voteproducer {
         voter: NameType
         proxy: NameType
         producers: NameType[]
     }
-    export interface Voteupdate {
+    export interface voteupdate {
         voter_name: NameType
     }
-    export interface Wasmcfg {
+    export interface wasmcfg {
         settings: NameType
     }
-    export interface Withdraw {
+    export interface withdraw {
         owner: NameType
         amount: AssetType
     }

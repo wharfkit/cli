@@ -26,37 +26,38 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    close: ActionParams.Close
-    create: ActionParams.Create
-    issue: ActionParams.Issue
-    open: ActionParams.Open
-    retire: ActionParams.Retire
-    transfer: ActionParams.Transfer
+    close: ActionParams.close
+    create: ActionParams.create
+    issue: ActionParams.issue
+    open: ActionParams.open
+    retire: ActionParams.retire
+    transfer: ActionParams.transfer
 }
 export namespace ActionParams {
-    export interface Close {
+    export namespace Types {}
+    export interface close {
         owner: NameType
         symbol: Asset.SymbolType
     }
-    export interface Create {
+    export interface create {
         issuer: NameType
         maximum_supply: AssetType
     }
-    export interface Issue {
+    export interface issue {
         to: NameType
         quantity: AssetType
         memo: string
     }
-    export interface Open {
+    export interface open {
         owner: NameType
         symbol: Asset.SymbolType
         ram_payer: NameType
     }
-    export interface Retire {
+    export interface retire {
         quantity: AssetType
         memo: string
     }
-    export interface Transfer {
+    export interface transfer {
         from: NameType
         to: NameType
         quantity: AssetType

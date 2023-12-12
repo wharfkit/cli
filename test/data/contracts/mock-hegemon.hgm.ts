@@ -4,6 +4,7 @@ import type {
     Float64Type,
     Int8Type,
     NameType,
+    TimePointType,
     UInt32Type,
     UInt64Type,
     UInt8Type,
@@ -48,113 +49,175 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    addbuilding: ActionParams.Addbuilding
-    adddeposit: ActionParams.Adddeposit
-    addfaction: ActionParams.Addfaction
-    addinventory: ActionParams.Addinventory
-    addmap: ActionParams.Addmap
-    addplanet: ActionParams.Addplanet
-    addregion: ActionParams.Addregion
-    addresource: ActionParams.Addresource
-    addterrain: ActionParams.Addterrain
-    addtile: ActionParams.Addtile
-    addunit: ActionParams.Addunit
-    addvehicle: ActionParams.Addvehicle
-    calcenergy: ActionParams.Calcenergy
-    clear: ActionParams.Clear
-    clearprim: ActionParams.Clearprim
-    clearsec1: ActionParams.Clearsec1
-    clearsec2: ActionParams.Clearsec2
-    createchar: ActionParams.Createchar
-    detokenize: ActionParams.Detokenize
-    discardchar: ActionParams.Discardchar
-    doaddmats: ActionParams.Doaddmats
-    doaddproj: ActionParams.Doaddproj
-    dobuild: ActionParams.Dobuild
-    docancelproj: ActionParams.Docancelproj
-    docombat: ActionParams.Docombat
-    doconquer: ActionParams.Doconquer
-    docontrol: ActionParams.Docontrol
-    docraft: ActionParams.Docraft
-    docreateship: ActionParams.Docreateship
-    dodemobilize: ActionParams.Dodemobilize
-    dodevelop: ActionParams.Dodevelop
-    dodisband: ActionParams.Dodisband
-    dodisembark: ActionParams.Dodisembark
-    dodropoff: ActionParams.Dodropoff
-    doeat: ActionParams.Doeat
-    doembark: ActionParams.Doembark
-    doentership: ActionParams.Doentership
-    doequip: ActionParams.Doequip
-    dogive: ActionParams.Dogive
-    doheal: ActionParams.Doheal
-    dojoinbattle: ActionParams.Dojoinbattle
-    doland: ActionParams.Doland
-    dolaunch: ActionParams.Dolaunch
-    doleaveship: ActionParams.Doleaveship
-    doload: ActionParams.Doload
-    domobilize: ActionParams.Domobilize
-    domove: ActionParams.Domove
-    domoveship: ActionParams.Domoveship
-    dopayupkeep: ActionParams.Dopayupkeep
-    dopickup: ActionParams.Dopickup
-    dorepair: ActionParams.Dorepair
-    doresearch: ActionParams.Doresearch
-    doretreat: ActionParams.Doretreat
-    dotrain: ActionParams.Dotrain
-    dotransfer: ActionParams.Dotransfer
-    dounequip: ActionParams.Dounequip
-    dounload: ActionParams.Dounload
-    dowork: ActionParams.Dowork
-    electresult: ActionParams.Electresult
-    endday: ActionParams.Endday
-    endepoch: ActionParams.Endepoch
-    grantspoils: ActionParams.Grantspoils
-    init: ActionParams.Init
-    joinfaction: ActionParams.Joinfaction
-    killchar: ActionParams.Killchar
-    msigsuccess: ActionParams.Msigsuccess
-    proc: ActionParams.Proc
-    regplayer: ActionParams.Regplayer
-    resolverngs: ActionParams.Resolverngs
-    restorehp: ActionParams.Restorehp
-    revivechar: ActionParams.Revivechar
-    setcharacter: ActionParams.Setcharacter
-    setcrew: ActionParams.Setcrew
-    setgm: ActionParams.Setgm
-    setoperator: ActionParams.Setoperator
-    setplayer: ActionParams.Setplayer
-    settilecw: ActionParams.Settilecw
-    startepoch: ActionParams.Startepoch
-    test: ActionParams.Test
-    tokenize: ActionParams.Tokenize
-    updatechars: ActionParams.Updatechars
-    updaterng: ActionParams.Updaterng
-    updatetile: ActionParams.Updatetile
-    updatetiles: ActionParams.Updatetiles
-    upgradechar: ActionParams.Upgradechar
+    addbuilding: ActionParams.addbuilding
+    adddeposit: ActionParams.adddeposit
+    addfaction: ActionParams.addfaction
+    addinventory: ActionParams.addinventory
+    addmap: ActionParams.addmap
+    addplanet: ActionParams.addplanet
+    addregion: ActionParams.addregion
+    addresource: ActionParams.addresource
+    addterrain: ActionParams.addterrain
+    addtile: ActionParams.addtile
+    addunit: ActionParams.addunit
+    addvehicle: ActionParams.addvehicle
+    calcenergy: ActionParams.calcenergy
+    clear: ActionParams.clear
+    clearprim: ActionParams.clearprim
+    clearsec1: ActionParams.clearsec1
+    clearsec2: ActionParams.clearsec2
+    createchar: ActionParams.createchar
+    detokenize: ActionParams.detokenize
+    discardchar: ActionParams.discardchar
+    doaddmats: ActionParams.doaddmats
+    doaddproj: ActionParams.doaddproj
+    dobuild: ActionParams.dobuild
+    docancelproj: ActionParams.docancelproj
+    docombat: ActionParams.docombat
+    doconquer: ActionParams.doconquer
+    docontrol: ActionParams.docontrol
+    docraft: ActionParams.docraft
+    docreateship: ActionParams.docreateship
+    dodemobilize: ActionParams.dodemobilize
+    dodevelop: ActionParams.dodevelop
+    dodisband: ActionParams.dodisband
+    dodisembark: ActionParams.dodisembark
+    dodropoff: ActionParams.dodropoff
+    doeat: ActionParams.doeat
+    doembark: ActionParams.doembark
+    doentership: ActionParams.doentership
+    doequip: ActionParams.doequip
+    dogive: ActionParams.dogive
+    doheal: ActionParams.doheal
+    dojoinbattle: ActionParams.dojoinbattle
+    doland: ActionParams.doland
+    dolaunch: ActionParams.dolaunch
+    doleaveship: ActionParams.doleaveship
+    doload: ActionParams.doload
+    domobilize: ActionParams.domobilize
+    domove: ActionParams.domove
+    domoveship: ActionParams.domoveship
+    dopayupkeep: ActionParams.dopayupkeep
+    dopickup: ActionParams.dopickup
+    dorepair: ActionParams.dorepair
+    doresearch: ActionParams.doresearch
+    doretreat: ActionParams.doretreat
+    dotrain: ActionParams.dotrain
+    dotransfer: ActionParams.dotransfer
+    dounequip: ActionParams.dounequip
+    dounload: ActionParams.dounload
+    dowork: ActionParams.dowork
+    electresult: ActionParams.electresult
+    endday: ActionParams.endday
+    endepoch: ActionParams.endepoch
+    grantspoils: ActionParams.grantspoils
+    init: ActionParams.init
+    joinfaction: ActionParams.joinfaction
+    killchar: ActionParams.killchar
+    msigsuccess: ActionParams.msigsuccess
+    proc: ActionParams.proc
+    regplayer: ActionParams.regplayer
+    resolverngs: ActionParams.resolverngs
+    restorehp: ActionParams.restorehp
+    revivechar: ActionParams.revivechar
+    setcharacter: ActionParams.setcharacter
+    setcrew: ActionParams.setcrew
+    setgm: ActionParams.setgm
+    setoperator: ActionParams.setoperator
+    setplayer: ActionParams.setplayer
+    settilecw: ActionParams.settilecw
+    startepoch: ActionParams.startepoch
+    test: ActionParams.test
+    tokenize: ActionParams.tokenize
+    updatechars: ActionParams.updatechars
+    updaterng: ActionParams.updaterng
+    updatetile: ActionParams.updatetile
+    updatetiles: ActionParams.updatetiles
+    upgradechar: ActionParams.upgradechar
 }
 export namespace ActionParams {
-    export interface Addbuilding {
+    export namespace Types {
+        export interface pair_uint32_uint64 {
+            first: UInt32Type
+            second: UInt64Type
+        }
+        export interface character {
+            id: UInt64Type
+            first_name: string
+            middle_name: string
+            last_name: string
+            asset_url: string
+            energy: Float64Type
+            max_energy: Float64Type
+            owner: NameType
+            last_action_time: TimePointType
+            time_last_fed: TimePointType
+            tool_equipped: UInt64Type
+            armor_equipped: UInt64Type
+            melee_weapon_equipped: UInt64Type
+            ranged_weapon_equipped: UInt64Type
+            on_board_vehicle: UInt64Type
+            active_effects: UInt64Type[]
+            base_character_role: UInt8Type
+            mid_character_role: UInt8Type
+            character_role: UInt8Type
+            experience_level: UInt32Type
+            experience_points: UInt32Type
+            hp: UInt32Type
+            max_hp: UInt32Type
+            alive: boolean
+            temporal_deja_vu_score: UInt8Type
+        }
+        export interface pair_uint64_CrewRole {
+            first: UInt64Type
+            second: UInt8Type
+        }
+        export interface player {
+            id: UInt64Type
+            owner: NameType
+            asset_url: string
+            character_slots: UInt8Type
+            reputation_level: UInt8Type
+            experience_level: UInt32Type
+            experience_points: UInt32Type
+            cooldowns: Types.cooldown[]
+            active_project: UInt64Type
+            faction: UInt64Type
+            base_faction_voting_power: Float64Type
+            max_inventory_size: UInt32Type
+            inventory: Types.pair_uint32_uint64[]
+            currency: AssetType
+            last_respawn: TimePointType
+            location_tile_id: UInt64Type
+            opted_out_of_politics: boolean
+            mobilized_units: UInt32Type
+        }
+        export interface cooldown {
+            cooldown_type: UInt8Type
+            time_started: TimePointType
+            cooldown_duration: UInt32Type
+        }
+    }
+    export interface addbuilding {
         gameasset_id: UInt64Type
         tile_id: UInt64Type
         owner: NameType
     }
-    export interface Adddeposit {
+    export interface adddeposit {
         resource_type_id: UInt64Type
         location_tile_id: UInt64Type
     }
-    export interface Addfaction {
+    export interface addfaction {
         id: UInt64Type
         name: string
         code: NameType
         flag_asset_url: string
     }
-    export interface Addinventory {
+    export interface addinventory {
         player: NameType
         ingredients: Types.pair_uint32_uint64[]
     }
-    export interface Addmap {
+    export interface addmap {
         area_map: NameType
         name: string
         code: NameType
@@ -163,7 +226,7 @@ export namespace ActionParams {
         g_color: UInt8Type
         b_color: UInt8Type
     }
-    export interface Addplanet {
+    export interface addplanet {
         id: UInt64Type
         area_map: NameType
         q_coord: Int8Type
@@ -175,20 +238,20 @@ export namespace ActionParams {
         g_color: UInt8Type
         b_color: UInt8Type
     }
-    export interface Addregion {
+    export interface addregion {
         id: UInt64Type
         area_map: NameType
         name: string
         code: NameType
     }
-    export interface Addresource {
+    export interface addresource {
         id: UInt64Type
         gameasset_id: UInt64Type
         name: string
         asset_url: string
         difficulty: UInt32Type
     }
-    export interface Addterrain {
+    export interface addterrain {
         id: UInt64Type
         type: string
         map_asset_urls: string[]
@@ -196,7 +259,7 @@ export namespace ActionParams {
         building_slots: UInt8Type
         effects: UInt64Type[]
     }
-    export interface Addtile {
+    export interface addtile {
         id: UInt64Type
         area_map: NameType
         region_id: UInt64Type
@@ -204,280 +267,280 @@ export namespace ActionParams {
         r_coord: Int8Type
         terrain_type: UInt64Type
     }
-    export interface Addunit {
+    export interface addunit {
         unit_type_id: UInt64Type
         owner: NameType
     }
-    export interface Addvehicle {
+    export interface addvehicle {
         gameasset_id: UInt64Type
         tile_id: UInt64Type
         owner: NameType
     }
-    export interface Calcenergy {
+    export interface calcenergy {
         character_id: UInt64Type
     }
-    export interface Clear {}
-    export interface Clearprim {
+    export interface clear {}
+    export interface clearprim {
         table_name: NameType
         scope: NameType
     }
-    export interface Clearsec1 {
-        table_name: NameType
-        index_num: UInt8Type
-        scope: NameType
-    }
-    export interface Clearsec2 {
+    export interface clearsec1 {
         table_name: NameType
         index_num: UInt8Type
         scope: NameType
     }
-    export interface Createchar {
+    export interface clearsec2 {
+        table_name: NameType
+        index_num: UInt8Type
+        scope: NameType
+    }
+    export interface createchar {
         player: NameType
     }
-    export interface Detokenize {
+    export interface detokenize {
         player: NameType
         resource: AssetType
     }
-    export interface Discardchar {
+    export interface discardchar {
         character_id: UInt64Type
     }
-    export interface Doaddmats {
+    export interface doaddmats {
         character_id: UInt64Type
         project_id: UInt64Type
         materials: Types.pair_uint32_uint64
     }
-    export interface Doaddproj {
+    export interface doaddproj {
         character_id: UInt64Type
         blueprint_id: UInt64Type
     }
-    export interface Dobuild {
+    export interface dobuild {
         character_id: UInt64Type
         project_id: UInt64Type
     }
-    export interface Docancelproj {
+    export interface docancelproj {
         character_id: UInt64Type
         project_id: UInt64Type
     }
-    export interface Docombat {
+    export interface docombat {
         player: NameType
         faction_id: UInt64Type
     }
-    export interface Doconquer {
+    export interface doconquer {
         player: NameType
         target_tile_id: UInt64Type
     }
-    export interface Docontrol {
+    export interface docontrol {
         character_id: UInt64Type
     }
-    export interface Docraft {
+    export interface docraft {
         character_id: UInt64Type
         recipe_id: UInt64Type
     }
-    export interface Docreateship {
+    export interface docreateship {
         character_id: UInt64Type
         shipmodules: UInt64Type[]
     }
-    export interface Dodemobilize {
+    export interface dodemobilize {
         player: NameType
         units: UInt64Type[]
     }
-    export interface Dodevelop {
+    export interface dodevelop {
         character_id: UInt64Type
     }
-    export interface Dodisband {
+    export interface dodisband {
         player: NameType
         unit_id: UInt64Type
     }
-    export interface Dodisembark {
+    export interface dodisembark {
         character_id: UInt64Type
     }
-    export interface Dodropoff {
+    export interface dodropoff {
         player: NameType
         items: Types.pair_uint32_uint64
     }
-    export interface Doeat {
+    export interface doeat {
         character_id: UInt64Type
     }
-    export interface Doembark {
+    export interface doembark {
         character_id: UInt64Type
         vehicle_id: UInt64Type
     }
-    export interface Doentership {
+    export interface doentership {
         player: NameType
         spaceship_id: UInt64Type
     }
-    export interface Doequip {
+    export interface doequip {
         character_id: UInt64Type
         gameasset_id: UInt64Type
     }
-    export interface Dogive {
+    export interface dogive {
         owner: NameType
         recipient: NameType
         items: Types.pair_uint32_uint64[]
     }
-    export interface Doheal {
+    export interface doheal {
         character_id: UInt64Type
         patient_id: UInt64Type
         is_character: boolean
     }
-    export interface Dojoinbattle {
+    export interface dojoinbattle {
         player: NameType
         battle_id: UInt64Type
     }
-    export interface Doland {
+    export interface doland {
         spaceship_id: UInt64Type
         tile_id: UInt64Type
     }
-    export interface Dolaunch {
+    export interface dolaunch {
         spaceship_id: UInt64Type
     }
-    export interface Doleaveship {
+    export interface doleaveship {
         player: NameType
     }
-    export interface Doload {
+    export interface doload {
         player: NameType
         vehicle_id: UInt64Type
         items: Types.pair_uint32_uint64
     }
-    export interface Domobilize {
+    export interface domobilize {
         player: NameType
         units: UInt64Type[]
     }
-    export interface Domove {
+    export interface domove {
         player: NameType
         destination_tile_id: UInt64Type
     }
-    export interface Domoveship {
+    export interface domoveship {
         spaceship_id: UInt64Type
         tile_id: UInt64Type
     }
-    export interface Dopayupkeep {
+    export interface dopayupkeep {
         character_id: UInt64Type
         type: UInt8Type
         entity: UInt64Type
     }
-    export interface Dopickup {
+    export interface dopickup {
         player: NameType
         items: Types.pair_uint32_uint64
     }
-    export interface Dorepair {
+    export interface dorepair {
         character_id: UInt64Type
         entity_id: UInt64Type
         type: UInt8Type
     }
-    export interface Doresearch {
+    export interface doresearch {
         character_id: UInt64Type
         technology_id: UInt64Type
     }
-    export interface Doretreat {
+    export interface doretreat {
         player: NameType
         destination_tile_id: UInt64Type
     }
-    export interface Dotrain {
+    export interface dotrain {
         character_id: UInt64Type
         recipe_id: UInt64Type
         mobilize: boolean
     }
-    export interface Dotransfer {
+    export interface dotransfer {
         entity_id: UInt64Type
         type: UInt8Type
         new_owner: NameType
     }
-    export interface Dounequip {
+    export interface dounequip {
         character_id: UInt64Type
         item_type: UInt8Type
     }
-    export interface Dounload {
+    export interface dounload {
         player: NameType
         vehicle_id: UInt64Type
         items: Types.pair_uint32_uint64
     }
-    export interface Dowork {
+    export interface dowork {
         character_id: UInt64Type
         activity: UInt8Type
     }
-    export interface Electresult {
+    export interface electresult {
         faction_id: UInt64Type
         leader: UInt64Type
         officers: UInt64Type[]
     }
-    export interface Endday {}
-    export interface Endepoch {}
-    export interface Grantspoils {
+    export interface endday {}
+    export interface endepoch {}
+    export interface grantspoils {
         beneficiary: NameType
         entity_id: UInt64Type
         entity_type: UInt8Type
     }
-    export interface Init {
+    export interface init {
         epoch: UInt8Type
     }
-    export interface Joinfaction {
+    export interface joinfaction {
         player: NameType
         faction_id: UInt64Type
     }
-    export interface Killchar {
+    export interface killchar {
         character_id: UInt64Type
     }
-    export interface Msigsuccess {
+    export interface msigsuccess {
         squad_id: UInt64Type
     }
-    export interface Proc {
+    export interface proc {
         count: UInt32Type
     }
-    export interface Regplayer {
+    export interface regplayer {
         player: NameType
         opt_out_of_politics: boolean
     }
-    export interface Resolverngs {
+    export interface resolverngs {
         count: UInt32Type
     }
-    export interface Restorehp {
+    export interface restorehp {
         character_id: UInt64Type
     }
-    export interface Revivechar {
+    export interface revivechar {
         character_id: UInt64Type
         payer: NameType
     }
-    export interface Setcharacter {
+    export interface setcharacter {
         c: Types.character
     }
-    export interface Setcrew {
+    export interface setcrew {
         spaceship_id: UInt64Type
         crew: Types.pair_uint64_CrewRole[]
     }
-    export interface Setgm {
+    export interface setgm {
         player: NameType
     }
-    export interface Setoperator {
+    export interface setoperator {
         spaceship_id: UInt64Type
         ship_operator: NameType
     }
-    export interface Setplayer {
+    export interface setplayer {
         p: Types.player
     }
-    export interface Settilecw {
+    export interface settilecw {
         tile_id: UInt64Type
         control: Float64Type
         wildness: Float64Type
         controlling_faction_id: UInt64Type
     }
-    export interface Startepoch {}
-    export interface Test {}
-    export interface Tokenize {
+    export interface startepoch {}
+    export interface test {}
+    export interface tokenize {
         player: NameType
         resource: AssetType
     }
-    export interface Updatechars {
+    export interface updatechars {
         count: UInt32Type
     }
-    export interface Updaterng {}
-    export interface Updatetile {
+    export interface updaterng {}
+    export interface updatetile {
         tile_id: UInt64Type
     }
-    export interface Updatetiles {
+    export interface updatetiles {
         count: UInt32Type
     }
-    export interface Upgradechar {
+    export interface upgradechar {
         character_id: UInt64Type
         new_role: UInt8Type
     }

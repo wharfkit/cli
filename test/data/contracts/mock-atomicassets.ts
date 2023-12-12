@@ -1,11 +1,18 @@
 import type {
     Action,
     AssetType,
+    BytesType,
+    Float32Type,
     Float64Type,
+    Int16Type,
     Int32Type,
+    Int64Type,
+    Int8Type,
     NameType,
+    UInt16Type,
     UInt32Type,
     UInt64Type,
+    UInt8Type,
 } from '@wharfkit/antelope'
 import {
     ABI,
@@ -52,79 +59,112 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    acceptoffer: ActionParams.Acceptoffer
-    addcolauth: ActionParams.Addcolauth
-    addconftoken: ActionParams.Addconftoken
-    addnotifyacc: ActionParams.Addnotifyacc
-    admincoledit: ActionParams.Admincoledit
-    announcedepo: ActionParams.Announcedepo
-    backasset: ActionParams.Backasset
-    burnasset: ActionParams.Burnasset
-    canceloffer: ActionParams.Canceloffer
-    createcol: ActionParams.Createcol
-    createoffer: ActionParams.Createoffer
-    createschema: ActionParams.Createschema
-    createtempl: ActionParams.Createtempl
-    declineoffer: ActionParams.Declineoffer
-    extendschema: ActionParams.Extendschema
-    forbidnotify: ActionParams.Forbidnotify
-    init: ActionParams.Init
-    locktemplate: ActionParams.Locktemplate
-    logbackasset: ActionParams.Logbackasset
-    logburnasset: ActionParams.Logburnasset
-    logmint: ActionParams.Logmint
-    lognewoffer: ActionParams.Lognewoffer
-    lognewtempl: ActionParams.Lognewtempl
-    logsetdata: ActionParams.Logsetdata
-    logtransfer: ActionParams.Logtransfer
-    mintasset: ActionParams.Mintasset
-    payofferram: ActionParams.Payofferram
-    remcolauth: ActionParams.Remcolauth
-    remnotifyacc: ActionParams.Remnotifyacc
-    setassetdata: ActionParams.Setassetdata
-    setcoldata: ActionParams.Setcoldata
-    setmarketfee: ActionParams.Setmarketfee
-    setversion: ActionParams.Setversion
-    transfer: ActionParams.Transfer
-    withdraw: ActionParams.Withdraw
+    acceptoffer: ActionParams.acceptoffer
+    addcolauth: ActionParams.addcolauth
+    addconftoken: ActionParams.addconftoken
+    addnotifyacc: ActionParams.addnotifyacc
+    admincoledit: ActionParams.admincoledit
+    announcedepo: ActionParams.announcedepo
+    backasset: ActionParams.backasset
+    burnasset: ActionParams.burnasset
+    canceloffer: ActionParams.canceloffer
+    createcol: ActionParams.createcol
+    createoffer: ActionParams.createoffer
+    createschema: ActionParams.createschema
+    createtempl: ActionParams.createtempl
+    declineoffer: ActionParams.declineoffer
+    extendschema: ActionParams.extendschema
+    forbidnotify: ActionParams.forbidnotify
+    init: ActionParams.init
+    locktemplate: ActionParams.locktemplate
+    logbackasset: ActionParams.logbackasset
+    logburnasset: ActionParams.logburnasset
+    logmint: ActionParams.logmint
+    lognewoffer: ActionParams.lognewoffer
+    lognewtempl: ActionParams.lognewtempl
+    logsetdata: ActionParams.logsetdata
+    logtransfer: ActionParams.logtransfer
+    mintasset: ActionParams.mintasset
+    payofferram: ActionParams.payofferram
+    remcolauth: ActionParams.remcolauth
+    remnotifyacc: ActionParams.remnotifyacc
+    setassetdata: ActionParams.setassetdata
+    setcoldata: ActionParams.setcoldata
+    setmarketfee: ActionParams.setmarketfee
+    setversion: ActionParams.setversion
+    transfer: ActionParams.transfer
+    withdraw: ActionParams.withdraw
 }
 export namespace ActionParams {
-    export interface Acceptoffer {
+    export namespace Types {
+        export interface FORMAT {
+            name: string
+            type: string
+        }
+        export interface pair_string_ATOMIC_ATTRIBUTE {
+            key: string
+            value: Types.pair_string_ATOMIC_ATTRIBUTE_value_variant
+        }
+        export type pair_string_ATOMIC_ATTRIBUTE_value_variant =
+            | Int8Type
+            | Int16Type
+            | Int32Type
+            | Int64Type
+            | UInt8Type
+            | UInt16Type
+            | UInt32Type
+            | UInt64Type
+            | Float32Type
+            | Float64Type
+            | string
+            | BytesType
+            | Int16Type[]
+            | Int32Type[]
+            | Int64Type[]
+            | UInt8Type[]
+            | UInt16Type[]
+            | UInt32Type[]
+            | UInt64Type[]
+            | Float32Type[]
+            | Float64Type[]
+            | string[]
+    }
+    export interface acceptoffer {
         offer_id: UInt64Type
     }
-    export interface Addcolauth {
+    export interface addcolauth {
         collection_name: NameType
         account_to_add: NameType
     }
-    export interface Addconftoken {
+    export interface addconftoken {
         token_contract: NameType
         token_symbol: Asset.SymbolType
     }
-    export interface Addnotifyacc {
+    export interface addnotifyacc {
         collection_name: NameType
         account_to_add: NameType
     }
-    export interface Admincoledit {
+    export interface admincoledit {
         collection_format_extension: Types.FORMAT[]
     }
-    export interface Announcedepo {
+    export interface announcedepo {
         owner: NameType
         symbol_to_announce: Asset.SymbolType
     }
-    export interface Backasset {
+    export interface backasset {
         payer: NameType
         asset_owner: NameType
         asset_id: UInt64Type
         token_to_back: AssetType
     }
-    export interface Burnasset {
+    export interface burnasset {
         asset_owner: NameType
         asset_id: UInt64Type
     }
-    export interface Canceloffer {
+    export interface canceloffer {
         offer_id: UInt64Type
     }
-    export interface Createcol {
+    export interface createcol {
         author: NameType
         collection_name: NameType
         allow_notify: boolean
@@ -133,20 +173,20 @@ export namespace ActionParams {
         market_fee: Float64Type
         data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Createoffer {
+    export interface createoffer {
         sender: NameType
         recipient: NameType
         sender_asset_ids: UInt64Type[]
         recipient_asset_ids: UInt64Type[]
         memo: string
     }
-    export interface Createschema {
+    export interface createschema {
         authorized_creator: NameType
         collection_name: NameType
         schema_name: NameType
         schema_format: Types.FORMAT[]
     }
-    export interface Createtempl {
+    export interface createtempl {
         authorized_creator: NameType
         collection_name: NameType
         schema_name: NameType
@@ -155,30 +195,30 @@ export namespace ActionParams {
         max_supply: UInt32Type
         immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Declineoffer {
+    export interface declineoffer {
         offer_id: UInt64Type
     }
-    export interface Extendschema {
+    export interface extendschema {
         authorized_editor: NameType
         collection_name: NameType
         schema_name: NameType
         schema_format_extension: Types.FORMAT[]
     }
-    export interface Forbidnotify {
+    export interface forbidnotify {
         collection_name: NameType
     }
-    export interface Init {}
-    export interface Locktemplate {
+    export interface init {}
+    export interface locktemplate {
         authorized_editor: NameType
         collection_name: NameType
         template_id: Int32Type
     }
-    export interface Logbackasset {
+    export interface logbackasset {
         asset_owner: NameType
         asset_id: UInt64Type
         backed_token: AssetType
     }
-    export interface Logburnasset {
+    export interface logburnasset {
         asset_owner: NameType
         asset_id: UInt64Type
         collection_name: NameType
@@ -189,7 +229,7 @@ export namespace ActionParams {
         old_mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
         asset_ram_payer: NameType
     }
-    export interface Logmint {
+    export interface logmint {
         asset_id: UInt64Type
         authorized_minter: NameType
         collection_name: NameType
@@ -201,7 +241,7 @@ export namespace ActionParams {
         backed_tokens: AssetType[]
         immutable_template_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Lognewoffer {
+    export interface lognewoffer {
         offer_id: UInt64Type
         sender: NameType
         recipient: NameType
@@ -209,7 +249,7 @@ export namespace ActionParams {
         recipient_asset_ids: UInt64Type[]
         memo: string
     }
-    export interface Lognewtempl {
+    export interface lognewtempl {
         template_id: Int32Type
         authorized_creator: NameType
         collection_name: NameType
@@ -219,20 +259,20 @@ export namespace ActionParams {
         max_supply: UInt32Type
         immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Logsetdata {
+    export interface logsetdata {
         asset_owner: NameType
         asset_id: UInt64Type
         old_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
         new_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Logtransfer {
+    export interface logtransfer {
         collection_name: NameType
         from: NameType
         to: NameType
         asset_ids: UInt64Type[]
         memo: string
     }
-    export interface Mintasset {
+    export interface mintasset {
         authorized_minter: NameType
         collection_name: NameType
         schema_name: NameType
@@ -242,42 +282,42 @@ export namespace ActionParams {
         mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
         tokens_to_back: AssetType[]
     }
-    export interface Payofferram {
+    export interface payofferram {
         payer: NameType
         offer_id: UInt64Type
     }
-    export interface Remcolauth {
+    export interface remcolauth {
         collection_name: NameType
         account_to_remove: NameType
     }
-    export interface Remnotifyacc {
+    export interface remnotifyacc {
         collection_name: NameType
         account_to_remove: NameType
     }
-    export interface Setassetdata {
+    export interface setassetdata {
         authorized_editor: NameType
         asset_owner: NameType
         asset_id: UInt64Type
         new_mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Setcoldata {
+    export interface setcoldata {
         collection_name: NameType
         data: Types.pair_string_ATOMIC_ATTRIBUTE[]
     }
-    export interface Setmarketfee {
+    export interface setmarketfee {
         collection_name: NameType
         market_fee: Float64Type
     }
-    export interface Setversion {
+    export interface setversion {
         new_version: string
     }
-    export interface Transfer {
+    export interface transfer {
         from: NameType
         to: NameType
         asset_ids: UInt64Type[]
         memo: string
     }
-    export interface Withdraw {
+    export interface withdraw {
         owner: NameType
         token_to_withdraw: AssetType
     }

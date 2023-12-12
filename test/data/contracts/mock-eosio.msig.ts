@@ -1,4 +1,4 @@
-import type {Action, Checksum256Type, NameType} from '@wharfkit/antelope'
+import type {Action, BytesType, Checksum256Type, NameType, UInt16Type} from '@wharfkit/antelope'
 import {
     ABI,
     Blob,
@@ -39,40 +39,61 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    approve: ActionParams.Approve
-    cancel: ActionParams.Cancel
-    exec: ActionParams.Exec
-    invalidate: ActionParams.Invalidate
-    propose: ActionParams.Propose
-    unapprove: ActionParams.Unapprove
+    approve: ActionParams.approve
+    cancel: ActionParams.cancel
+    exec: ActionParams.exec
+    invalidate: ActionParams.invalidate
+    propose: ActionParams.propose
+    unapprove: ActionParams.unapprove
 }
 export namespace ActionParams {
-    export interface Approve {
+    export namespace Types {
+        export interface permission_level {
+            actor: NameType
+            permission: NameType
+        }
+        export interface transaction {
+            context_free_actions: Types.action[]
+            actions: Types.action[]
+            transaction_extensions: Types.extension[]
+        }
+        export interface action {
+            account: NameType
+            name: NameType
+            authorization: Types.permission_level[]
+            data: BytesType
+        }
+        export interface extension {
+            type: UInt16Type
+            data: BytesType
+        }
+    }
+    export interface approve {
         proposer: NameType
         proposal_name: NameType
         level: Types.permission_level
         proposal_hash?: Checksum256Type
     }
-    export interface Cancel {
+    export interface cancel {
         proposer: NameType
         proposal_name: NameType
         canceler: NameType
     }
-    export interface Exec {
+    export interface exec {
         proposer: NameType
         proposal_name: NameType
         executer: NameType
     }
-    export interface Invalidate {
+    export interface invalidate {
         account: NameType
     }
-    export interface Propose {
+    export interface propose {
         proposer: NameType
         proposal_name: NameType
         requested: Types.permission_level[]
         trx: Types.transaction
     }
-    export interface Unapprove {
+    export interface unapprove {
         proposer: NameType
         proposal_name: NameType
         level: Types.permission_level

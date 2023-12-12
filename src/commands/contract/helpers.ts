@@ -1,7 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {formatClassName} from '../../utils'
-import {findAbiType, findCoreClass, findCoreType} from './finders'
+import {findAbiType, findTypeFromAlias, findCoreClass, findCoreType, findVariant, findAliasFromType} from './finders'
 import { TypeInterfaceDeclaration } from './interfaces'
 
 export function getCoreImports(abi: ABI.Def) {
@@ -10,33 +10,38 @@ export function getCoreImports(abi: ABI.Def) {
 
     for (const struct of abi.structs) {
         for (const field of struct.fields) {
-            const fieldTypeWithoutDecorator = extractDecorator(field.type).type
-            const fieldTypeIsStruct = abi.structs.find(
-                (abiStruct) => abiStruct.name === fieldTypeWithoutDecorator
-            )
+            const variant = findVariant(field.type, abi)
 
-            // We don't need to import any core classes if the field type is a struct
-            if (fieldTypeIsStruct) {
-                continue
-            }
+            for (const type of (variant?.types || [field.type])) {
+                const fieldTypeWithoutDecorator = extractDecorator(type).type
 
-            const {type} = findAbiType(field.type, abi)
+                const fieldTypeIsStruct = abi.structs.find(
+                    (abiStruct) => abiStruct.name === fieldTypeWithoutDecorator
+                )
 
-            const coreClass = findCoreClassImport(type)
+                // We don't need to import any core classes if the field type is a struct
+                if (fieldTypeIsStruct) {
+                    continue
+                }
 
-            if (coreClass) {
-                coreImports.push(coreClass)
-            }
+                const {type: abiType} = findAbiType(type, abi)
 
-            // We don't need to add action types unless the struct is an action param
-            if (!structIsUsedInActionParams(struct, abi)) {
-                continue
-            }
+                const coreClass = findCoreClassImport(abiType)
 
-            const coreType = findCoreType(type)
+                if (coreClass) {
+                    coreImports.push(coreClass)
+                }
 
-            if (coreType) {
-                coreTypes.push(coreType)
+                // We don't need to add action types unless the struct is an action param
+                if (!structIsUsedInActionParams(struct, abi)) {
+                    continue
+                }
+
+                const coreType = findCoreType(abiType)
+
+                if (coreType) {
+                    coreTypes.push(coreType)
+                }
             }
         }
     }
@@ -73,8 +78,10 @@ function structIsUsedInActionParams(struct: ABI.Struct, abi: ABI.Def) {
 
     let isUsedByActionStruct = false
 
+    const alias = findAliasFromType(struct.name, abi)
+
     const structsUsingStruct = abi.structs.filter((abiStruct) => {
-        return abiStruct.fields.some((field) => extractDecorator(field.type).type === struct.name)
+        return abiStruct.fields.some((field) => extractDecorator(field.type).type === (alias || struct.name))
     })
 
     if (structsUsingStruct.length === 0) {
@@ -254,4 +261,8 @@ export function removeDuplicateInterfaces(interfaces: TypeInterfaceDeclaration[]
         seen.push(name);
         return true;
     });
+}
+
+export function removeCommas(interfaceName: string): string {
+    return interfaceName.replace(/\./g, '');
 }

@@ -19,11 +19,21 @@ export const ANTELOPE_CLASS_WITHOUT_TYPES = [
     'TimePointSec',
 ]
 
-export function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
+export function findTypeFromAlias(typeString: string, abi: ABI.Def): string | undefined {
     const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
     const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
 
     return alias?.type && `${alias?.type}${decorator || ''}`
+}
+
+export function findAliasFromType(typeString: string, abi: ABI.Def): string | undefined {
+    const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
+
+    const alias = abi.types.find((type) => type.type === typeStringWithoutDecorator ||
+        type.type === `${typeStringWithoutDecorator}[]`)
+
+    return alias?.new_type_name && `${alias?.new_type_name}${decorator || ''}`
+
 }
 
 export function findAbiStruct(
@@ -33,15 +43,11 @@ export function findAbiStruct(
     const extractDecoratorResponse = extractDecorator(type)
     const typeString = extractDecoratorResponse.type
 
-    const aliasType = findAliasType(typeString, abi)
+    const aliasType = findTypeFromAlias(typeString, abi)
 
     let abiStruct = abi.structs.find(
         (abiType) => abiType.name === extractDecorator(aliasType || typeString).type
     )
-
-    if (aliasType) {
-        console.log({aliasType, abiStruct})
-    }
 
     return abiStruct
 }
@@ -50,9 +56,9 @@ export function findVariant(
     typeString: string,
     abi: ABI.Def
 ): ABI.Variant | undefined {
-    const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
+    const {type: typeStringWithoutDecorator} = extractDecorator(typeString)
 
-    const aliastype = findAliasType(typeStringWithoutDecorator, abi)
+    const aliastype = findTypeFromAlias(typeStringWithoutDecorator, abi)
 
     return abi.variants.find(
         (variant) => variant.name === typeStringWithoutDecorator || variant.name === aliastype
@@ -66,7 +72,7 @@ export function findAbiType(
 ): {type: string; decorator?: string} {
     let typeString = parseType(trim(type))
 
-    const aliasType = findAliasType(typeString, abi)
+    const aliasType = findTypeFromAlias(typeString, abi)
 
     if (aliasType) {
         typeString = aliasType

@@ -1,4 +1,11 @@
-import type {Action, AssetType, NameType, UInt16Type} from '@wharfkit/antelope'
+import type {
+    Action,
+    AssetType,
+    Float64Type,
+    NameType,
+    TimePointType,
+    UInt16Type,
+} from '@wharfkit/antelope'
 import {ABI, Asset, Blob, Float64, Name, Struct, TimePoint, UInt16} from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy, Table} from '@wharfkit/contract'
 import {Contract as BaseContract} from '@wharfkit/contract'
@@ -26,36 +33,47 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    adduser: ActionParams.Adduser
-    claim: ActionParams.Claim
-    configure: ActionParams.Configure
-    deluser: ActionParams.Deluser
-    receipt: ActionParams.Receipt
-    updateuser: ActionParams.Updateuser
+    adduser: ActionParams.adduser
+    claim: ActionParams.claim
+    configure: ActionParams.configure
+    deluser: ActionParams.deluser
+    receipt: ActionParams.receipt
+    updateuser: ActionParams.updateuser
 }
 export namespace ActionParams {
-    export interface Adduser {
+    export namespace Types {
+        export interface oracle_pair {
+            name: NameType
+            precision: UInt16Type
+        }
+        export interface price_info {
+            pair: string
+            price: Float64Type
+            timestamp: TimePointType
+        }
+    }
+    export interface adduser {
         account: NameType
         weight: UInt16Type
     }
-    export interface Claim {
+    export interface claim {
         account: NameType
         amount?: AssetType
     }
-    export interface Configure {
+    export interface configure {
         token_symbol: Asset.SymbolType
         oracle_account: NameType
         oracle_pairs: Types.oracle_pair[]
     }
-    export interface Deluser {
+    export interface deluser {
         account: NameType
     }
-    export interface Receipt {
+    export interface receipt {
         account: NameType
         amount: AssetType
         ticker: Types.price_info[]
     }
-    export interface Updateuser {
+    export interface updateuser {
         account: NameType
         weight: UInt16Type
     }
