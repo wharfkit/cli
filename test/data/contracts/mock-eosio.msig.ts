@@ -103,148 +103,148 @@ export namespace Types {
     @Struct.type('permission_level')
     export class permission_level extends Struct {
         @Struct.field(Name)
-        Actor!: Name
+        actor!: Name
         @Struct.field(Name)
-        Permission!: Name
+        permission!: Name
     }
     @Struct.type('action')
     export class action extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name)
-        Name!: Name
+        name!: Name
         @Struct.field(permission_level, {array: true})
-        Authorization!: permission_level[]
+        authorization!: permission_level[]
         @Struct.field(Bytes)
-        Data!: Bytes
+        data!: Bytes
     }
     @Struct.type('approval')
     export class approval extends Struct {
         @Struct.field(permission_level)
-        Level!: permission_level
+        level!: permission_level
         @Struct.field(TimePoint)
-        Time!: TimePoint
+        time!: TimePoint
     }
     @Struct.type('approvals_info')
     export class approvals_info extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(approval, {array: true})
-        Requested_approvals!: approval[]
+        requested_approvals!: approval[]
         @Struct.field(approval, {array: true})
-        Provided_approvals!: approval[]
+        provided_approvals!: approval[]
     }
     @Struct.type('approve')
     export class approve extends Struct {
         @Struct.field(Name)
-        Proposer!: Name
+        proposer!: Name
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(permission_level)
-        Level!: permission_level
+        level!: permission_level
         @Struct.field(Checksum256, {optional: true})
-        Proposal_hash?: Checksum256
+        proposal_hash?: Checksum256
     }
     @Struct.type('cancel')
     export class cancel extends Struct {
         @Struct.field(Name)
-        Proposer!: Name
+        proposer!: Name
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(Name)
-        Canceler!: Name
+        canceler!: Name
     }
     @Struct.type('exec')
     export class exec extends Struct {
         @Struct.field(Name)
-        Proposer!: Name
+        proposer!: Name
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(Name)
-        Executer!: Name
+        executer!: Name
     }
     @Struct.type('extension')
     export class extension extends Struct {
         @Struct.field(UInt16)
-        Type!: UInt16
+        type!: UInt16
         @Struct.field(Bytes)
-        Data!: Bytes
+        data!: Bytes
     }
     @Struct.type('invalidate')
     export class invalidate extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
     }
     @Struct.type('invalidation')
     export class invalidation extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(TimePoint)
-        Last_invalidation_time!: TimePoint
+        last_invalidation_time!: TimePoint
     }
     @Struct.type('old_approvals_info')
     export class old_approvals_info extends Struct {
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(permission_level, {array: true})
-        Requested_approvals!: permission_level[]
+        requested_approvals!: permission_level[]
         @Struct.field(permission_level, {array: true})
-        Provided_approvals!: permission_level[]
+        provided_approvals!: permission_level[]
     }
     @Struct.type('proposal')
     export class proposal extends Struct {
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(Bytes)
-        Packed_transaction!: Bytes
+        packed_transaction!: Bytes
         @Struct.field(TimePoint, {optional: true})
-        Earliest_exec_time?: TimePoint
+        earliest_exec_time?: TimePoint
     }
     @Struct.type('transaction')
     export class transaction extends Struct {
         @Struct.field(action, {array: true})
-        Context_free_actions!: action[]
+        context_free_actions!: action[]
         @Struct.field(action, {array: true})
-        Actions!: action[]
+        actions!: action[]
         @Struct.field(extension, {array: true})
-        Transaction_extensions!: extension[]
+        transaction_extensions!: extension[]
     }
     @Struct.type('propose')
     export class propose extends Struct {
         @Struct.field(Name)
-        Proposer!: Name
+        proposer!: Name
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(permission_level, {array: true})
-        Requested!: permission_level[]
+        requested!: permission_level[]
         @Struct.field(transaction)
-        Trx!: transaction
+        trx!: transaction
     }
     @Struct.type('transaction_header')
     export class transaction_header extends Struct {
         @Struct.field(TimePointSec)
-        Expiration!: TimePointSec
+        expiration!: TimePointSec
         @Struct.field(UInt16)
-        Ref_block_num!: UInt16
+        ref_block_num!: UInt16
         @Struct.field(UInt32)
-        Ref_block_prefix!: UInt32
+        ref_block_prefix!: UInt32
         @Struct.field(VarUInt)
-        Max_net_usage_words!: VarUInt
+        max_net_usage_words!: VarUInt
         @Struct.field(UInt8)
-        Max_cpu_usage_ms!: UInt8
+        max_cpu_usage_ms!: UInt8
         @Struct.field(VarUInt)
-        Delay_sec!: VarUInt
+        delay_sec!: VarUInt
     }
     @Struct.type('unapprove')
     export class unapprove extends Struct {
         @Struct.field(Name)
-        Proposer!: Name
+        proposer!: Name
         @Struct.field(Name)
-        Proposal_name!: Name
+        proposal_name!: Name
         @Struct.field(permission_level)
-        Level!: permission_level
+        level!: permission_level
     }
 }
 export const TableMap = {

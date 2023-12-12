@@ -549,646 +549,646 @@ export namespace Types {
     @Struct.type('addbuilding')
     export class addbuilding extends Struct {
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('adddeposit')
     export class adddeposit extends Struct {
         @Struct.field(UInt64)
-        Resource_type_id!: UInt64
+        resource_type_id!: UInt64
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
     }
     @Struct.type('addfaction')
     export class addfaction extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field('string')
-        Flag_asset_url!: string
+        flag_asset_url!: string
     }
     @Struct.type('pair_uint32_uint64')
     export class pair_uint32_uint64 extends Struct {
         @Struct.field(UInt32)
-        First!: UInt32
+        first!: UInt32
         @Struct.field(UInt64)
-        Second!: UInt64
+        second!: UInt64
     }
     @Struct.type('addinventory')
     export class addinventory extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(pair_uint32_uint64, {array: true})
-        Ingredients!: pair_uint32_uint64[]
+        ingredients!: pair_uint32_uint64[]
     }
     @Struct.type('addmap')
     export class addmap extends Struct {
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(UInt8)
-        R_color!: UInt8
+        r_color!: UInt8
         @Struct.field(UInt8)
-        G_color!: UInt8
+        g_color!: UInt8
         @Struct.field(UInt8)
-        B_color!: UInt8
+        b_color!: UInt8
     }
     @Struct.type('addplanet')
     export class addplanet extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field(Int8)
-        Q_coord!: Int8
+        q_coord!: Int8
         @Struct.field(Int8)
-        R_coord!: Int8
+        r_coord!: Int8
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(UInt8)
-        R_color!: UInt8
+        r_color!: UInt8
         @Struct.field(UInt8)
-        G_color!: UInt8
+        g_color!: UInt8
         @Struct.field(UInt8)
-        B_color!: UInt8
+        b_color!: UInt8
     }
     @Struct.type('addregion')
     export class addregion extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
     }
     @Struct.type('addresource')
     export class addresource extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(UInt32)
-        Difficulty!: UInt32
+        difficulty!: UInt32
     }
     @Struct.type('addterrain')
     export class addterrain extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        Type!: string
+        type!: string
         @Struct.field('string', {array: true})
-        Map_asset_urls!: string[]
+        map_asset_urls!: string[]
         @Struct.field('string')
-        Background_asset_url!: string
+        background_asset_url!: string
         @Struct.field(UInt8)
-        Building_slots!: UInt8
+        building_slots!: UInt8
         @Struct.field(UInt64, {array: true})
-        Effects!: UInt64[]
+        effects!: UInt64[]
     }
     @Struct.type('addtile')
     export class addtile extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field(UInt64)
-        Region_id!: UInt64
+        region_id!: UInt64
         @Struct.field(Int8)
-        Q_coord!: Int8
+        q_coord!: Int8
         @Struct.field(Int8)
-        R_coord!: Int8
+        r_coord!: Int8
         @Struct.field(UInt64)
-        Terrain_type!: UInt64
+        terrain_type!: UInt64
     }
     @Struct.type('addunit')
     export class addunit extends Struct {
         @Struct.field(UInt64)
-        Unit_type_id!: UInt64
+        unit_type_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('addvehicle')
     export class addvehicle extends Struct {
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('battle')
     export class battle extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(UInt64)
-        Attacking_faction_id!: UInt64
+        attacking_faction_id!: UInt64
         @Struct.field(UInt64)
-        Defending_faction_id!: UInt64
+        defending_faction_id!: UInt64
         @Struct.field(TimePoint)
-        Battle_start!: TimePoint
+        battle_start!: TimePoint
         @Struct.field(UInt32)
-        Battle_round!: UInt32
+        battle_round!: UInt32
     }
     @Struct.type('battleunit')
     export class battleunit extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(UInt64)
-        Battle_id!: UInt64
+        battle_id!: UInt64
         @Struct.field(UInt64)
-        External_id!: UInt64
+        external_id!: UInt64
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field('bool')
-        Is_character!: boolean
+        is_character!: boolean
         @Struct.field('bool')
-        Is_garrison!: boolean
+        is_garrison!: boolean
         @Struct.field(UInt64)
-        Retreat_to_tile!: UInt64
+        retreat_to_tile!: UInt64
     }
     @Struct.type('building')
     export class building extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field('bool')
-        Is_owner_faction!: boolean
+        is_owner_faction!: boolean
         @Struct.field('bool')
-        Disabled!: boolean
+        disabled!: boolean
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(TimePoint)
-        Next_upkeep!: TimePoint
+        next_upkeep!: TimePoint
         @Struct.field(pair_uint32_uint64, {array: true})
-        Inventory!: pair_uint32_uint64[]
+        inventory!: pair_uint32_uint64[]
     }
     @Struct.type('calcenergy')
     export class calcenergy extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('character')
     export class character extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        First_name!: string
+        first_name!: string
         @Struct.field('string')
-        Middle_name!: string
+        middle_name!: string
         @Struct.field('string')
-        Last_name!: string
+        last_name!: string
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(Float64)
-        Energy!: Float64
+        energy!: Float64
         @Struct.field(Float64)
-        Max_energy!: Float64
+        max_energy!: Float64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(TimePoint)
-        Last_action_time!: TimePoint
+        last_action_time!: TimePoint
         @Struct.field(TimePoint)
-        Time_last_fed!: TimePoint
+        time_last_fed!: TimePoint
         @Struct.field(UInt64)
-        Tool_equipped!: UInt64
+        tool_equipped!: UInt64
         @Struct.field(UInt64)
-        Armor_equipped!: UInt64
+        armor_equipped!: UInt64
         @Struct.field(UInt64)
-        Melee_weapon_equipped!: UInt64
+        melee_weapon_equipped!: UInt64
         @Struct.field(UInt64)
-        Ranged_weapon_equipped!: UInt64
+        ranged_weapon_equipped!: UInt64
         @Struct.field(UInt64)
-        On_board_vehicle!: UInt64
+        on_board_vehicle!: UInt64
         @Struct.field(UInt64, {array: true})
-        Active_effects!: UInt64[]
+        active_effects!: UInt64[]
         @Struct.field(UInt8)
-        Base_character_role!: UInt8
+        base_character_role!: UInt8
         @Struct.field(UInt8)
-        Mid_character_role!: UInt8
+        mid_character_role!: UInt8
         @Struct.field(UInt8)
-        Character_role!: UInt8
+        character_role!: UInt8
         @Struct.field(UInt32)
-        Experience_level!: UInt32
+        experience_level!: UInt32
         @Struct.field(UInt32)
-        Experience_points!: UInt32
+        experience_points!: UInt32
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field('bool')
-        Alive!: boolean
+        alive!: boolean
         @Struct.field(UInt8)
-        Temporal_deja_vu_score!: UInt8
+        temporal_deja_vu_score!: UInt8
     }
     @Struct.type('clear')
     export class clear extends Struct {}
     @Struct.type('clearprim')
     export class clearprim extends Struct {
         @Struct.field(Name)
-        Table_name!: Name
+        table_name!: Name
         @Struct.field(Name)
-        Scope!: Name
+        scope!: Name
     }
     @Struct.type('clearsec1')
     export class clearsec1 extends Struct {
         @Struct.field(Name)
-        Table_name!: Name
+        table_name!: Name
         @Struct.field(UInt8)
-        Index_num!: UInt8
+        index_num!: UInt8
         @Struct.field(Name)
-        Scope!: Name
+        scope!: Name
     }
     @Struct.type('clearsec2')
     export class clearsec2 extends Struct {
         @Struct.field(Name)
-        Table_name!: Name
+        table_name!: Name
         @Struct.field(UInt8)
-        Index_num!: UInt8
+        index_num!: UInt8
         @Struct.field(Name)
-        Scope!: Name
+        scope!: Name
     }
     @Struct.type('combatant')
     export class combatant extends Struct {
         @Struct.field(UInt64)
-        Player_id!: UInt64
+        player_id!: UInt64
         @Struct.field(UInt64)
-        Battle_id!: UInt64
+        battle_id!: UInt64
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field(UInt64)
-        Retreat_to_tile!: UInt64
+        retreat_to_tile!: UInt64
     }
     @Struct.type('cooldown')
     export class cooldown extends Struct {
         @Struct.field(UInt8)
-        Cooldown_type!: UInt8
+        cooldown_type!: UInt8
         @Struct.field(TimePoint)
-        Time_started!: TimePoint
+        time_started!: TimePoint
         @Struct.field(UInt32)
-        Cooldown_duration!: UInt32
+        cooldown_duration!: UInt32
     }
     @Struct.type('createchar')
     export class createchar extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
     }
     @Struct.type('crew')
     export class crew extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(UInt8)
-        Role!: UInt8
+        role!: UInt8
     }
     @Struct.type('day')
     export class day extends Struct {
         @Struct.field(TimePoint)
-        Day_start!: TimePoint
+        day_start!: TimePoint
         @Struct.field(TimePoint)
-        Day_end!: TimePoint
+        day_end!: TimePoint
         @Struct.field(UInt32)
-        Total_active_players!: UInt32
+        total_active_players!: UInt32
         @Struct.field(Float64)
-        Energy_spent!: Float64
+        energy_spent!: Float64
     }
     @Struct.type('deposit')
     export class deposit extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Resource_type_id!: UInt64
+        resource_type_id!: UInt64
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
     }
     @Struct.type('detokenize')
     export class detokenize extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(Asset)
-        Resource!: Asset
+        resource!: Asset
     }
     @Struct.type('discardchar')
     export class discardchar extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('doaddmats')
     export class doaddmats extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Project_id!: UInt64
+        project_id!: UInt64
         @Struct.field(pair_uint32_uint64)
-        Materials!: pair_uint32_uint64
+        materials!: pair_uint32_uint64
     }
     @Struct.type('doaddproj')
     export class doaddproj extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Blueprint_id!: UInt64
+        blueprint_id!: UInt64
     }
     @Struct.type('dobuild')
     export class dobuild extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Project_id!: UInt64
+        project_id!: UInt64
     }
     @Struct.type('docancelproj')
     export class docancelproj extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Project_id!: UInt64
+        project_id!: UInt64
     }
     @Struct.type('docombat')
     export class docombat extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
     }
     @Struct.type('doconquer')
     export class doconquer extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Target_tile_id!: UInt64
+        target_tile_id!: UInt64
     }
     @Struct.type('docontrol')
     export class docontrol extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('docraft')
     export class docraft extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Recipe_id!: UInt64
+        recipe_id!: UInt64
     }
     @Struct.type('docreateship')
     export class docreateship extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64, {array: true})
-        Shipmodules!: UInt64[]
+        shipmodules!: UInt64[]
     }
     @Struct.type('dodemobilize')
     export class dodemobilize extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64, {array: true})
-        Units!: UInt64[]
+        units!: UInt64[]
     }
     @Struct.type('dodevelop')
     export class dodevelop extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('dodisband')
     export class dodisband extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Unit_id!: UInt64
+        unit_id!: UInt64
     }
     @Struct.type('dodisembark')
     export class dodisembark extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('dodropoff')
     export class dodropoff extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(pair_uint32_uint64)
-        Items!: pair_uint32_uint64
+        items!: pair_uint32_uint64
     }
     @Struct.type('doeat')
     export class doeat extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('doembark')
     export class doembark extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Vehicle_id!: UInt64
+        vehicle_id!: UInt64
     }
     @Struct.type('doentership')
     export class doentership extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
     }
     @Struct.type('doequip')
     export class doequip extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
     }
     @Struct.type('dogive')
     export class dogive extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Name)
-        Recipient!: Name
+        recipient!: Name
         @Struct.field(pair_uint32_uint64, {array: true})
-        Items!: pair_uint32_uint64[]
+        items!: pair_uint32_uint64[]
     }
     @Struct.type('doheal')
     export class doheal extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Patient_id!: UInt64
+        patient_id!: UInt64
         @Struct.field('bool')
-        Is_character!: boolean
+        is_character!: boolean
     }
     @Struct.type('dojoinbattle')
     export class dojoinbattle extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Battle_id!: UInt64
+        battle_id!: UInt64
     }
     @Struct.type('doland')
     export class doland extends Struct {
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
     }
     @Struct.type('dolaunch')
     export class dolaunch extends Struct {
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
     }
     @Struct.type('doleaveship')
     export class doleaveship extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
     }
     @Struct.type('doload')
     export class doload extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Vehicle_id!: UInt64
+        vehicle_id!: UInt64
         @Struct.field(pair_uint32_uint64)
-        Items!: pair_uint32_uint64
+        items!: pair_uint32_uint64
     }
     @Struct.type('domobilize')
     export class domobilize extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64, {array: true})
-        Units!: UInt64[]
+        units!: UInt64[]
     }
     @Struct.type('domove')
     export class domove extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Destination_tile_id!: UInt64
+        destination_tile_id!: UInt64
     }
     @Struct.type('domoveship')
     export class domoveship extends Struct {
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
     }
     @Struct.type('dopayupkeep')
     export class dopayupkeep extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt8)
-        Type!: UInt8
+        type!: UInt8
         @Struct.field(UInt64)
-        Entity!: UInt64
+        entity!: UInt64
     }
     @Struct.type('dopickup')
     export class dopickup extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(pair_uint32_uint64)
-        Items!: pair_uint32_uint64
+        items!: pair_uint32_uint64
     }
     @Struct.type('dorepair')
     export class dorepair extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Entity_id!: UInt64
+        entity_id!: UInt64
         @Struct.field(UInt8)
-        Type!: UInt8
+        type!: UInt8
     }
     @Struct.type('doresearch')
     export class doresearch extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Technology_id!: UInt64
+        technology_id!: UInt64
     }
     @Struct.type('doretreat')
     export class doretreat extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Destination_tile_id!: UInt64
+        destination_tile_id!: UInt64
     }
     @Struct.type('dotrain')
     export class dotrain extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt64)
-        Recipe_id!: UInt64
+        recipe_id!: UInt64
         @Struct.field('bool')
-        Mobilize!: boolean
+        mobilize!: boolean
     }
     @Struct.type('dotransfer')
     export class dotransfer extends Struct {
         @Struct.field(UInt64)
-        Entity_id!: UInt64
+        entity_id!: UInt64
         @Struct.field(UInt8)
-        Type!: UInt8
+        type!: UInt8
         @Struct.field(Name)
-        New_owner!: Name
+        new_owner!: Name
     }
     @Struct.type('dounequip')
     export class dounequip extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt8)
-        Item_type!: UInt8
+        item_type!: UInt8
     }
     @Struct.type('dounload')
     export class dounload extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Vehicle_id!: UInt64
+        vehicle_id!: UInt64
         @Struct.field(pair_uint32_uint64)
-        Items!: pair_uint32_uint64
+        items!: pair_uint32_uint64
     }
     @Struct.type('dowork')
     export class dowork extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt8)
-        Activity!: UInt8
+        activity!: UInt8
     }
     @Struct.type('electresult')
     export class electresult extends Struct {
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field(UInt64)
-        Leader!: UInt64
+        leader!: UInt64
         @Struct.field(UInt64, {array: true})
-        Officers!: UInt64[]
+        officers!: UInt64[]
     }
     @Struct.type('endday')
     export class endday extends Struct {}
@@ -1197,597 +1197,597 @@ export namespace Types {
     @Struct.type('faction')
     export class faction extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field('string')
-        Flag_asset_url!: string
+        flag_asset_url!: string
         @Struct.field('bool')
-        Activated!: boolean
+        activated!: boolean
         @Struct.field(UInt64)
-        Leader!: UInt64
+        leader!: UInt64
         @Struct.field(UInt64, {array: true})
-        Officers!: UInt64[]
+        officers!: UInt64[]
         @Struct.field(UInt32)
-        Total_players!: UInt32
+        total_players!: UInt32
         @Struct.field(UInt64, {array: true})
-        Mining_characters!: UInt64[]
+        mining_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Engineering_characters!: UInt64[]
+        engineering_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Farming_characters!: UInt64[]
+        farming_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Logistics_characters!: UInt64[]
+        logistics_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Health_care_characters!: UInt64[]
+        health_care_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Commerce_characters!: UInt64[]
+        commerce_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Civil_service_characters!: UInt64[]
+        civil_service_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Intelligence_characters!: UInt64[]
+        intelligence_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Military_characters!: UInt64[]
+        military_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Research_characters!: UInt64[]
+        research_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Energy_characters!: UInt64[]
+        energy_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Infrastructure_characters!: UInt64[]
+        infrastructure_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Operations_characters!: UInt64[]
+        operations_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Governance_characters!: UInt64[]
+        governance_characters!: UInt64[]
         @Struct.field(UInt64, {array: true})
-        Diplomacy_characters!: UInt64[]
+        diplomacy_characters!: UInt64[]
         @Struct.field(day)
-        Day_stats!: day
+        day_stats!: day
         @Struct.field(UInt64, {array: true})
-        Active_effects!: UInt64[]
+        active_effects!: UInt64[]
     }
     @Struct.type('global')
     export class global extends Struct {
         @Struct.field(Name)
-        Game_master!: Name
+        game_master!: Name
         @Struct.field(TimePoint)
-        Game_started!: TimePoint
+        game_started!: TimePoint
         @Struct.field(TimePoint)
-        Game_end!: TimePoint
+        game_end!: TimePoint
         @Struct.field(UInt8)
-        Current_epoch!: UInt8
+        current_epoch!: UInt8
         @Struct.field(UInt8)
-        Current_period!: UInt8
+        current_period!: UInt8
         @Struct.field(UInt8)
-        Current_cycle!: UInt8
+        current_cycle!: UInt8
         @Struct.field(UInt8)
-        Current_day!: UInt8
+        current_day!: UInt8
         @Struct.field(UInt32)
-        Total_days!: UInt32
+        total_days!: UInt32
         @Struct.field(Float64)
-        Total_energy!: Float64
+        total_energy!: Float64
         @Struct.field(UInt32)
-        Total_players!: UInt32
+        total_players!: UInt32
         @Struct.field(UInt32)
-        Total_characters!: UInt32
+        total_characters!: UInt32
         @Struct.field(TimePoint)
-        Last_oracle_timestamp!: TimePoint
+        last_oracle_timestamp!: TimePoint
         @Struct.field(Checksum256)
-        Last_oracle_hash!: Checksum256
+        last_oracle_hash!: Checksum256
         @Struct.field(day)
-        Day_stats!: day
+        day_stats!: day
         @Struct.field(day)
-        Ind_day_stats!: day
+        ind_day_stats!: day
         @Struct.field('bool')
-        Players_inflation_bucket_active!: boolean
+        players_inflation_bucket_active!: boolean
         @Struct.field('bool')
-        Factions_inflation_bucket_active!: boolean
+        factions_inflation_bucket_active!: boolean
         @Struct.field('bool')
-        Regions_inflation_bucket_active!: boolean
+        regions_inflation_bucket_active!: boolean
         @Struct.field('bool')
-        Planets_inflation_bucket_active!: boolean
+        planets_inflation_bucket_active!: boolean
     }
     @Struct.type('grantspoils')
     export class grantspoils extends Struct {
         @Struct.field(Name)
-        Beneficiary!: Name
+        beneficiary!: Name
         @Struct.field(UInt64)
-        Entity_id!: UInt64
+        entity_id!: UInt64
         @Struct.field(UInt8)
-        Entity_type!: UInt8
+        entity_type!: UInt8
     }
     @Struct.type('hashes')
     export class hashes extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Checksum256)
-        Multiparty!: Checksum256
+        multiparty!: Checksum256
         @Struct.field(Checksum256)
-        Hash!: Checksum256
+        hash!: Checksum256
         @Struct.field('string')
-        Reveal!: string
+        reveal!: string
         @Struct.field(TimePoint)
-        Timestamp!: TimePoint
+        timestamp!: TimePoint
     }
     @Struct.type('init')
     export class init extends Struct {
         @Struct.field(UInt8)
-        Epoch!: UInt8
+        epoch!: UInt8
     }
     @Struct.type('joinfaction')
     export class joinfaction extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
     }
     @Struct.type('killchar')
     export class killchar extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('map')
     export class map extends Struct {
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(day)
-        Day_stats!: day
+        day_stats!: day
         @Struct.field(UInt8)
-        R_color!: UInt8
+        r_color!: UInt8
         @Struct.field(UInt8)
-        G_color!: UInt8
+        g_color!: UInt8
         @Struct.field(UInt8)
-        B_color!: UInt8
+        b_color!: UInt8
     }
     @Struct.type('msigsuccess')
     export class msigsuccess extends Struct {
         @Struct.field(UInt64)
-        Squad_id!: UInt64
+        squad_id!: UInt64
     }
     @Struct.type('pair_uint64_CrewRole')
     export class pair_uint64_CrewRole extends Struct {
         @Struct.field(UInt64)
-        First!: UInt64
+        first!: UInt64
         @Struct.field(UInt8)
-        Second!: UInt8
+        second!: UInt8
     }
     @Struct.type('passenger')
     export class passenger extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
     }
     @Struct.type('planet')
     export class planet extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field(Int8)
-        Q_coord!: Int8
+        q_coord!: Int8
         @Struct.field(Int8)
-        R_coord!: Int8
+        r_coord!: Int8
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field(day)
-        Day_stats!: day
+        day_stats!: day
         @Struct.field(UInt64)
-        Control_faction!: UInt64
+        control_faction!: UInt64
         @Struct.field(UInt8)
-        R_color!: UInt8
+        r_color!: UInt8
         @Struct.field(UInt8)
-        G_color!: UInt8
+        g_color!: UInt8
         @Struct.field(UInt8)
-        B_color!: UInt8
+        b_color!: UInt8
     }
     @Struct.type('player')
     export class player extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
         @Struct.field(UInt8)
-        Character_slots!: UInt8
+        character_slots!: UInt8
         @Struct.field(UInt8)
-        Reputation_level!: UInt8
+        reputation_level!: UInt8
         @Struct.field(UInt32)
-        Experience_level!: UInt32
+        experience_level!: UInt32
         @Struct.field(UInt32)
-        Experience_points!: UInt32
+        experience_points!: UInt32
         @Struct.field(cooldown, {array: true})
-        Cooldowns!: cooldown[]
+        cooldowns!: cooldown[]
         @Struct.field(UInt64)
-        Active_project!: UInt64
+        active_project!: UInt64
         @Struct.field(UInt64)
-        Faction!: UInt64
+        faction!: UInt64
         @Struct.field(Float64)
-        Base_faction_voting_power!: Float64
+        base_faction_voting_power!: Float64
         @Struct.field(UInt32)
-        Max_inventory_size!: UInt32
+        max_inventory_size!: UInt32
         @Struct.field(pair_uint32_uint64, {array: true})
-        Inventory!: pair_uint32_uint64[]
+        inventory!: pair_uint32_uint64[]
         @Struct.field(Asset)
-        Currency!: Asset
+        currency!: Asset
         @Struct.field(TimePoint)
-        Last_respawn!: TimePoint
+        last_respawn!: TimePoint
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field('bool')
-        Opted_out_of_politics!: boolean
+        opted_out_of_politics!: boolean
         @Struct.field(UInt32)
-        Mobilized_units!: UInt32
+        mobilized_units!: UInt32
     }
     @Struct.type('primarykey')
     export class primarykey extends Struct {
         @Struct.field(Name)
-        Table!: Name
+        table!: Name
         @Struct.field(UInt64)
-        Next_key!: UInt64
+        next_key!: UInt64
     }
     @Struct.type('proc')
     export class proc extends Struct {
         @Struct.field(UInt32)
-        Count!: UInt32
+        count!: UInt32
     }
     @Struct.type('project')
     export class project extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Blueprint_id!: UInt64
+        blueprint_id!: UInt64
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(TimePoint)
-        Last_action_time!: TimePoint
+        last_action_time!: TimePoint
         @Struct.field(pair_uint32_uint64, {array: true})
-        Materials!: pair_uint32_uint64[]
+        materials!: pair_uint32_uint64[]
         @Struct.field(UInt32)
-        Work!: UInt32
+        work!: UInt32
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field('bool')
-        Is_owner_faction!: boolean
+        is_owner_faction!: boolean
         @Struct.field('bool')
-        Is_building!: boolean
+        is_building!: boolean
     }
     @Struct.type('region')
     export class region extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field(day)
-        Day_stats!: day
+        day_stats!: day
         @Struct.field(UInt64)
-        Control_faction!: UInt64
+        control_faction!: UInt64
     }
     @Struct.type('regplayer')
     export class regplayer extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field('bool')
-        Opt_out_of_politics!: boolean
+        opt_out_of_politics!: boolean
     }
     @Struct.type('resolverngs')
     export class resolverngs extends Struct {
         @Struct.field(UInt32)
-        Count!: UInt32
+        count!: UInt32
     }
     @Struct.type('resource')
     export class resource extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field('string')
-        Name!: string
+        name!: string
         @Struct.field(UInt32)
-        Difficulty!: UInt32
+        difficulty!: UInt32
         @Struct.field('string')
-        Asset_url!: string
+        asset_url!: string
     }
     @Struct.type('restorehp')
     export class restorehp extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
     }
     @Struct.type('revivechar')
     export class revivechar extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(Name)
-        Payer!: Name
+        payer!: Name
     }
     @Struct.type('rngrequest')
     export class rngrequest extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(TimePoint)
-        Created!: TimePoint
+        created!: TimePoint
         @Struct.field(TimePoint)
-        Execution!: TimePoint
+        execution!: TimePoint
         @Struct.field(UInt64)
-        External_id!: UInt64
+        external_id!: UInt64
         @Struct.field('bool')
-        Is_character_rng!: boolean
+        is_character_rng!: boolean
         @Struct.field(UInt8)
-        Rng_type!: UInt8
+        rng_type!: UInt8
         @Struct.field(Checksum256)
-        Result!: Checksum256
+        result!: Checksum256
     }
     @Struct.type('rprog')
     export class rprog extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Technology_id!: UInt64
+        technology_id!: UInt64
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field(UInt64)
-        Tree_id!: UInt64
+        tree_id!: UInt64
         @Struct.field(Float64)
-        Research_points!: Float64
+        research_points!: Float64
     }
     @Struct.type('setcharacter')
     export class setcharacter extends Struct {
         @Struct.field(character)
-        C!: character
+        c!: character
     }
     @Struct.type('setcrew')
     export class setcrew extends Struct {
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(pair_uint64_CrewRole, {array: true})
-        Crew!: pair_uint64_CrewRole[]
+        crew!: pair_uint64_CrewRole[]
     }
     @Struct.type('setgm')
     export class setgm extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
     }
     @Struct.type('setoperator')
     export class setoperator extends Struct {
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(Name)
-        Ship_operator!: Name
+        ship_operator!: Name
     }
     @Struct.type('setplayer')
     export class setplayer extends Struct {
         @Struct.field(player)
-        P!: player
+        p!: player
     }
     @Struct.type('settilecw')
     export class settilecw extends Struct {
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
         @Struct.field(Float64)
-        Control!: Float64
+        control!: Float64
         @Struct.field(Float64)
-        Wildness!: Float64
+        wildness!: Float64
         @Struct.field(UInt64)
-        Controlling_faction_id!: UInt64
+        controlling_faction_id!: UInt64
     }
     @Struct.type('shipmodule')
     export class shipmodule extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field('bool')
-        Is_owner_faction!: boolean
+        is_owner_faction!: boolean
         @Struct.field(UInt64)
-        Spaceship_id!: UInt64
+        spaceship_id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field(TimePoint)
-        Next_upkeep!: TimePoint
+        next_upkeep!: TimePoint
         @Struct.field('bool')
-        Disabled!: boolean
+        disabled!: boolean
     }
     @Struct.type('spaceship')
     export class spaceship extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Name)
-        Ship_operator!: Name
+        ship_operator!: Name
         @Struct.field('bool')
-        Is_owner_faction!: boolean
+        is_owner_faction!: boolean
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(UInt32)
-        Max_passengers!: UInt32
+        max_passengers!: UInt32
         @Struct.field(UInt32)
-        Max_inventory_size!: UInt32
+        max_inventory_size!: UInt32
         @Struct.field(pair_uint32_uint64, {array: true})
-        Inventory!: pair_uint32_uint64[]
+        inventory!: pair_uint32_uint64[]
     }
     @Struct.type('squad')
     export class squad extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field('bool')
-        Msig_succeeded!: boolean
+        msig_succeeded!: boolean
         @Struct.field(UInt8)
-        Character_role!: UInt8
+        character_role!: UInt8
     }
     @Struct.type('startepoch')
     export class startepoch extends Struct {}
     @Struct.type('terrain')
     export class terrain extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field('string')
-        Type!: string
+        type!: string
         @Struct.field('string', {array: true})
-        Map_asset_urls!: string[]
+        map_asset_urls!: string[]
         @Struct.field('string')
-        Background_asset_url!: string
+        background_asset_url!: string
         @Struct.field(UInt8)
-        Building_slots!: UInt8
+        building_slots!: UInt8
         @Struct.field(UInt8)
-        Player_slots!: UInt8
+        player_slots!: UInt8
         @Struct.field(UInt64, {array: true})
-        Effects!: UInt64[]
+        effects!: UInt64[]
     }
     @Struct.type('test')
     export class test extends Struct {}
     @Struct.type('tile')
     export class tile extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Area_map!: Name
+        area_map!: Name
         @Struct.field(UInt64)
-        Region_id!: UInt64
+        region_id!: UInt64
         @Struct.field(Int8)
-        Q_coord!: Int8
+        q_coord!: Int8
         @Struct.field(Int8)
-        R_coord!: Int8
+        r_coord!: Int8
         @Struct.field(UInt64)
-        Terrain_type!: UInt64
+        terrain_type!: UInt64
         @Struct.field(UInt64)
-        Control_faction!: UInt64
+        control_faction!: UInt64
         @Struct.field(Float64)
-        Control!: Float64
+        control!: Float64
         @Struct.field(Float64)
-        Wildness!: Float64
+        wildness!: Float64
         @Struct.field(TimePoint)
-        Time_since_refresh!: TimePoint
+        time_since_refresh!: TimePoint
         @Struct.field(UInt32)
-        Max_inventory_size!: UInt32
+        max_inventory_size!: UInt32
         @Struct.field(UInt32)
-        Players_count!: UInt32
+        players_count!: UInt32
         @Struct.field(pair_uint32_uint64, {array: true})
-        Inventory!: pair_uint32_uint64[]
+        inventory!: pair_uint32_uint64[]
         @Struct.field(UInt64, {array: true})
-        Active_effects!: UInt64[]
+        active_effects!: UInt64[]
         @Struct.field(UInt32)
-        Garrisoned_units!: UInt32
+        garrisoned_units!: UInt32
     }
     @Struct.type('timedeffect')
     export class timedeffect extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Effect_id!: UInt64
+        effect_id!: UInt64
         @Struct.field(UInt64)
-        Entity_id!: UInt64
+        entity_id!: UInt64
         @Struct.field(UInt8)
-        Type!: UInt8
+        type!: UInt8
         @Struct.field(TimePoint)
-        Expiry!: TimePoint
+        expiry!: TimePoint
     }
     @Struct.type('tokenize')
     export class tokenize extends Struct {
         @Struct.field(Name)
-        Player!: Name
+        player!: Name
         @Struct.field(Asset)
-        Resource!: Asset
+        resource!: Asset
     }
     @Struct.type('unit')
     export class unit extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Unit_type_id!: UInt64
+        unit_type_id!: UInt64
         @Struct.field(UInt64)
-        Faction_id!: UInt64
+        faction_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field('bool')
-        Mobilized!: boolean
+        mobilized!: boolean
         @Struct.field(TimePoint)
-        Last_mobilization_action_time!: TimePoint
+        last_mobilization_action_time!: TimePoint
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(TimePoint)
-        Next_upkeep!: TimePoint
+        next_upkeep!: TimePoint
         @Struct.field(UInt64, {array: true})
-        Active_effects!: UInt64[]
+        active_effects!: UInt64[]
     }
     @Struct.type('updatechars')
     export class updatechars extends Struct {
         @Struct.field(UInt32)
-        Count!: UInt32
+        count!: UInt32
     }
     @Struct.type('updaterng')
     export class updaterng extends Struct {}
     @Struct.type('updatetile')
     export class updatetile extends Struct {
         @Struct.field(UInt64)
-        Tile_id!: UInt64
+        tile_id!: UInt64
     }
     @Struct.type('updatetiles')
     export class updatetiles extends Struct {
         @Struct.field(UInt32)
-        Count!: UInt32
+        count!: UInt32
     }
     @Struct.type('upgradechar')
     export class upgradechar extends Struct {
         @Struct.field(UInt64)
-        Character_id!: UInt64
+        character_id!: UInt64
         @Struct.field(UInt8)
-        New_role!: UInt8
+        new_role!: UInt8
     }
     @Struct.type('vehicle')
     export class vehicle extends Struct {
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(UInt64)
-        Gameasset_id!: UInt64
+        gameasset_id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field('bool')
-        Is_owner_faction!: boolean
+        is_owner_faction!: boolean
         @Struct.field(UInt32)
-        Hp!: UInt32
+        hp!: UInt32
         @Struct.field(UInt32)
-        Max_hp!: UInt32
+        max_hp!: UInt32
         @Struct.field(UInt64)
-        Location_tile_id!: UInt64
+        location_tile_id!: UInt64
         @Struct.field(TimePoint)
-        Next_upkeep!: TimePoint
+        next_upkeep!: TimePoint
         @Struct.field('bool')
-        Disabled!: boolean
+        disabled!: boolean
         @Struct.field(UInt64, {array: true})
-        Passengers!: UInt64[]
+        passengers!: UInt64[]
         @Struct.field(pair_uint32_uint64, {array: true})
-        Inventory!: pair_uint32_uint64[]
+        inventory!: pair_uint32_uint64[]
     }
 }
 export const TableMap = {
