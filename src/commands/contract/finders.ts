@@ -14,6 +14,11 @@ export const ANTELOPE_CLASS_MAPPINGS = {
     block_timestamp_type: 'BlockTimestamp',
 }
 
+export const ANTELOPE_CLASS_WITHOUT_TYPES = [
+    'BlockTimestamp',
+    'TimePointSec',
+]
+
 export function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
     const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
     const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
@@ -31,8 +36,12 @@ export function findAbiStruct(
     const aliasType = findAliasType(typeString, abi)
 
     let abiStruct = abi.structs.find(
-        (abiType) => abiType.name === typeString || abiType.name === aliasType
+        (abiType) => abiType.name === extractDecorator(aliasType || typeString).type
     )
+
+    if (aliasType) {
+        console.log({aliasType, abiStruct})
+    }
 
     return abiStruct
 }
@@ -91,9 +100,15 @@ function findType(type: string, abi: ABI.Def, typeNamespace?: string) {
 export function findCoreType(type: string): string | undefined {
     const coreType = findCoreClass(type)
 
-    if (coreType) {
-        return `${coreType}Type`
+    if (!coreType) {
+        return
     }
+
+    if (ANTELOPE_CLASS_WITHOUT_TYPES.includes(coreType)) {
+        return coreType
+    }
+
+    return `${coreType}Type`
 }
 
 export function findCoreClass(type: string): string | undefined {

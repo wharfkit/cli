@@ -3,6 +3,7 @@ import type {
     AssetType,
     BytesType,
     Checksum256Type,
+    Float64Type,
     Int64Type,
     NameType,
     PublicKeyType,
@@ -140,7 +141,7 @@ export namespace ActionParams {
             current_weight_ratio: Int64Type
             target_weight_ratio: Int64Type
             assumed_stake_weight: Int64Type
-            target_timestamp: TimePointSecType
+            target_timestamp: TimePointSec
             exponent: Float64Type
             decay_secs: UInt32Type
             min_price: AssetType
@@ -182,7 +183,7 @@ export namespace ActionParams {
             producer_name: NameType
             block_signing_key: PublicKeyType
         }
-        export type regproducer2_Producer_authority_Variant = Types.block_signing_authority_v0
+        export type regproducer2_producer_authority_variant = Types.block_signing_authority_v0
         export interface block_signing_authority_v0 {
             threshold: UInt32Type
             keys: Types.key_weight[]
@@ -192,296 +193,296 @@ export namespace ActionParams {
         }
     }
     export interface activate {
-        Feature_digest: Checksum256Type
+        feature_digest: Checksum256Type
     }
     export interface bidname {
-        Bidder: NameType
-        Newname: NameType
-        Bid: AssetType
+        bidder: NameType
+        newname: NameType
+        bid: AssetType
     }
     export interface bidrefund {
-        Bidder: NameType
-        Newname: NameType
+        bidder: NameType
+        newname: NameType
     }
     export interface buyram {
-        Payer: NameType
-        Receiver: NameType
-        Quant: AssetType
+        payer: NameType
+        receiver: NameType
+        quant: AssetType
     }
     export interface buyrambytes {
-        Payer: NameType
-        Receiver: NameType
-        Bytes: UInt32Type
+        payer: NameType
+        receiver: NameType
+        bytes: UInt32Type
     }
     export interface buyrex {
-        From: NameType
-        Amount: AssetType
+        from: NameType
+        amount: AssetType
     }
     export interface canceldelay {
-        Canceling_auth: Types.permission_level
-        Trx_id: Checksum256Type
+        canceling_auth: Types.permission_level
+        trx_id: Checksum256Type
     }
     export interface cfgpowerup {
-        Args: Types.powerup_config
+        args: Types.powerup_config
     }
     export interface claimrewards {
-        Owner: NameType
+        owner: NameType
     }
     export interface closerex {
-        Owner: NameType
+        owner: NameType
     }
     export interface cnclrexorder {
-        Owner: NameType
+        owner: NameType
     }
     export interface consolidate {
-        Owner: NameType
+        owner: NameType
     }
     export interface defcpuloan {
-        From: NameType
-        Loan_num: UInt64Type
-        Amount: AssetType
+        from: NameType
+        loan_num: UInt64Type
+        amount: AssetType
     }
     export interface defnetloan {
-        From: NameType
-        Loan_num: UInt64Type
-        Amount: AssetType
+        from: NameType
+        loan_num: UInt64Type
+        amount: AssetType
     }
     export interface delegatebw {
-        From: NameType
-        Receiver: NameType
-        Stake_net_quantity: AssetType
-        Stake_cpu_quantity: AssetType
-        Transfer: boolean
+        from: NameType
+        receiver: NameType
+        stake_net_quantity: AssetType
+        stake_cpu_quantity: AssetType
+        transfer: boolean
     }
     export interface deleteauth {
-        Account: NameType
-        Permission: NameType
-        Authorized_by?: NameType
+        account: NameType
+        permission: NameType
+        authorized_by?: NameType
     }
     export interface deposit {
-        Owner: NameType
-        Amount: AssetType
+        owner: NameType
+        amount: AssetType
     }
     export interface fundcpuloan {
-        From: NameType
-        Loan_num: UInt64Type
-        Payment: AssetType
+        from: NameType
+        loan_num: UInt64Type
+        payment: AssetType
     }
     export interface fundnetloan {
-        From: NameType
-        Loan_num: UInt64Type
-        Payment: AssetType
+        from: NameType
+        loan_num: UInt64Type
+        payment: AssetType
     }
     export interface init {
-        Version: VarUIntType
-        Core: Asset.SymbolType
+        version: VarUIntType
+        core: Asset.SymbolType
     }
     export interface limitauthchg {
-        Account: NameType
-        Allow_perms: NameType[]
-        Disallow_perms: NameType[]
+        account: NameType
+        allow_perms: NameType[]
+        disallow_perms: NameType[]
     }
     export interface linkauth {
-        Account: NameType
-        Code: NameType
-        Type: NameType
-        Requirement: NameType
-        Authorized_by?: NameType
+        account: NameType
+        code: NameType
+        type: NameType
+        requirement: NameType
+        authorized_by?: NameType
     }
     export interface mvfrsavings {
-        Owner: NameType
-        Rex: AssetType
+        owner: NameType
+        rex: AssetType
     }
     export interface mvtosavings {
-        Owner: NameType
-        Rex: AssetType
+        owner: NameType
+        rex: AssetType
     }
     export interface newaccount {
-        Creator: NameType
-        Name: NameType
-        Owner: Types.authority
-        Active: Types.authority
+        creator: NameType
+        name: NameType
+        owner: Types.authority
+        active: Types.authority
     }
     export interface onblock {
-        Header: Types.block_header
+        header: Types.block_header
     }
     export interface onerror {
-        Sender_id: UInt128Type
-        Sent_trx: BytesType
+        sender_id: UInt128Type
+        sent_trx: BytesType
     }
     export interface powerup {
-        Payer: NameType
-        Receiver: NameType
-        Days: UInt32Type
-        Net_frac: Int64Type
-        Cpu_frac: Int64Type
-        Max_payment: AssetType
+        payer: NameType
+        receiver: NameType
+        days: UInt32Type
+        net_frac: Int64Type
+        cpu_frac: Int64Type
+        max_payment: AssetType
     }
     export interface powerupexec {
-        User: NameType
-        Max: UInt16Type
+        user: NameType
+        max: UInt16Type
     }
     export interface refund {
-        Owner: NameType
+        owner: NameType
     }
     export interface regproducer {
-        Producer: NameType
-        Producer_key: PublicKeyType
-        Url: string
-        Location: UInt16Type
+        producer: NameType
+        producer_key: PublicKeyType
+        url: string
+        location: UInt16Type
     }
     export interface regproducer2 {
-        Producer: NameType
-        Producer_authority: Types.variant_block_signing_authority_v0
-        Url: string
-        Location: UInt16Type
+        producer: NameType
+        producer_authority: Types.regproducer2_producer_authority_variant
+        url: string
+        location: UInt16Type
     }
     export interface regproxy {
-        Proxy: NameType
-        Isproxy: boolean
+        proxy: NameType
+        isproxy: boolean
     }
     export interface rentcpu {
-        From: NameType
-        Receiver: NameType
-        Loan_payment: AssetType
-        Loan_fund: AssetType
+        from: NameType
+        receiver: NameType
+        loan_payment: AssetType
+        loan_fund: AssetType
     }
     export interface rentnet {
-        From: NameType
-        Receiver: NameType
-        Loan_payment: AssetType
-        Loan_fund: AssetType
+        from: NameType
+        receiver: NameType
+        loan_payment: AssetType
+        loan_fund: AssetType
     }
     export interface rexexec {
-        User: NameType
-        Max: UInt16Type
+        user: NameType
+        max: UInt16Type
     }
     export interface rmvproducer {
-        Producer: NameType
+        producer: NameType
     }
     export interface sellram {
-        Account: NameType
-        Bytes: Int64Type
+        account: NameType
+        bytes: Int64Type
     }
     export interface sellrex {
-        From: NameType
-        Rex: AssetType
+        from: NameType
+        rex: AssetType
     }
     export interface setabi {
-        Account: NameType
-        Abi: BytesType
-        Memo?: string
+        account: NameType
+        abi: BytesType
+        memo?: string
     }
     export interface setacctcpu {
-        Account: NameType
-        Cpu_weight?: Int64Type
+        account: NameType
+        cpu_weight?: Int64Type
     }
     export interface setacctnet {
-        Account: NameType
-        Net_weight?: Int64Type
+        account: NameType
+        net_weight?: Int64Type
     }
     export interface setacctram {
-        Account: NameType
-        Ram_bytes?: Int64Type
+        account: NameType
+        ram_bytes?: Int64Type
     }
     export interface setalimits {
-        Account: NameType
-        Ram_bytes: Int64Type
-        Net_weight: Int64Type
-        Cpu_weight: Int64Type
+        account: NameType
+        ram_bytes: Int64Type
+        net_weight: Int64Type
+        cpu_weight: Int64Type
     }
     export interface setcode {
-        Account: NameType
-        Vmtype: UInt8Type
-        Vmversion: UInt8Type
-        Code: BytesType
-        Memo?: string
+        account: NameType
+        vmtype: UInt8Type
+        vmversion: UInt8Type
+        code: BytesType
+        memo?: string
     }
     export interface setinflation {
-        Annual_rate: Int64Type
-        Inflation_pay_factor: Int64Type
-        Votepay_factor: Int64Type
+        annual_rate: Int64Type
+        inflation_pay_factor: Int64Type
+        votepay_factor: Int64Type
     }
     export interface setparams {
-        Params: Types.blockchain_parameters_v1
+        params: Types.blockchain_parameters_v1
     }
     export interface setpriv {
-        Account: NameType
-        Is_priv: UInt8Type
+        account: NameType
+        is_priv: UInt8Type
     }
     export interface setram {
-        Max_ram_size: UInt64Type
+        max_ram_size: UInt64Type
     }
     export interface setramrate {
-        Bytes_per_block: UInt16Type
+        bytes_per_block: UInt16Type
     }
     export interface setrex {
-        Balance: AssetType
+        balance: AssetType
     }
     export interface undelegatebw {
-        From: NameType
-        Receiver: NameType
-        Unstake_net_quantity: AssetType
-        Unstake_cpu_quantity: AssetType
+        from: NameType
+        receiver: NameType
+        unstake_net_quantity: AssetType
+        unstake_cpu_quantity: AssetType
     }
     export interface unlinkauth {
-        Account: NameType
-        Code: NameType
-        Type: NameType
-        Authorized_by?: NameType
+        account: NameType
+        code: NameType
+        type: NameType
+        authorized_by?: NameType
     }
     export interface unregprod {
-        Producer: NameType
+        producer: NameType
     }
     export interface unstaketorex {
-        Owner: NameType
-        Receiver: NameType
-        From_net: AssetType
-        From_cpu: AssetType
+        owner: NameType
+        receiver: NameType
+        from_net: AssetType
+        from_cpu: AssetType
     }
     export interface updateauth {
-        Account: NameType
-        Permission: NameType
-        Parent: NameType
-        Auth: Types.authority
-        Authorized_by?: NameType
+        account: NameType
+        permission: NameType
+        parent: NameType
+        auth: Types.authority
+        authorized_by?: NameType
     }
     export interface updaterex {
-        Owner: NameType
+        owner: NameType
     }
     export interface updtrevision {
-        Revision: UInt8Type
+        revision: UInt8Type
     }
     export interface voteproducer {
-        Voter: NameType
-        Proxy: NameType
-        Producers: NameType[]
+        voter: NameType
+        proxy: NameType
+        producers: NameType[]
     }
     export interface voteupdate {
-        Voter_name: NameType
+        voter_name: NameType
     }
     export interface wasmcfg {
-        Settings: NameType
+        settings: NameType
     }
     export interface withdraw {
-        Owner: NameType
-        Amount: AssetType
+        owner: NameType
+        amount: AssetType
     }
 }
 export namespace Types {
     @Struct.type('key_weight')
     export class key_weight extends Struct {
         @Struct.field(PublicKey)
-        Key!: PublicKey
+        key!: PublicKey
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
     }
     @Struct.type('block_signing_authority_v0')
     export class block_signing_authority_v0 extends Struct {
         @Struct.field(UInt32)
-        Threshold!: UInt32
+        threshold!: UInt32
         @Struct.field(key_weight, {array: true})
-        Keys!: key_weight[]
+        keys!: key_weight[]
     }
     @Variant.type('variant_block_signing_authority_v0', [block_signing_authority_v0])
     export class variant_block_signing_authority_v0 extends Struct {
@@ -490,1005 +491,1005 @@ export namespace Types {
     @Struct.type('abi_hash')
     export class abi_hash extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Checksum256)
-        Hash!: Checksum256
+        hash!: Checksum256
     }
     @Struct.type('activate')
     export class activate extends Struct {
         @Struct.field(Checksum256)
-        Feature_digest!: Checksum256
+        feature_digest!: Checksum256
     }
     @Struct.type('permission_level')
     export class permission_level extends Struct {
         @Struct.field(Name)
-        Actor!: Name
+        actor!: Name
         @Struct.field(Name)
-        Permission!: Name
+        permission!: Name
     }
     @Struct.type('permission_level_weight')
     export class permission_level_weight extends Struct {
         @Struct.field(permission_level)
-        Permission!: permission_level
+        permission!: permission_level
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
     }
     @Struct.type('wait_weight')
     export class wait_weight extends Struct {
         @Struct.field(UInt32)
-        Wait_sec!: UInt32
+        wait_sec!: UInt32
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
     }
     @Struct.type('authority')
     export class authority extends Struct {
         @Struct.field(UInt32)
-        Threshold!: UInt32
+        threshold!: UInt32
         @Struct.field(key_weight, {array: true})
-        Keys!: key_weight[]
+        keys!: key_weight[]
         @Struct.field(permission_level_weight, {array: true})
-        Accounts!: permission_level_weight[]
+        accounts!: permission_level_weight[]
         @Struct.field(wait_weight, {array: true})
-        Waits!: wait_weight[]
+        waits!: wait_weight[]
     }
     @Struct.type('bid_refund')
     export class bid_refund extends Struct {
         @Struct.field(Name)
-        Bidder!: Name
+        bidder!: Name
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('bidname')
     export class bidname extends Struct {
         @Struct.field(Name)
-        Bidder!: Name
+        bidder!: Name
         @Struct.field(Name)
-        Newname!: Name
+        newname!: Name
         @Struct.field(Asset)
-        Bid!: Asset
+        bid!: Asset
     }
     @Struct.type('bidrefund')
     export class bidrefund extends Struct {
         @Struct.field(Name)
-        Bidder!: Name
+        bidder!: Name
         @Struct.field(Name)
-        Newname!: Name
+        newname!: Name
     }
     @Struct.type('producer_key')
     export class producer_key extends Struct {
         @Struct.field(Name)
-        Producer_name!: Name
+        producer_name!: Name
         @Struct.field(PublicKey)
-        Block_signing_key!: PublicKey
+        block_signing_key!: PublicKey
     }
     @Struct.type('producer_schedule')
     export class producer_schedule extends Struct {
         @Struct.field(UInt32)
-        Version!: UInt32
+        version!: UInt32
         @Struct.field(producer_key, {array: true})
-        Producers!: producer_key[]
+        producers!: producer_key[]
     }
     @Struct.type('block_header')
     export class block_header extends Struct {
         @Struct.field(UInt32)
-        Timestamp!: UInt32
+        timestamp!: UInt32
         @Struct.field(Name)
-        Producer!: Name
+        producer!: Name
         @Struct.field(UInt16)
-        Confirmed!: UInt16
+        confirmed!: UInt16
         @Struct.field(Checksum256)
-        Previous!: Checksum256
+        previous!: Checksum256
         @Struct.field(Checksum256)
-        Transaction_mroot!: Checksum256
+        transaction_mroot!: Checksum256
         @Struct.field(Checksum256)
-        Action_mroot!: Checksum256
+        action_mroot!: Checksum256
         @Struct.field(UInt32)
-        Schedule_version!: UInt32
+        schedule_version!: UInt32
         @Struct.field(producer_schedule, {optional: true})
-        New_producers?: producer_schedule
+        new_producers?: producer_schedule
     }
     @Struct.type('block_info_record')
     export class block_info_record extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(UInt32)
-        Block_height!: UInt32
+        block_height!: UInt32
         @Struct.field(TimePoint)
-        Block_timestamp!: TimePoint
+        block_timestamp!: TimePoint
     }
     @Struct.type('blockchain_parameters')
     export class blockchain_parameters extends Struct {
         @Struct.field(UInt64)
-        Max_block_net_usage!: UInt64
+        max_block_net_usage!: UInt64
         @Struct.field(UInt32)
-        Target_block_net_usage_pct!: UInt32
+        target_block_net_usage_pct!: UInt32
         @Struct.field(UInt32)
-        Max_transaction_net_usage!: UInt32
+        max_transaction_net_usage!: UInt32
         @Struct.field(UInt32)
-        Base_per_transaction_net_usage!: UInt32
+        base_per_transaction_net_usage!: UInt32
         @Struct.field(UInt32)
-        Net_usage_leeway!: UInt32
+        net_usage_leeway!: UInt32
         @Struct.field(UInt32)
-        Context_free_discount_net_usage_num!: UInt32
+        context_free_discount_net_usage_num!: UInt32
         @Struct.field(UInt32)
-        Context_free_discount_net_usage_den!: UInt32
+        context_free_discount_net_usage_den!: UInt32
         @Struct.field(UInt32)
-        Max_block_cpu_usage!: UInt32
+        max_block_cpu_usage!: UInt32
         @Struct.field(UInt32)
-        Target_block_cpu_usage_pct!: UInt32
+        target_block_cpu_usage_pct!: UInt32
         @Struct.field(UInt32)
-        Max_transaction_cpu_usage!: UInt32
+        max_transaction_cpu_usage!: UInt32
         @Struct.field(UInt32)
-        Min_transaction_cpu_usage!: UInt32
+        min_transaction_cpu_usage!: UInt32
         @Struct.field(UInt32)
-        Max_transaction_lifetime!: UInt32
+        max_transaction_lifetime!: UInt32
         @Struct.field(UInt32)
-        Deferred_trx_expiration_window!: UInt32
+        deferred_trx_expiration_window!: UInt32
         @Struct.field(UInt32)
-        Max_transaction_delay!: UInt32
+        max_transaction_delay!: UInt32
         @Struct.field(UInt32)
-        Max_inline_action_size!: UInt32
+        max_inline_action_size!: UInt32
         @Struct.field(UInt16)
-        Max_inline_action_depth!: UInt16
+        max_inline_action_depth!: UInt16
         @Struct.field(UInt16)
-        Max_authority_depth!: UInt16
+        max_authority_depth!: UInt16
     }
     @Struct.type('blockchain_parameters_v1')
     export class blockchain_parameters_v1 extends Struct {
         @Struct.field(UInt32, {optional: true})
-        Max_action_return_value_size?: UInt32
+        max_action_return_value_size?: UInt32
     }
     @Struct.type('buyram')
     export class buyram extends Struct {
         @Struct.field(Name)
-        Payer!: Name
+        payer!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Quant!: Asset
+        quant!: Asset
     }
     @Struct.type('buyrambytes')
     export class buyrambytes extends Struct {
         @Struct.field(Name)
-        Payer!: Name
+        payer!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(UInt32)
-        Bytes!: UInt32
+        bytes!: UInt32
     }
     @Struct.type('buyrex')
     export class buyrex extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('canceldelay')
     export class canceldelay extends Struct {
         @Struct.field(permission_level)
-        Canceling_auth!: permission_level
+        canceling_auth!: permission_level
         @Struct.field(Checksum256)
-        Trx_id!: Checksum256
+        trx_id!: Checksum256
     }
     @Struct.type('powerup_config_resource')
     export class powerup_config_resource extends Struct {
         @Struct.field(Int64, {optional: true})
-        Current_weight_ratio?: Int64
+        current_weight_ratio?: Int64
         @Struct.field(Int64, {optional: true})
-        Target_weight_ratio?: Int64
+        target_weight_ratio?: Int64
         @Struct.field(Int64, {optional: true})
-        Assumed_stake_weight?: Int64
+        assumed_stake_weight?: Int64
         @Struct.field(TimePointSec, {optional: true})
-        Target_timestamp?: TimePointSec
+        target_timestamp?: TimePointSec
         @Struct.field(Float64, {optional: true})
-        Exponent?: Float64
+        exponent?: Float64
         @Struct.field(UInt32, {optional: true})
-        Decay_secs?: UInt32
+        decay_secs?: UInt32
         @Struct.field(Asset, {optional: true})
-        Min_price?: Asset
+        min_price?: Asset
         @Struct.field(Asset, {optional: true})
-        Max_price?: Asset
+        max_price?: Asset
     }
     @Struct.type('powerup_config')
     export class powerup_config extends Struct {
         @Struct.field(powerup_config_resource)
-        Net!: powerup_config_resource
+        net!: powerup_config_resource
         @Struct.field(powerup_config_resource)
-        Cpu!: powerup_config_resource
+        cpu!: powerup_config_resource
         @Struct.field(UInt32, {optional: true})
-        Powerup_days?: UInt32
+        powerup_days?: UInt32
         @Struct.field(Asset, {optional: true})
-        Min_powerup_fee?: Asset
+        min_powerup_fee?: Asset
     }
     @Struct.type('cfgpowerup')
     export class cfgpowerup extends Struct {
         @Struct.field(powerup_config)
-        Args!: powerup_config
+        args!: powerup_config
     }
     @Struct.type('claimrewards')
     export class claimrewards extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('closerex')
     export class closerex extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('cnclrexorder')
     export class cnclrexorder extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('connector')
     export class connector extends Struct {
         @Struct.field(Asset)
-        Balance!: Asset
+        balance!: Asset
         @Struct.field(Float64)
-        Weight!: Float64
+        weight!: Float64
     }
     @Struct.type('consolidate')
     export class consolidate extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('defcpuloan')
     export class defcpuloan extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('defnetloan')
     export class defnetloan extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('delegatebw')
     export class delegatebw extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Stake_net_quantity!: Asset
+        stake_net_quantity!: Asset
         @Struct.field(Asset)
-        Stake_cpu_quantity!: Asset
+        stake_cpu_quantity!: Asset
         @Struct.field('bool')
-        Transfer!: boolean
+        transfer!: boolean
     }
     @Struct.type('delegated_bandwidth')
     export class delegated_bandwidth extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        To!: Name
+        to!: Name
         @Struct.field(Asset)
-        Net_weight!: Asset
+        net_weight!: Asset
         @Struct.field(Asset)
-        Cpu_weight!: Asset
+        cpu_weight!: Asset
     }
     @Struct.type('deleteauth')
     export class deleteauth extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name)
-        Permission!: Name
+        permission!: Name
         @Struct.field(Name, {optional: true})
-        Authorized_by?: Name
+        authorized_by?: Name
     }
     @Struct.type('deposit')
     export class deposit extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('eosio_global_state')
     export class eosio_global_state extends Struct {
         @Struct.field(UInt64)
-        Max_ram_size!: UInt64
+        max_ram_size!: UInt64
         @Struct.field(UInt64)
-        Total_ram_bytes_reserved!: UInt64
+        total_ram_bytes_reserved!: UInt64
         @Struct.field(Int64)
-        Total_ram_stake!: Int64
+        total_ram_stake!: Int64
         @Struct.field(BlockTimestamp)
-        Last_producer_schedule_update!: BlockTimestamp
+        last_producer_schedule_update!: BlockTimestamp
         @Struct.field(TimePoint)
-        Last_pervote_bucket_fill!: TimePoint
+        last_pervote_bucket_fill!: TimePoint
         @Struct.field(Int64)
-        Pervote_bucket!: Int64
+        pervote_bucket!: Int64
         @Struct.field(Int64)
-        Perblock_bucket!: Int64
+        perblock_bucket!: Int64
         @Struct.field(UInt32)
-        Total_unpaid_blocks!: UInt32
+        total_unpaid_blocks!: UInt32
         @Struct.field(Int64)
-        Total_activated_stake!: Int64
+        total_activated_stake!: Int64
         @Struct.field(TimePoint)
-        Thresh_activated_stake_time!: TimePoint
+        thresh_activated_stake_time!: TimePoint
         @Struct.field(UInt16)
-        Last_producer_schedule_size!: UInt16
+        last_producer_schedule_size!: UInt16
         @Struct.field(Float64)
-        Total_producer_vote_weight!: Float64
+        total_producer_vote_weight!: Float64
         @Struct.field(BlockTimestamp)
-        Last_name_close!: BlockTimestamp
+        last_name_close!: BlockTimestamp
     }
     @Struct.type('eosio_global_state2')
     export class eosio_global_state2 extends Struct {
         @Struct.field(UInt16)
-        New_ram_per_block!: UInt16
+        new_ram_per_block!: UInt16
         @Struct.field(BlockTimestamp)
-        Last_ram_increase!: BlockTimestamp
+        last_ram_increase!: BlockTimestamp
         @Struct.field(BlockTimestamp)
-        Last_block_num!: BlockTimestamp
+        last_block_num!: BlockTimestamp
         @Struct.field(Float64)
-        Total_producer_votepay_share!: Float64
+        total_producer_votepay_share!: Float64
         @Struct.field(UInt8)
-        Revision!: UInt8
+        revision!: UInt8
     }
     @Struct.type('eosio_global_state3')
     export class eosio_global_state3 extends Struct {
         @Struct.field(TimePoint)
-        Last_vpay_state_update!: TimePoint
+        last_vpay_state_update!: TimePoint
         @Struct.field(Float64)
-        Total_vpay_share_change_rate!: Float64
+        total_vpay_share_change_rate!: Float64
     }
     @Struct.type('eosio_global_state4')
     export class eosio_global_state4 extends Struct {
         @Struct.field(Float64)
-        Continuous_rate!: Float64
+        continuous_rate!: Float64
         @Struct.field(Int64)
-        Inflation_pay_factor!: Int64
+        inflation_pay_factor!: Int64
         @Struct.field(Int64)
-        Votepay_factor!: Int64
+        votepay_factor!: Int64
     }
     @Struct.type('exchange_state')
     export class exchange_state extends Struct {
         @Struct.field(Asset)
-        Supply!: Asset
+        supply!: Asset
         @Struct.field(connector)
-        Base!: connector
+        base!: connector
         @Struct.field(connector)
-        Quote!: connector
+        quote!: connector
     }
     @Struct.type('fundcpuloan')
     export class fundcpuloan extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
         @Struct.field(Asset)
-        Payment!: Asset
+        payment!: Asset
     }
     @Struct.type('fundnetloan')
     export class fundnetloan extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
         @Struct.field(Asset)
-        Payment!: Asset
+        payment!: Asset
     }
     @Struct.type('init')
     export class init extends Struct {
         @Struct.field(VarUInt)
-        Version!: VarUInt
+        version!: VarUInt
         @Struct.field(Asset.Symbol)
-        Core!: Asset.Symbol
+        core!: Asset.Symbol
     }
     @Struct.type('limitauthchg')
     export class limitauthchg extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name, {array: true})
-        Allow_perms!: Name[]
+        allow_perms!: Name[]
         @Struct.field(Name, {array: true})
-        Disallow_perms!: Name[]
+        disallow_perms!: Name[]
     }
     @Struct.type('linkauth')
     export class linkauth extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field(Name)
-        Type!: Name
+        type!: Name
         @Struct.field(Name)
-        Requirement!: Name
+        requirement!: Name
         @Struct.field(Name, {optional: true})
-        Authorized_by?: Name
+        authorized_by?: Name
     }
     @Struct.type('mvfrsavings')
     export class mvfrsavings extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Rex!: Asset
+        rex!: Asset
     }
     @Struct.type('mvtosavings')
     export class mvtosavings extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Rex!: Asset
+        rex!: Asset
     }
     @Struct.type('name_bid')
     export class name_bid extends Struct {
         @Struct.field(Name)
-        Newname!: Name
+        newname!: Name
         @Struct.field(Name)
-        High_bidder!: Name
+        high_bidder!: Name
         @Struct.field(Int64)
-        High_bid!: Int64
+        high_bid!: Int64
         @Struct.field(TimePoint)
-        Last_bid_time!: TimePoint
+        last_bid_time!: TimePoint
     }
     @Struct.type('newaccount')
     export class newaccount extends Struct {
         @Struct.field(Name)
-        Creator!: Name
+        creator!: Name
         @Struct.field(Name)
-        Name!: Name
+        name!: Name
         @Struct.field(authority)
-        Owner!: authority
+        owner!: authority
         @Struct.field(authority)
-        Active!: authority
+        active!: authority
     }
     @Struct.type('onblock')
     export class onblock extends Struct {
         @Struct.field(block_header)
-        Header!: block_header
+        header!: block_header
     }
     @Struct.type('onerror')
     export class onerror extends Struct {
         @Struct.field(UInt128)
-        Sender_id!: UInt128
+        sender_id!: UInt128
         @Struct.field(Bytes)
-        Sent_trx!: Bytes
+        sent_trx!: Bytes
     }
     @Struct.type('pair_time_point_sec_int64')
     export class pair_time_point_sec_int64 extends Struct {
         @Struct.field(TimePointSec)
-        First!: TimePointSec
+        first!: TimePointSec
         @Struct.field(Int64)
-        Second!: Int64
+        second!: Int64
     }
     @Struct.type('powerup')
     export class powerup extends Struct {
         @Struct.field(Name)
-        Payer!: Name
+        payer!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(UInt32)
-        Days!: UInt32
+        days!: UInt32
         @Struct.field(Int64)
-        Net_frac!: Int64
+        net_frac!: Int64
         @Struct.field(Int64)
-        Cpu_frac!: Int64
+        cpu_frac!: Int64
         @Struct.field(Asset)
-        Max_payment!: Asset
+        max_payment!: Asset
     }
     @Struct.type('powerup_order')
     export class powerup_order extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(UInt64)
-        Id!: UInt64
+        id!: UInt64
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Int64)
-        Net_weight!: Int64
+        net_weight!: Int64
         @Struct.field(Int64)
-        Cpu_weight!: Int64
+        cpu_weight!: Int64
         @Struct.field(TimePointSec)
-        Expires!: TimePointSec
+        expires!: TimePointSec
     }
     @Struct.type('powerup_state_resource')
     export class powerup_state_resource extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Int64)
-        Weight!: Int64
+        weight!: Int64
         @Struct.field(Int64)
-        Weight_ratio!: Int64
+        weight_ratio!: Int64
         @Struct.field(Int64)
-        Assumed_stake_weight!: Int64
+        assumed_stake_weight!: Int64
         @Struct.field(Int64)
-        Initial_weight_ratio!: Int64
+        initial_weight_ratio!: Int64
         @Struct.field(Int64)
-        Target_weight_ratio!: Int64
+        target_weight_ratio!: Int64
         @Struct.field(TimePointSec)
-        Initial_timestamp!: TimePointSec
+        initial_timestamp!: TimePointSec
         @Struct.field(TimePointSec)
-        Target_timestamp!: TimePointSec
+        target_timestamp!: TimePointSec
         @Struct.field(Float64)
-        Exponent!: Float64
+        exponent!: Float64
         @Struct.field(UInt32)
-        Decay_secs!: UInt32
+        decay_secs!: UInt32
         @Struct.field(Asset)
-        Min_price!: Asset
+        min_price!: Asset
         @Struct.field(Asset)
-        Max_price!: Asset
+        max_price!: Asset
         @Struct.field(Int64)
-        Utilization!: Int64
+        utilization!: Int64
         @Struct.field(Int64)
-        Adjusted_utilization!: Int64
+        adjusted_utilization!: Int64
         @Struct.field(TimePointSec)
-        Utilization_timestamp!: TimePointSec
+        utilization_timestamp!: TimePointSec
     }
     @Struct.type('powerup_state')
     export class powerup_state extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(powerup_state_resource)
-        Net!: powerup_state_resource
+        net!: powerup_state_resource
         @Struct.field(powerup_state_resource)
-        Cpu!: powerup_state_resource
+        cpu!: powerup_state_resource
         @Struct.field(UInt32)
-        Powerup_days!: UInt32
+        powerup_days!: UInt32
         @Struct.field(Asset)
-        Min_powerup_fee!: Asset
+        min_powerup_fee!: Asset
     }
     @Struct.type('powerupexec')
     export class powerupexec extends Struct {
         @Struct.field(Name)
-        User!: Name
+        user!: Name
         @Struct.field(UInt16)
-        Max!: UInt16
+        max!: UInt16
     }
     @Struct.type('producer_info')
     export class producer_info extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Float64)
-        Total_votes!: Float64
+        total_votes!: Float64
         @Struct.field(PublicKey)
-        Producer_key!: PublicKey
+        producer_key!: PublicKey
         @Struct.field('bool')
-        Is_active!: boolean
+        is_active!: boolean
         @Struct.field('string')
-        Url!: string
+        url!: string
         @Struct.field(UInt32)
-        Unpaid_blocks!: UInt32
+        unpaid_blocks!: UInt32
         @Struct.field(TimePoint)
-        Last_claim_time!: TimePoint
+        last_claim_time!: TimePoint
         @Struct.field(UInt16)
-        Location!: UInt16
+        location!: UInt16
         @Struct.field(variant_block_signing_authority_v0, {optional: true})
-        Producer_authority?: variant_block_signing_authority_v0
+        producer_authority?: variant_block_signing_authority_v0
     }
     @Struct.type('producer_info2')
     export class producer_info2 extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Float64)
-        Votepay_share!: Float64
+        votepay_share!: Float64
         @Struct.field(TimePoint)
-        Last_votepay_share_update!: TimePoint
+        last_votepay_share_update!: TimePoint
     }
     @Struct.type('refund')
     export class refund extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('refund_request')
     export class refund_request extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(TimePointSec)
-        Request_time!: TimePointSec
+        request_time!: TimePointSec
         @Struct.field(Asset)
-        Net_amount!: Asset
+        net_amount!: Asset
         @Struct.field(Asset)
-        Cpu_amount!: Asset
+        cpu_amount!: Asset
     }
     @Struct.type('regproducer')
     export class regproducer extends Struct {
         @Struct.field(Name)
-        Producer!: Name
+        producer!: Name
         @Struct.field(PublicKey)
-        Producer_key!: PublicKey
+        producer_key!: PublicKey
         @Struct.field('string')
-        Url!: string
+        url!: string
         @Struct.field(UInt16)
-        Location!: UInt16
+        location!: UInt16
     }
     @Struct.type('regproducer2')
     export class regproducer2 extends Struct {
         @Struct.field(Name)
-        Producer!: Name
+        producer!: Name
         @Struct.field(variant_block_signing_authority_v0)
-        Producer_authority!: variant_block_signing_authority_v0
+        producer_authority!: variant_block_signing_authority_v0
         @Struct.field('string')
-        Url!: string
+        url!: string
         @Struct.field(UInt16)
-        Location!: UInt16
+        location!: UInt16
     }
     @Struct.type('regproxy')
     export class regproxy extends Struct {
         @Struct.field(Name)
-        Proxy!: Name
+        proxy!: Name
         @Struct.field('bool')
-        Isproxy!: boolean
+        isproxy!: boolean
     }
     @Struct.type('rentcpu')
     export class rentcpu extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Loan_payment!: Asset
+        loan_payment!: Asset
         @Struct.field(Asset)
-        Loan_fund!: Asset
+        loan_fund!: Asset
     }
     @Struct.type('rentnet')
     export class rentnet extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Loan_payment!: Asset
+        loan_payment!: Asset
         @Struct.field(Asset)
-        Loan_fund!: Asset
+        loan_fund!: Asset
     }
     @Struct.type('rex_balance')
     export class rex_balance extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Vote_stake!: Asset
+        vote_stake!: Asset
         @Struct.field(Asset)
-        Rex_balance!: Asset
+        rex_balance!: Asset
         @Struct.field(Int64)
-        Matured_rex!: Int64
+        matured_rex!: Int64
         @Struct.field(pair_time_point_sec_int64, {array: true})
-        Rex_maturities!: pair_time_point_sec_int64[]
+        rex_maturities!: pair_time_point_sec_int64[]
     }
     @Struct.type('rex_fund')
     export class rex_fund extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Balance!: Asset
+        balance!: Asset
     }
     @Struct.type('rex_loan')
     export class rex_loan extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Payment!: Asset
+        payment!: Asset
         @Struct.field(Asset)
-        Balance!: Asset
+        balance!: Asset
         @Struct.field(Asset)
-        Total_staked!: Asset
+        total_staked!: Asset
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
         @Struct.field(TimePoint)
-        Expiration!: TimePoint
+        expiration!: TimePoint
     }
     @Struct.type('rex_order')
     export class rex_order extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Rex_requested!: Asset
+        rex_requested!: Asset
         @Struct.field(Asset)
-        Proceeds!: Asset
+        proceeds!: Asset
         @Struct.field(Asset)
-        Stake_change!: Asset
+        stake_change!: Asset
         @Struct.field(TimePoint)
-        Order_time!: TimePoint
+        order_time!: TimePoint
         @Struct.field('bool')
-        Is_open!: boolean
+        is_open!: boolean
     }
     @Struct.type('rex_pool')
     export class rex_pool extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Asset)
-        Total_lent!: Asset
+        total_lent!: Asset
         @Struct.field(Asset)
-        Total_unlent!: Asset
+        total_unlent!: Asset
         @Struct.field(Asset)
-        Total_rent!: Asset
+        total_rent!: Asset
         @Struct.field(Asset)
-        Total_lendable!: Asset
+        total_lendable!: Asset
         @Struct.field(Asset)
-        Total_rex!: Asset
+        total_rex!: Asset
         @Struct.field(Asset)
-        Namebid_proceeds!: Asset
+        namebid_proceeds!: Asset
         @Struct.field(UInt64)
-        Loan_num!: UInt64
+        loan_num!: UInt64
     }
     @Struct.type('rex_return_buckets')
     export class rex_return_buckets extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(pair_time_point_sec_int64, {array: true})
-        Return_buckets!: pair_time_point_sec_int64[]
+        return_buckets!: pair_time_point_sec_int64[]
     }
     @Struct.type('rex_return_pool')
     export class rex_return_pool extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(TimePointSec)
-        Last_dist_time!: TimePointSec
+        last_dist_time!: TimePointSec
         @Struct.field(TimePointSec)
-        Pending_bucket_time!: TimePointSec
+        pending_bucket_time!: TimePointSec
         @Struct.field(TimePointSec)
-        Oldest_bucket_time!: TimePointSec
+        oldest_bucket_time!: TimePointSec
         @Struct.field(Int64)
-        Pending_bucket_proceeds!: Int64
+        pending_bucket_proceeds!: Int64
         @Struct.field(Int64)
-        Current_rate_of_increase!: Int64
+        current_rate_of_increase!: Int64
         @Struct.field(Int64)
-        Proceeds!: Int64
+        proceeds!: Int64
     }
     @Struct.type('rexexec')
     export class rexexec extends Struct {
         @Struct.field(Name)
-        User!: Name
+        user!: Name
         @Struct.field(UInt16)
-        Max!: UInt16
+        max!: UInt16
     }
     @Struct.type('rmvproducer')
     export class rmvproducer extends Struct {
         @Struct.field(Name)
-        Producer!: Name
+        producer!: Name
     }
     @Struct.type('sellram')
     export class sellram extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Int64)
-        Bytes!: Int64
+        bytes!: Int64
     }
     @Struct.type('sellrex')
     export class sellrex extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Asset)
-        Rex!: Asset
+        rex!: Asset
     }
     @Struct.type('setabi')
     export class setabi extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Bytes)
-        Abi!: Bytes
+        abi!: Bytes
         @Struct.field('string', {optional: true})
-        Memo?: string
+        memo?: string
     }
     @Struct.type('setacctcpu')
     export class setacctcpu extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Int64, {optional: true})
-        Cpu_weight?: Int64
+        cpu_weight?: Int64
     }
     @Struct.type('setacctnet')
     export class setacctnet extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Int64, {optional: true})
-        Net_weight?: Int64
+        net_weight?: Int64
     }
     @Struct.type('setacctram')
     export class setacctram extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Int64, {optional: true})
-        Ram_bytes?: Int64
+        ram_bytes?: Int64
     }
     @Struct.type('setalimits')
     export class setalimits extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Int64)
-        Ram_bytes!: Int64
+        ram_bytes!: Int64
         @Struct.field(Int64)
-        Net_weight!: Int64
+        net_weight!: Int64
         @Struct.field(Int64)
-        Cpu_weight!: Int64
+        cpu_weight!: Int64
     }
     @Struct.type('setcode')
     export class setcode extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(UInt8)
-        Vmtype!: UInt8
+        vmtype!: UInt8
         @Struct.field(UInt8)
-        Vmversion!: UInt8
+        vmversion!: UInt8
         @Struct.field(Bytes)
-        Code!: Bytes
+        code!: Bytes
         @Struct.field('string', {optional: true})
-        Memo?: string
+        memo?: string
     }
     @Struct.type('setinflation')
     export class setinflation extends Struct {
         @Struct.field(Int64)
-        Annual_rate!: Int64
+        annual_rate!: Int64
         @Struct.field(Int64)
-        Inflation_pay_factor!: Int64
+        inflation_pay_factor!: Int64
         @Struct.field(Int64)
-        Votepay_factor!: Int64
+        votepay_factor!: Int64
     }
     @Struct.type('setparams')
     export class setparams extends Struct {
         @Struct.field(blockchain_parameters_v1)
-        Params!: blockchain_parameters_v1
+        params!: blockchain_parameters_v1
     }
     @Struct.type('setpriv')
     export class setpriv extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(UInt8)
-        Is_priv!: UInt8
+        is_priv!: UInt8
     }
     @Struct.type('setram')
     export class setram extends Struct {
         @Struct.field(UInt64)
-        Max_ram_size!: UInt64
+        max_ram_size!: UInt64
     }
     @Struct.type('setramrate')
     export class setramrate extends Struct {
         @Struct.field(UInt16)
-        Bytes_per_block!: UInt16
+        bytes_per_block!: UInt16
     }
     @Struct.type('setrex')
     export class setrex extends Struct {
         @Struct.field(Asset)
-        Balance!: Asset
+        balance!: Asset
     }
     @Struct.type('undelegatebw')
     export class undelegatebw extends Struct {
         @Struct.field(Name)
-        From!: Name
+        from!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        Unstake_net_quantity!: Asset
+        unstake_net_quantity!: Asset
         @Struct.field(Asset)
-        Unstake_cpu_quantity!: Asset
+        unstake_cpu_quantity!: Asset
     }
     @Struct.type('unlinkauth')
     export class unlinkauth extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name)
-        Code!: Name
+        code!: Name
         @Struct.field(Name)
-        Type!: Name
+        type!: Name
         @Struct.field(Name, {optional: true})
-        Authorized_by?: Name
+        authorized_by?: Name
     }
     @Struct.type('unregprod')
     export class unregprod extends Struct {
         @Struct.field(Name)
-        Producer!: Name
+        producer!: Name
     }
     @Struct.type('unstaketorex')
     export class unstaketorex extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Name)
-        Receiver!: Name
+        receiver!: Name
         @Struct.field(Asset)
-        From_net!: Asset
+        from_net!: Asset
         @Struct.field(Asset)
-        From_cpu!: Asset
+        from_cpu!: Asset
     }
     @Struct.type('updateauth')
     export class updateauth extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name)
-        Permission!: Name
+        permission!: Name
         @Struct.field(Name)
-        Parent!: Name
+        parent!: Name
         @Struct.field(authority)
-        Auth!: authority
+        auth!: authority
         @Struct.field(Name, {optional: true})
-        Authorized_by?: Name
+        authorized_by?: Name
     }
     @Struct.type('updaterex')
     export class updaterex extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
     }
     @Struct.type('updtrevision')
     export class updtrevision extends Struct {
         @Struct.field(UInt8)
-        Revision!: UInt8
+        revision!: UInt8
     }
     @Struct.type('user_resources')
     export class user_resources extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Net_weight!: Asset
+        net_weight!: Asset
         @Struct.field(Asset)
-        Cpu_weight!: Asset
+        cpu_weight!: Asset
         @Struct.field(Int64)
-        Ram_bytes!: Int64
+        ram_bytes!: Int64
     }
     @Struct.type('voteproducer')
     export class voteproducer extends Struct {
         @Struct.field(Name)
-        Voter!: Name
+        voter!: Name
         @Struct.field(Name)
-        Proxy!: Name
+        proxy!: Name
         @Struct.field(Name, {array: true})
-        Producers!: Name[]
+        producers!: Name[]
     }
     @Struct.type('voter_info')
     export class voter_info extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Name)
-        Proxy!: Name
+        proxy!: Name
         @Struct.field(Name, {array: true})
-        Producers!: Name[]
+        producers!: Name[]
         @Struct.field(Int64)
-        Staked!: Int64
+        staked!: Int64
         @Struct.field(Float64)
-        Last_vote_weight!: Float64
+        last_vote_weight!: Float64
         @Struct.field(Float64)
-        Proxied_vote_weight!: Float64
+        proxied_vote_weight!: Float64
         @Struct.field('bool')
-        Is_proxy!: boolean
+        is_proxy!: boolean
         @Struct.field(UInt32)
-        Flags1!: UInt32
+        flags1!: UInt32
         @Struct.field(UInt32)
-        Reserved2!: UInt32
+        reserved2!: UInt32
         @Struct.field(Asset)
-        Reserved3!: Asset
+        reserved3!: Asset
     }
     @Struct.type('voteupdate')
     export class voteupdate extends Struct {
         @Struct.field(Name)
-        Voter_name!: Name
+        voter_name!: Name
     }
     @Struct.type('wasmcfg')
     export class wasmcfg extends Struct {
         @Struct.field(Name)
-        Settings!: Name
+        settings!: Name
     }
     @Struct.type('withdraw')
     export class withdraw extends Struct {
         @Struct.field(Name)
-        Owner!: Name
+        owner!: Name
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
     }
     @Struct.type('limit_auth_change')
     export class limit_auth_change extends Struct {
         @Struct.field(UInt8)
-        Version!: UInt8
+        version!: UInt8
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Name, {array: true})
-        Allow_perms!: Name[]
+        allow_perms!: Name[]
         @Struct.field(Name, {array: true})
-        Disallow_perms!: Name[]
+        disallow_perms!: Name[]
     }
 }
 export const TableMap = {

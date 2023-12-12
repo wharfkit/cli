@@ -2,7 +2,7 @@ import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {parseType, removeDuplicateInterfaces} from './helpers'
 import {getActionFieldFromAbi} from './structs'
-import { findAbiStruct, findExternalType, findVariant } from './finders'
+import { findAbiStruct, findAliasType, findExternalType, findVariant } from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
@@ -33,25 +33,24 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
     const typeInterfaces: TypeInterfaceDeclaration[] = []
 
     const members = struct.fields.map((field) => {
-        const typeReferenceNode = ts.factory.createTypeReferenceNode(
-            findParamTypeString(field.type, 'Types.', abi)
-        )
-
         const abiVariant = findVariant(field.type, abi)
 
         let types
+        let variantType
+        const aliasType = findAliasType(field.type, abi)
 
         if (abiVariant) {
             types = abiVariant.types
 
-            const variantTypeName = `${struct.structName || struct.name}_${field.name}_Variant`;
+            variantType = `${struct.name}_${field.name}_variant`;
+
             const variantTypeNodes = types.map((type) => 
                 ts.factory.createTypeReferenceNode(findExternalType(type, 'Types.', abi))
             );
             const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
                 undefined,
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-                variantTypeName,
+                variantType,
                 undefined,
                 ts.factory.createUnionTypeNode(variantTypeNodes)
             );
@@ -60,6 +59,8 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
         } else {
             types = [field.type]
         }
+
+        const internalType = (variantType || aliasType) && `Types.${variantType || aliasType}`
 
         types.forEach((type) => {
             const typeStruct = findAbiStruct(type, abi)
@@ -71,6 +72,10 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
             }
         })
 
+        const typeReferenceNode = ts.factory.createTypeReferenceNode(
+            internalType || findParamTypeString(field.type, 'Types.', abi)
+        )
+
         return ts.factory.createPropertySignature(
             undefined,
             field.name,
@@ -81,7 +86,7 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
 
     const actionInterface = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        struct.structName || struct.name,
+        struct.name,
         undefined,
         undefined,
         members

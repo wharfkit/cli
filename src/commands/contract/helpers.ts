@@ -9,8 +9,6 @@ export function getCoreImports(abi: ABI.Def) {
     const coreTypes: string[] = []
 
     for (const struct of abi.structs) {
-        const structIsActionParams = !!abi.actions.find((action) => action.type === struct.name)
-
         for (const field of struct.fields) {
             const fieldTypeWithoutDecorator = extractDecorator(field.type).type
             const fieldTypeIsStruct = abi.structs.find(
@@ -31,7 +29,7 @@ export function getCoreImports(abi: ABI.Def) {
             }
 
             // We don't need to add action types unless the struct is an action param
-            if (!structIsActionParams) {
+            if (!structIsUsedInActionParams(struct, abi)) {
                 continue
             }
 
@@ -62,6 +60,39 @@ export function getCoreImports(abi: ABI.Def) {
             .filter((value, index, self) => self.indexOf(value) === index)
             .filter((type) => !coreImports.includes(type)),
     }
+}
+
+function structIsActionParams(struct: ABI.Struct, abi: ABI.Def) {
+    return abi.actions.some((action) => action.type === struct.name)
+}
+
+function structIsUsedInActionParams(struct: ABI.Struct, abi: ABI.Def) {
+    if (structIsActionParams(struct, abi)) {
+        return true
+    }
+
+    let isUsedByActionStruct = false
+
+    const structsUsingStruct = abi.structs.filter((abiStruct) => {
+        return abiStruct.fields.some((field) => extractDecorator(field.type).type === struct.name)
+    })
+
+    if (structsUsingStruct.length === 0) {
+        return false
+    }
+
+    isUsedByActionStruct =
+        abi.actions.some((action) => structsUsingStruct.map(s => s.name).includes(action.type))
+
+    if (!isUsedByActionStruct) {
+        structsUsingStruct.forEach((structUsingStruct) => {
+            if (structIsUsedInActionParams(structUsingStruct, abi)) {
+                isUsedByActionStruct = true
+            }
+        })
+    }
+
+    return isUsedByActionStruct
 }
 
 export function findCoreClassImport(type: string) {
