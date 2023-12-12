@@ -202,8 +202,23 @@ export namespace Types {
         @Struct.field(TimePoint, {optional: true})
         earliest_exec_time?: TimePoint
     }
+    @Struct.type('transaction_header')
+    export class transaction_header extends Struct {
+        @Struct.field(TimePointSec)
+        expiration!: TimePointSec
+        @Struct.field(UInt16)
+        ref_block_num!: UInt16
+        @Struct.field(UInt32)
+        ref_block_prefix!: UInt32
+        @Struct.field(VarUInt)
+        max_net_usage_words!: VarUInt
+        @Struct.field(UInt8)
+        max_cpu_usage_ms!: UInt8
+        @Struct.field(VarUInt)
+        delay_sec!: VarUInt
+    }
     @Struct.type('transaction')
-    export class transaction extends Struct {
+    export class transaction extends transaction_header {
         @Struct.field(action, {array: true})
         context_free_actions!: action[]
         @Struct.field(action, {array: true})
@@ -221,21 +236,6 @@ export namespace Types {
         requested!: permission_level[]
         @Struct.field(transaction)
         trx!: transaction
-    }
-    @Struct.type('transaction_header')
-    export class transaction_header extends Struct {
-        @Struct.field(TimePointSec)
-        expiration!: TimePointSec
-        @Struct.field(UInt16)
-        ref_block_num!: UInt16
-        @Struct.field(UInt32)
-        ref_block_prefix!: UInt32
-        @Struct.field(VarUInt)
-        max_net_usage_words!: VarUInt
-        @Struct.field(UInt8)
-        max_cpu_usage_ms!: UInt8
-        @Struct.field(VarUInt)
-        delay_sec!: VarUInt
     }
     @Struct.type('unapprove')
     export class unapprove extends Struct {

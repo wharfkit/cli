@@ -635,7 +635,7 @@ export namespace Types {
         max_authority_depth!: UInt16
     }
     @Struct.type('blockchain_parameters_v1')
-    export class blockchain_parameters_v1 extends Struct {
+    export class blockchain_parameters_v1 extends blockchain_parameters {
         @Struct.field(UInt32, {optional: true})
         max_action_return_value_size?: UInt32
     }
@@ -792,7 +792,7 @@ export namespace Types {
         amount!: Asset
     }
     @Struct.type('eosio_global_state')
-    export class eosio_global_state extends Struct {
+    export class eosio_global_state extends blockchain_parameters {
         @Struct.field(UInt64)
         max_ram_size!: UInt64
         @Struct.field(UInt64)

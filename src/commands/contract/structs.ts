@@ -12,6 +12,7 @@ interface FieldType {
 
 interface StructData {
     name: string
+    base?: string
     fields: FieldType[]
     variant: boolean
 }
@@ -69,7 +70,7 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
                 })
             }
 
-            structTypes.push({name: struct.name, fields, variant: false})
+            structTypes.push({name: struct.name, base: struct.base, fields, variant: false})
         }
     }
 
@@ -258,6 +259,12 @@ function findDependencies(
     typeAliases: TypeAlias[]
 ): StructData[] {
     const dependencies: StructData[] = []
+
+    if (struct.base?.length) {
+        const baseStruct = allStructs.find((s) => s.name === struct.base)
+
+        baseStruct && dependencies.push(baseStruct)
+    }
 
     for (const field of struct.fields) {
         const {type: fieldType} = extractDecorator(field.type)
