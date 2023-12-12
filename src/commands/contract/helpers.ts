@@ -1,18 +1,8 @@
-import * as Antelope from '@wharfkit/antelope'
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {formatClassName} from '../../utils'
-
-const ANTELOPE_CLASSES: string[] = []
-Object.keys(Antelope).map((key) => {
-    if (Antelope[key].abiName) {
-        ANTELOPE_CLASSES.push(key)
-    }
-})
-
-export const ANTELOPE_CLASS_MAPPINGS = {
-    block_timestamp_type: 'BlockTimestamp',
-}
+import {findAbiType, findCoreClass, findCoreType} from './finders'
+import { TypeInterfaceDeclaration } from './interfaces'
 
 export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
@@ -151,41 +141,7 @@ export function generateInterface(
     )
 }
 
-export function findCoreClass(type: string): string | undefined {
-    if (ANTELOPE_CLASS_MAPPINGS[type]) {
-        return ANTELOPE_CLASS_MAPPINGS[type]
-    }
-
-    const parsedType = parseType(trim(type)).split('_').join('').toLowerCase()
-
-    return (
-        ANTELOPE_CLASSES.find((antelopeClass) => parsedType === antelopeClass.toLowerCase()) ||
-        ANTELOPE_CLASSES.find(
-            (antelopeClass) => parsedType.replace(/[0-9]/g, '') === antelopeClass.toLowerCase()
-        )
-    )
-}
-
-export function findCoreType(type: string): string | undefined {
-    const coreType = findCoreClass(type)
-
-    if (coreType) {
-        return `${coreType}Type`
-    }
-}
-
-export function findInternalType(
-    type: string,
-    typeNamespace: string | undefined,
-    abi: ABI.Def
-): string {
-    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
-
-    // TODO: inside findType, namespace is prefixed, but format internal is doing the same
-    return formatInternalType(typeString, typeNamespace, abi, decorator)
-}
-
-function formatInternalType(
+export function formatInternalType(
     typeString: string,
     namespace = '',
     abi: ABI.Def,
@@ -202,66 +158,6 @@ function formatInternalType(
     }
 
     return `${type}${decorator}`
-}
-
-function findAliasType(typeString: string, abi: ABI.Def): string | undefined {
-    const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
-    const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
-
-    return alias?.type && `${alias?.type}${decorator || ''}`
-}
-
-export function findAbiStruct(
-    type: string,
-    abi: ABI.Def,
-): ABI.Struct | undefined {
-    const extractDecoratorResponse = extractDecorator(type)
-    const typeString = extractDecoratorResponse.type
-    const decorator = extractDecoratorResponse.decorator
-
-    const abiStruct = abi.structs.find(
-        (abiType) => abiType.name === typeString
-    )
-
-    return abiStruct
-}
-
-export function findAbiType(
-    type: string,
-    abi: ABI.Def,
-    typeNamespace = ''
-): {type: string; decorator?: string} {
-    let typeString = parseType(trim(type))
-
-    const aliasType = findAliasType(typeString, abi)
-
-    if (aliasType) {
-        typeString = aliasType
-    }
-
-    const extractDecoratorResponse = extractDecorator(typeString)
-    typeString = extractDecoratorResponse.type
-    const decorator = extractDecoratorResponse.decorator
-
-    const abiType = [...abi.structs, ...abi.variants].find(
-        (abiType) => abiType.name === typeString
-    )?.name
-
-    if (abiType) {
-        return {type: `${typeNamespace}${formatClassName(abiType)}`, decorator}
-    }
-
-    return {type: typeString, decorator}
-}
-
-export function findExternalType(type: string, typeNamespace = '', abi: ABI.Def): string {
-    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
-
-    return `${findCoreType(typeString) || capitalize(typeString)}${decorator === '[]' ? '[]' : ''}`
-}
-
-function findType(type: string, abi: ABI.Def, typeNamespace?: string) {
-    return findAbiType(type, abi, typeNamespace)
 }
 
 const decorators = ['?', '[]']
@@ -303,7 +199,7 @@ export function parseType(type: string): string {
     return type
 }
 
-function trim(string: string) {
+export function trim(string: string) {
     return string.replace(/\s/g, '')
 }
 
@@ -315,7 +211,7 @@ export function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export function removeDuplicateInterfaces(interfaces: ts.InterfaceDeclaration[]): ts.InterfaceDeclaration[] {
+export function removeDuplicateInterfaces(interfaces: TypeInterfaceDeclaration[]): TypeInterfaceDeclaration[] {
     const seen: string[] = [];
 
     return interfaces.filter(interfaceDeclaration => {

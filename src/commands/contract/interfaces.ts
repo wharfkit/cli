@@ -1,7 +1,8 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
-import {findAbiStruct, findExternalType, parseType, removeDuplicateInterfaces} from './helpers'
+import {parseType, removeDuplicateInterfaces} from './helpers'
 import {getActionFieldFromAbi} from './structs'
+import { findAbiStruct, findExternalType, findVariant } from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
@@ -26,28 +27,49 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
     )
 }
 
-export function generateActionInterface(struct, abi): { actionInterface: ts.InterfaceDeclaration, typeInterfaces: ts.InterfaceDeclaration[] } {
-    const typeInterfaces: ts.InterfaceDeclaration[] = []
+export type TypeInterfaceDeclaration = ts.InterfaceDeclaration | ts.TypeAliasDeclaration
+
+export function generateActionInterface(struct, abi): { actionInterface: ts.InterfaceDeclaration, typeInterfaces: TypeInterfaceDeclaration[] } {
+    const typeInterfaces: TypeInterfaceDeclaration[] = []
 
     const members = struct.fields.map((field) => {
         const typeReferenceNode = ts.factory.createTypeReferenceNode(
             findParamTypeString(field.type, 'Types.', abi)
         )
 
-        // We need to check for types and variants. We also need to add core types that may be used in structs that are
-        // used in action params (the check will have to recursivly look for those structs). Optionally, we can add all
-        // core types and have eslint remove them.
-        if (field.type === 'blockchain_parameters_v1') {
-            console.log({type: field.type})
+        const abiVariant = findVariant(field.type, abi)
+
+        let types
+
+        if (abiVariant) {
+            types = abiVariant.types
+
+            const variantTypeName = `${struct.structName || struct.name}_${field.name}_Variant`;
+            const variantTypeNodes = types.map((type) => 
+                ts.factory.createTypeReferenceNode(findExternalType(type, 'Types.', abi))
+            );
+            const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
+                undefined,
+                [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+                variantTypeName,
+                undefined,
+                ts.factory.createUnionTypeNode(variantTypeNodes)
+            );
+
+            typeInterfaces.push(variantTypeAlias)
+        } else {
+            types = [field.type]
         }
 
-        const typeStruct = findAbiStruct(field.type, abi)
+        types.forEach((type) => {
+            const typeStruct = findAbiStruct(type, abi)
 
-        if (typeStruct) {
-            const interfaces = generateActionInterface(typeStruct, abi)
-            
-            typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
-        }
+            if (typeStruct) {
+                const interfaces = generateActionInterface(typeStruct, abi)
+                
+                typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
+            }
+        })
 
         return ts.factory.createPropertySignature(
             undefined,
@@ -71,11 +93,11 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
 export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
-    const typeInterfaces: ts.InterfaceDeclaration[] = []
+    const typeInterfaces: TypeInterfaceDeclaration[] = []
 
     const interfaces = abi.actions.map((action) => {
         const actionStruct = actionStructsWithFields.find(
-            (actionStructWithField) => actionStructWithField.structName === action.type
+            (actionStructWithField) => actionStructWithField.name === action.type
         )
 
         const interfaces = generateActionInterface(actionStruct, abi)
