@@ -2,7 +2,7 @@ import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {parseType, removeCommas, removeDuplicateInterfaces} from './helpers'
 import {getActionFieldFromAbi} from './structs'
-import { findAbiStruct, findTypeFromAlias, findExternalType, findVariant } from './finders'
+import {findAbiStruct, findExternalType, findTypeFromAlias, findVariant} from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
@@ -29,7 +29,10 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
 
 export type TypeInterfaceDeclaration = ts.InterfaceDeclaration | ts.TypeAliasDeclaration
 
-export function generateActionInterface(struct, abi): { actionInterface: ts.InterfaceDeclaration, typeInterfaces: TypeInterfaceDeclaration[] } {
+export function generateActionInterface(
+    struct,
+    abi
+): {actionInterface: ts.InterfaceDeclaration; typeInterfaces: TypeInterfaceDeclaration[]} {
     const typeInterfaces: TypeInterfaceDeclaration[] = []
 
     const members = struct.fields.map((field) => {
@@ -42,18 +45,18 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
         if (abiVariant) {
             types = abiVariant.types
 
-            variantType = `${struct.name}_${field.name}_variant`;
+            variantType = `${struct.name}_${field.name}_variant`
 
-            const variantTypeNodes = types.map((type) => 
+            const variantTypeNodes = types.map((type) =>
                 ts.factory.createTypeReferenceNode(findExternalType(type, 'Types.', abi))
-            );
+            )
             const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
                 undefined,
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
                 variantType,
                 undefined,
                 ts.factory.createUnionTypeNode(variantTypeNodes)
-            );
+            )
 
             typeInterfaces.push(variantTypeAlias)
         } else {
@@ -67,7 +70,7 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
 
             if (typeStruct) {
                 const interfaces = generateActionInterface(typeStruct, abi)
-                
+
                 typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
             }
         })
@@ -92,7 +95,7 @@ export function generateActionInterface(struct, abi): { actionInterface: ts.Inte
         members
     )
 
-    return { actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces) }
+    return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
 export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
@@ -110,16 +113,14 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
         if (interfaces.actionInterface) {
             typeInterfaces.push(...interfaces.typeInterfaces)
         }
-            
+
         return interfaces.actionInterface
     })
 
     const actionParamsTypes = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('Types'),
-        ts.factory.createModuleBlock(
-            removeDuplicateInterfaces(typeInterfaces)
-        ),
+        ts.factory.createModuleBlock(removeDuplicateInterfaces(typeInterfaces)),
         ts.NodeFlags.Namespace
     )
 

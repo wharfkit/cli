@@ -1,7 +1,7 @@
 import * as Antelope from '@wharfkit/antelope'
-import { ABI } from "@wharfkit/antelope"
-import { capitalize, extractDecorator, formatInternalType, parseType, trim } from "./helpers"
-import { formatClassName } from "../../utils"
+import type {ABI} from '@wharfkit/antelope'
+import {capitalize, extractDecorator, formatInternalType, parseType, trim} from './helpers'
+import {formatClassName} from '../../utils'
 
 const ANTELOPE_CLASSES: string[] = []
 Object.keys(Antelope).map((key) => {
@@ -14,10 +14,7 @@ export const ANTELOPE_CLASS_MAPPINGS = {
     block_timestamp_type: 'BlockTimestamp',
 }
 
-export const ANTELOPE_CLASS_WITHOUT_TYPES = [
-    'BlockTimestamp',
-    'TimePointSec',
-]
+export const ANTELOPE_CLASS_WITHOUT_TYPES = ['BlockTimestamp', 'TimePointSec']
 
 export function findTypeFromAlias(typeString: string, abi: ABI.Def): string | undefined {
     const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
@@ -29,33 +26,29 @@ export function findTypeFromAlias(typeString: string, abi: ABI.Def): string | un
 export function findAliasFromType(typeString: string, abi: ABI.Def): string | undefined {
     const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
 
-    const alias = abi.types.find((type) => type.type === typeStringWithoutDecorator ||
-        type.type === `${typeStringWithoutDecorator}[]`)
+    const alias = abi.types.find(
+        (type) =>
+            type.type === typeStringWithoutDecorator ||
+            type.type === `${typeStringWithoutDecorator}[]`
+    )
 
     return alias?.new_type_name && `${alias?.new_type_name}${decorator || ''}`
-
 }
 
-export function findAbiStruct(
-    type: string,
-    abi: ABI.Def,
-): ABI.Struct | undefined {
+export function findAbiStruct(type: string, abi: ABI.Def): ABI.Struct | undefined {
     const extractDecoratorResponse = extractDecorator(type)
     const typeString = extractDecoratorResponse.type
 
     const aliasType = findTypeFromAlias(typeString, abi)
 
-    let abiStruct = abi.structs.find(
+    const abiStruct = abi.structs.find(
         (abiType) => abiType.name === extractDecorator(aliasType || typeString).type
     )
 
     return abiStruct
 }
 
-export function findVariant(
-    typeString: string,
-    abi: ABI.Def
-): ABI.Variant | undefined {
+export function findVariant(typeString: string, abi: ABI.Def): ABI.Variant | undefined {
     const {type: typeStringWithoutDecorator} = extractDecorator(typeString)
 
     const aliastype = findTypeFromAlias(typeStringWithoutDecorator, abi)

@@ -1,8 +1,8 @@
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {formatClassName} from '../../utils'
-import {findAbiType, findTypeFromAlias, findCoreClass, findCoreType, findVariant, findAliasFromType} from './finders'
-import { TypeInterfaceDeclaration } from './interfaces'
+import {findAbiType, findAliasFromType, findCoreClass, findCoreType, findVariant} from './finders'
+import type {TypeInterfaceDeclaration} from './interfaces'
 
 export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
@@ -12,7 +12,7 @@ export function getCoreImports(abi: ABI.Def) {
         for (const field of struct.fields) {
             const variant = findVariant(field.type, abi)
 
-            for (const type of (variant?.types || [field.type])) {
+            for (const type of variant?.types || [field.type]) {
                 const fieldTypeWithoutDecorator = extractDecorator(type).type
 
                 const fieldTypeIsStruct = abi.structs.find(
@@ -81,15 +81,18 @@ function structIsUsedInActionParams(struct: ABI.Struct, abi: ABI.Def) {
     const alias = findAliasFromType(struct.name, abi)
 
     const structsUsingStruct = abi.structs.filter((abiStruct) => {
-        return abiStruct.fields.some((field) => extractDecorator(field.type).type === (alias || struct.name))
+        return abiStruct.fields.some(
+            (field) => extractDecorator(field.type).type === (alias || struct.name)
+        )
     })
 
     if (structsUsingStruct.length === 0) {
         return false
     }
 
-    isUsedByActionStruct =
-        abi.actions.some((action) => structsUsingStruct.map(s => s.name).includes(action.type))
+    isUsedByActionStruct = abi.actions.some((action) =>
+        structsUsingStruct.map((s) => s.name).includes(action.type)
+    )
 
     if (!isUsedByActionStruct) {
         structsUsingStruct.forEach((structUsingStruct) => {
@@ -249,20 +252,22 @@ export function capitalize(string) {
     return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export function removeDuplicateInterfaces(interfaces: TypeInterfaceDeclaration[]): TypeInterfaceDeclaration[] {
-    const seen: string[] = [];
+export function removeDuplicateInterfaces(
+    interfaces: TypeInterfaceDeclaration[]
+): TypeInterfaceDeclaration[] {
+    const seen: string[] = []
 
-    return interfaces.filter(interfaceDeclaration => {
-        const name = String(interfaceDeclaration.name.escapedText);
+    return interfaces.filter((interfaceDeclaration) => {
+        const name = String(interfaceDeclaration.name.escapedText)
 
         if (seen.includes(name)) {
-            return false;
+            return false
         }
-        seen.push(name);
-        return true;
-    });
+        seen.push(name)
+        return true
+    })
 }
 
 export function removeCommas(interfaceName: string): string {
-    return interfaceName.replace(/\./g, '');
+    return interfaceName.replace(/\./g, '')
 }

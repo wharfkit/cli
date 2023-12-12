@@ -1,9 +1,8 @@
 import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
-import {capitalize} from '@wharfkit/contract'
 import {extractDecorator, parseType} from './helpers'
 import {formatClassName} from '../../utils'
-import { findInternalType } from './finders'
+import {findInternalType} from './finders'
 
 interface FieldType {
     name: string
