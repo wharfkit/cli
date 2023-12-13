@@ -62,7 +62,7 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
     return {classDeclaration}
 }
 
-function generateConstructorFunction(contractName): ts.ExpressionStatement {
+function generateConstructorFunction(contractName) {
     return ts.factory.createExpressionStatement(
         ts.factory.createCallExpression(ts.factory.createSuper(), undefined, [
             ts.factory.createObjectLiteralExpression(
@@ -77,13 +77,20 @@ function generateConstructorFunction(contractName): ts.ExpressionStatement {
                     ts.factory.createPropertyAssignment('abi', ts.factory.createIdentifier('abi')),
                     ts.factory.createPropertyAssignment(
                         'account',
-                        ts.factory.createCallExpression(
+                        ts.factory.createBinaryExpression(
                             ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier('Name'),
-                                'from'
+                                ts.factory.createIdentifier('args'),
+                                'account'
                             ),
-                            undefined,
-                            [ts.factory.createStringLiteral(contractName)]
+                            ts.factory.createToken(ts.SyntaxKind.BarBarToken),
+                            ts.factory.createCallExpression(
+                                ts.factory.createPropertyAccessExpression(
+                                    ts.factory.createIdentifier('Name'),
+                                    'from'
+                                ),
+                                undefined,
+                                [ts.factory.createStringLiteral(contractName)]
+                            )
                         )
                     ),
                 ],

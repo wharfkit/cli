@@ -1,8 +1,8 @@
 import type {ABI} from '@wharfkit/session'
 import ts from 'typescript'
-import {capitalize} from '@wharfkit/contract'
-import {extractDecorator, findInternalType, parseType} from './helpers'
+import {extractDecorator, parseType} from './helpers'
 import {formatClassName} from '../../utils'
+import {findInternalType} from './finders'
 
 interface FieldType {
     name: string
@@ -11,7 +11,8 @@ interface FieldType {
 }
 
 interface StructData {
-    structName: string
+    name: string
+    base?: string
     fields: FieldType[]
     variant: boolean
 }
@@ -44,7 +45,7 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
     if (abi && abi.variants) {
         for (const variant of abi.variants) {
             structTypes.push({
-                structName: variant.name,
+                name: variant.name,
                 fields: variant.types.map((t) => {
                     return {
                         name: 'value',
@@ -63,13 +64,13 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
 
             for (const field of struct.fields) {
                 fields.push({
-                    name: capitalize(field.name),
+                    name: field.name,
                     type: parseType(field.type),
                     optional: field.type.endsWith('?') || field.type.endsWith('$'),
                 })
             }
 
-            structTypes.push({structName: struct.name, fields, variant: false})
+            structTypes.push({name: struct.name, base: struct.base, fields, variant: false})
         }
     }
 
@@ -86,7 +87,7 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
                 ts.factory.createIdentifier('Variant.type'),
                 undefined,
                 [
-                    ts.factory.createStringLiteral(variant.structName),
+                    ts.factory.createStringLiteral(variant.name),
                     ts.factory.createArrayLiteralExpression(decoratorArguments),
                 ]
             )
@@ -114,7 +115,7 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
         isExport
             ? [...decorators, ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
             : decorators,
-        ts.factory.createIdentifier(formatClassName(variant.structName)),
+        ts.factory.createIdentifier(formatClassName(variant.name)),
         undefined, // typeParameters
         [
             ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
@@ -132,10 +133,12 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
     const decorators = [
         ts.factory.createDecorator(
             ts.factory.createCallExpression(ts.factory.createIdentifier('Struct.type'), undefined, [
-                ts.factory.createStringLiteral(struct.structName),
+                ts.factory.createStringLiteral(struct.name),
             ])
         ),
     ]
+
+    const baseClass = struct.base?.length ? struct.base : 'Struct'
 
     const members: ts.ClassElement[] = []
 
@@ -147,12 +150,12 @@ export function generateStruct(struct, abi, isExport = false): ts.ClassDeclarati
         isExport
             ? [...decorators, ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)]
             : decorators,
-        ts.factory.createIdentifier(formatClassName(struct.structName)),
+        ts.factory.createIdentifier(formatClassName(struct.name)),
         undefined, // typeParameters
         [
             ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
                 ts.factory.createExpressionWithTypeArguments(
-                    ts.factory.createIdentifier('Struct'),
+                    ts.factory.createIdentifier(baseClass),
                     []
                 ),
             ]),
@@ -246,7 +249,7 @@ function orderStructs(structs, typeAliases: TypeAlias[] = []) {
     }
 
     return orderedStructs.filter((struct, index, self) => {
-        return index === self.findIndex((s) => s.structName === struct.structName)
+        return index === self.findIndex((s) => s.name === struct.name)
     })
 }
 
@@ -257,10 +260,16 @@ function findDependencies(
 ): StructData[] {
     const dependencies: StructData[] = []
 
+    if (struct.base?.length) {
+        const baseStruct = allStructs.find((s) => s.name === struct.base)
+
+        baseStruct && dependencies.push(baseStruct)
+    }
+
     for (const field of struct.fields) {
         const {type: fieldType} = extractDecorator(field.type)
 
-        let dependencyStruct = allStructs.find((struct) => struct.structName === fieldType)
+        let dependencyStruct = allStructs.find((struct) => struct.name === fieldType)
 
         if (!dependencyStruct) {
             const typeAlias = typeAliases.find((typeAlias) => typeAlias.new_type_name === fieldType)
@@ -268,15 +277,15 @@ function findDependencies(
             const typeAliasString = typeAlias && extractDecorator(typeAlias.type).type
 
             dependencyStruct = typeAliasString
-                ? allStructs.find((struct) => struct.structName === typeAliasString)
+                ? allStructs.find((struct) => struct.name === typeAliasString)
                 : undefined
         }
 
         const alreadyIncluded = dependencies.some(
-            (struct) => struct.structName === dependencyStruct?.structName
+            (struct) => struct.name === dependencyStruct?.name
         )
 
-        if (alreadyIncluded || dependencyStruct?.structName === struct.structName) {
+        if (alreadyIncluded || dependencyStruct?.name === struct.name) {
             continue
         }
 

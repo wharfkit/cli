@@ -1,4 +1,11 @@
-import type {Action, AssetType, NameType, UInt16Type} from '@wharfkit/antelope'
+import type {
+    Action,
+    AssetType,
+    Float64Type,
+    NameType,
+    TimePointType,
+    UInt16Type,
+} from '@wharfkit/antelope'
 import {ABI, Asset, Blob, Float64, Name, Struct, TimePoint, UInt16} from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy, Table} from '@wharfkit/contract'
 import {Contract as BaseContract} from '@wharfkit/contract'
@@ -11,7 +18,7 @@ export class Contract extends BaseContract {
         super({
             client: args.client,
             abi: abi,
-            account: Name.from('rewards.gm'),
+            account: args.account || Name.from('rewards.gm'),
         })
     }
     action<T extends ActionNames>(
@@ -26,36 +33,47 @@ export class Contract extends BaseContract {
     }
 }
 export interface ActionNameParams {
-    adduser: ActionParams.Adduser
-    claim: ActionParams.Claim
-    configure: ActionParams.Configure
-    deluser: ActionParams.Deluser
-    receipt: ActionParams.Receipt
-    updateuser: ActionParams.Updateuser
+    adduser: ActionParams.adduser
+    claim: ActionParams.claim
+    configure: ActionParams.configure
+    deluser: ActionParams.deluser
+    receipt: ActionParams.receipt
+    updateuser: ActionParams.updateuser
 }
 export namespace ActionParams {
-    export interface Adduser {
+    export namespace Types {
+        export interface oracle_pair {
+            name: NameType
+            precision: UInt16Type
+        }
+        export interface price_info {
+            pair: string
+            price: Float64Type
+            timestamp: TimePointType
+        }
+    }
+    export interface adduser {
         account: NameType
         weight: UInt16Type
     }
-    export interface Claim {
+    export interface claim {
         account: NameType
         amount?: AssetType
     }
-    export interface Configure {
+    export interface configure {
         token_symbol: Asset.SymbolType
         oracle_account: NameType
         oracle_pairs: Types.oracle_pair[]
     }
-    export interface Deluser {
+    export interface deluser {
         account: NameType
     }
-    export interface Receipt {
+    export interface receipt {
         account: NameType
         amount: AssetType
         ticker: Types.price_info[]
     }
-    export interface Updateuser {
+    export interface updateuser {
         account: NameType
         weight: UInt16Type
     }
@@ -64,80 +82,80 @@ export namespace Types {
     @Struct.type('adduser')
     export class adduser extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
     }
     @Struct.type('claim')
     export class claim extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Asset, {optional: true})
-        Amount?: Asset
+        amount?: Asset
     }
     @Struct.type('oracle_pair')
     export class oracle_pair extends Struct {
         @Struct.field(Name)
-        Name!: Name
+        name!: Name
         @Struct.field(UInt16)
-        Precision!: UInt16
+        precision!: UInt16
     }
     @Struct.type('config')
     export class config extends Struct {
         @Struct.field(Asset.Symbol)
-        Token_symbol!: Asset.Symbol
+        token_symbol!: Asset.Symbol
         @Struct.field(Name)
-        Oracle_account!: Name
+        oracle_account!: Name
         @Struct.field(oracle_pair, {array: true})
-        Oracle_pairs!: oracle_pair[]
+        oracle_pairs!: oracle_pair[]
     }
     @Struct.type('configure')
     export class configure extends Struct {
         @Struct.field(Asset.Symbol)
-        Token_symbol!: Asset.Symbol
+        token_symbol!: Asset.Symbol
         @Struct.field(Name)
-        Oracle_account!: Name
+        oracle_account!: Name
         @Struct.field(oracle_pair, {array: true})
-        Oracle_pairs!: oracle_pair[]
+        oracle_pairs!: oracle_pair[]
     }
     @Struct.type('deluser')
     export class deluser extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
     }
     @Struct.type('price_info')
     export class price_info extends Struct {
         @Struct.field('string')
-        Pair!: string
+        pair!: string
         @Struct.field(Float64)
-        Price!: Float64
+        price!: Float64
         @Struct.field(TimePoint)
-        Timestamp!: TimePoint
+        timestamp!: TimePoint
     }
     @Struct.type('receipt')
     export class receipt extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(Asset)
-        Amount!: Asset
+        amount!: Asset
         @Struct.field(price_info, {array: true})
-        Ticker!: price_info[]
+        ticker!: price_info[]
     }
     @Struct.type('updateuser')
     export class updateuser extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
     }
     @Struct.type('user_row')
     export class user_row extends Struct {
         @Struct.field(Name)
-        Account!: Name
+        account!: Name
         @Struct.field(UInt16)
-        Weight!: UInt16
+        weight!: UInt16
         @Struct.field(Asset)
-        Balance!: Asset
+        balance!: Asset
     }
 }
 export const TableMap = {

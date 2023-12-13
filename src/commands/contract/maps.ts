@@ -1,6 +1,6 @@
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
-import {findAbiType} from './helpers'
+import {findAbiType} from './finders'
 
 export function generateTableMap(abi: ABI.Def): ts.VariableStatement {
     // Map over tables to create the object properties

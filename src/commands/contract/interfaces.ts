@@ -1,8 +1,8 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
-import {findExternalType, parseType} from './helpers'
+import {parseType, removeCommas, removeDuplicateInterfaces} from './helpers'
 import {getActionFieldFromAbi} from './structs'
-import {capitalizeName} from '../../utils'
+import {findAbiStruct, findExternalType, findTypeFromAlias, findVariant} from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
     // Generate property signatures for each action
@@ -10,13 +10,11 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
         const actionName = String(action.name)
         const actionNameKey = actionName.includes('.') ? `'${actionName}'` : actionName
 
-        const actionNameCapitalized = capitalizeName(actionName)
-
         return ts.factory.createPropertySignature(
             undefined,
             actionNameKey,
             undefined,
-            ts.factory.createTypeReferenceNode(`ActionParams.${actionNameCapitalized}`)
+            ts.factory.createTypeReferenceNode(`ActionParams.${removeCommas(actionName)}`)
         )
     })
 
@@ -29,43 +27,107 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
     )
 }
 
-export function generateActionInterface(actionStruct, abi): ts.InterfaceDeclaration {
-    const members = actionStruct.fields.map((field) => {
+export type TypeInterfaceDeclaration = ts.InterfaceDeclaration | ts.TypeAliasDeclaration
+
+export function generateActionInterface(
+    struct,
+    abi
+): {actionInterface: ts.InterfaceDeclaration; typeInterfaces: TypeInterfaceDeclaration[]} {
+    const typeInterfaces: TypeInterfaceDeclaration[] = []
+
+    const members = struct.fields.map((field) => {
+        const abiVariant = findVariant(field.type, abi)
+
+        let types
+        let variantType
+        const aliasType = findTypeFromAlias(field.type, abi)
+
+        if (abiVariant) {
+            types = abiVariant.types
+
+            variantType = `${struct.name}_${field.name}_variant`
+
+            const variantTypeNodes = types.map((type) =>
+                ts.factory.createTypeReferenceNode(findExternalType(type, 'Types.', abi))
+            )
+            const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
+                undefined,
+                [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+                variantType,
+                undefined,
+                ts.factory.createUnionTypeNode(variantTypeNodes)
+            )
+
+            typeInterfaces.push(variantTypeAlias)
+        } else {
+            types = [field.type]
+        }
+
+        const variantName = variantType && `Types.${variantType}`
+
+        types.forEach((type) => {
+            const typeStruct = findAbiStruct(type, abi)
+
+            if (typeStruct) {
+                const interfaces = generateActionInterface(typeStruct, abi)
+
+                typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
+            }
+        })
+
         const typeReferenceNode = ts.factory.createTypeReferenceNode(
-            findParamTypeString(field.type, 'Types.', abi)
+            variantName || findParamTypeString(aliasType || field.type, 'Types.', abi)
         )
 
         return ts.factory.createPropertySignature(
             undefined,
-            field.name.toLowerCase(),
+            field.name,
             field.optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
             typeReferenceNode
         )
     })
 
-    return ts.factory.createInterfaceDeclaration(
+    const actionInterface = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        capitalizeName(actionStruct.structName),
+        removeCommas(struct.name),
         undefined,
         undefined,
         members
     )
+
+    return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
 export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
-    const interfaces = abi.actions.map((action) => {
+    const typeInterfaces: TypeInterfaceDeclaration[] = []
+
+    const actionParamInterfaces = abi.actions.map((action) => {
         const actionStruct = actionStructsWithFields.find(
-            (actionStructWithField) => actionStructWithField.structName === action.type
+            (actionStructWithField) => actionStructWithField.name === action.type
         )
-        return generateActionInterface(actionStruct, abi)
+
+        const interfaces = generateActionInterface(actionStruct, abi)
+
+        if (interfaces.actionInterface) {
+            typeInterfaces.push(...interfaces.typeInterfaces)
+        }
+
+        return interfaces.actionInterface
     })
+
+    const actionParamsTypes = ts.factory.createModuleDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createIdentifier('Types'),
+        ts.factory.createModuleBlock(removeDuplicateInterfaces(typeInterfaces)),
+        ts.NodeFlags.Namespace
+    )
 
     return ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
-        ts.factory.createModuleBlock(interfaces),
+        ts.factory.createModuleBlock([actionParamsTypes, ...actionParamInterfaces]),
         ts.NodeFlags.Namespace
     )
 }
