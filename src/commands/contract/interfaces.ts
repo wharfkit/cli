@@ -48,7 +48,7 @@ export function generateActionInterface(
             variantType = `${struct.name}_${field.name}_variant`
 
             const variantTypeNodes = types.map((type) =>
-                ts.factory.createTypeReferenceNode(findExternalType(type, 'Types.', abi))
+                ts.factory.createTypeReferenceNode(parseType(findExternalType(type, 'Types.', abi)))
             )
             const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
                 undefined,
