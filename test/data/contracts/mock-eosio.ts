@@ -485,7 +485,7 @@ export namespace Types {
         keys!: key_weight[]
     }
     @Variant.type('variant_block_signing_authority_v0', [block_signing_authority_v0])
-    export class variant_block_signing_authority_v0 extends Struct {
+    export class variant_block_signing_authority_v0 extends Variant {
         value!: block_signing_authority_v0
     }
     @Struct.type('abi_hash')
