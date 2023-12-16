@@ -22,6 +22,16 @@ ci-test: node_modules
 test_generate: node_modules clean lib
 	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com
 
+.PHONY: update_mock_contracts
+update_mock_contracts: node_modules clean lib
+	node lib/cli.js generate atomicassets -u https://jungle4.greymass.com -j test/data/abis/atomicassets.json -f test/data/contracts/mock-atomicassets.ts -e .eslintrc
+	node lib/cli.js generate boid -u https://jungle4.greymass.com -j test/data/abis/boid.json -f test/data/contracts/mock-boid.ts -e .eslintrc
+	node lib/cli.js generate eosio -u https://jungle4.greymass.com -j test/data/abis/eosio.json -f test/data/contracts/mock-eosio.ts -e .eslintrc
+	node lib/cli.js generate eosio.msig -u https://jungle4.greymass.com -j test/data/abis/eosio.msig.json -f test/data/contracts/mock-eosio.msig.ts -e .eslintrc
+	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com -j test/data/abis/eosio.token.json -f test/data/contracts/mock-eosio.token.ts -e .eslintrc
+	node lib/cli.js generate hegemon.hgm -u https://jungle4.greymass.com -j test/data/abis/hegemon.hgm.json -f test/data/contracts/mock-hegemon.hgm.ts -e .eslintrc
+	node lib/cli.js generate rewards.gm -u https://jungle4.greymass.com -j test/data/abis/rewards.gm.json -f test/data/contracts/mock-rewards.gm.ts -e .eslintrc
+
 .PHONY: check
 check: node_modules
 	@${BIN}/eslint src test --ext .ts --max-warnings 0 --format unix && echo "Ok"
