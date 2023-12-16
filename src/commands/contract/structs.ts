@@ -95,9 +95,9 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
     ]
 
     const valueField = ts.factory.createPropertyDeclaration(
-        [],
+        [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
         ts.factory.createIdentifier('value'),
-        ts.factory.createToken(ts.SyntaxKind.ExclamationToken),
+        undefined,
         ts.factory.createUnionTypeNode(
             variant.fields.map((field) => {
                 return ts.factory.createTypeReferenceNode(

@@ -45,20 +45,26 @@ export function generateActionInterface(
         if (abiVariant) {
             types = abiVariant.types
 
-            variantType = `${struct.name}_${field.name}_variant`
-
             const variantTypeNodes = types.map((type) =>
                 ts.factory.createTypeReferenceNode(parseType(findExternalType(type, 'Types.', abi)))
             )
-            const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
-                undefined,
+
+            const variantInterface = ts.factory.createInterfaceDeclaration(
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-                variantType,
+                removeCommas(abiVariant.name),
                 undefined,
-                ts.factory.createUnionTypeNode(variantTypeNodes)
+                undefined,
+                [
+                    ts.factory.createPropertySignature(
+                        undefined,
+                        'value',
+                        undefined,
+                        ts.factory.createUnionTypeNode(variantTypeNodes)
+                    ),
+                ]
             )
 
-            typeInterfaces.push(variantTypeAlias)
+            typeInterfaces.push(variantInterface)
         } else {
             types = [field.type]
         }
