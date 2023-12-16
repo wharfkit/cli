@@ -185,7 +185,7 @@ export namespace ActionParams {
             faction: UInt64Type
             base_faction_voting_power: Float64Type
             max_inventory_size: UInt32Type
-            inventory: Types.pair_uint32_uint64[]
+            inventory: Types.pair_uint32_uint64
             currency: AssetType
             last_respawn: TimePointType
             location_tile_id: UInt64Type
@@ -215,7 +215,7 @@ export namespace ActionParams {
     }
     export interface addinventory {
         player: NameType
-        ingredients: Types.pair_uint32_uint64[]
+        ingredients: Types.pair_uint32_uint64
     }
     export interface addmap {
         area_map: NameType
@@ -376,7 +376,7 @@ export namespace ActionParams {
     export interface dogive {
         owner: NameType
         recipient: NameType
-        items: Types.pair_uint32_uint64[]
+        items: Types.pair_uint32_uint64
     }
     export interface doheal {
         character_id: UInt64Type
@@ -506,7 +506,7 @@ export namespace ActionParams {
     }
     export interface setcrew {
         spaceship_id: UInt64Type
-        crew: Types.pair_uint64_CrewRole[]
+        crew: Types.pair_uint64_CrewRole
     }
     export interface setgm {
         player: NameType

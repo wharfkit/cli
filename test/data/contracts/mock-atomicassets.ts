@@ -103,31 +103,33 @@ export namespace ActionParams {
         }
         export interface pair_string_ATOMIC_ATTRIBUTE {
             key: string
-            value: Types.pair_string_ATOMIC_ATTRIBUTE_value_variant
+            value: Types.variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
         }
-        export type pair_string_ATOMIC_ATTRIBUTE_value_variant =
-            | Int8Type
-            | Int16Type
-            | Int32Type
-            | Int64Type
-            | UInt8Type
-            | UInt16Type
-            | UInt32Type
-            | UInt64Type
-            | Float32Type
-            | Float64Type
-            | string
-            | BytesType
-            | Int16Type[]
-            | Int32Type[]
-            | Int64Type[]
-            | UInt8Type[]
-            | UInt16Type[]
-            | UInt32Type[]
-            | UInt64Type[]
-            | Float32Type[]
-            | Float64Type[]
-            | string[]
+        export interface variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC {
+            value:
+                | Int8Type
+                | Int16Type
+                | Int32Type
+                | Int64Type
+                | UInt8Type
+                | UInt16Type
+                | UInt32Type
+                | UInt64Type
+                | Float32Type
+                | Float64Type
+                | string
+                | BytesType
+                | Int16Type[]
+                | Int32Type[]
+                | Int64Type[]
+                | UInt8Type[]
+                | UInt16Type[]
+                | UInt32Type[]
+                | UInt64Type[]
+                | Float32Type[]
+                | Float64Type[]
+                | string[]
+        }
     }
     export interface acceptoffer {
         offer_id: UInt64Type
@@ -351,7 +353,7 @@ export namespace Types {
         ]
     )
     export class variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC extends Variant {
-        value!:
+        declare value:
             | Int8
             | Int16
             | Int32
@@ -529,8 +531,8 @@ export namespace Types {
         notify_accounts!: Name[]
         @Struct.field(Float64)
         market_fee!: Float64
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('createoffer')
     export class createoffer extends Struct {
@@ -570,8 +572,8 @@ export namespace Types {
         burnable!: boolean
         @Struct.field(UInt32)
         max_supply!: UInt32
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('declineoffer')
     export class declineoffer extends Struct {
@@ -628,10 +630,10 @@ export namespace Types {
         template_id!: Int32
         @Struct.field(Asset, {array: true})
         backed_tokens!: Asset[]
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        old_immutable_data!: pair_string_ATOMIC_ATTRIBUTE
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        old_mutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        old_immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        old_mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Name)
         asset_ram_payer!: Name
     }
@@ -649,14 +651,14 @@ export namespace Types {
         template_id!: Int32
         @Struct.field(Name)
         new_asset_owner!: Name
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        mutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Asset, {array: true})
         backed_tokens!: Asset[]
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        immutable_template_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        immutable_template_data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('lognewoffer')
     export class lognewoffer extends Struct {
@@ -689,8 +691,8 @@ export namespace Types {
         burnable!: boolean
         @Struct.field(UInt32)
         max_supply!: UInt32
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('logsetdata')
     export class logsetdata extends Struct {
@@ -698,10 +700,10 @@ export namespace Types {
         asset_owner!: Name
         @Struct.field(UInt64)
         asset_id!: UInt64
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        old_data!: pair_string_ATOMIC_ATTRIBUTE
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        new_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        old_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        new_data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('logtransfer')
     export class logtransfer extends Struct {
@@ -728,10 +730,10 @@ export namespace Types {
         template_id!: Int32
         @Struct.field(Name)
         new_asset_owner!: Name
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        mutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Asset, {array: true})
         tokens_to_back!: Asset[]
     }
@@ -788,15 +790,15 @@ export namespace Types {
         asset_owner!: Name
         @Struct.field(UInt64)
         asset_id!: UInt64
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        new_mutable_data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        new_mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('setcoldata')
     export class setcoldata extends Struct {
         @Struct.field(Name)
         collection_name!: Name
-        @Struct.field(pair_string_ATOMIC_ATTRIBUTE)
-        data!: pair_string_ATOMIC_ATTRIBUTE
+        @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
+        data!: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('setmarketfee')
     export class setmarketfee extends Struct {

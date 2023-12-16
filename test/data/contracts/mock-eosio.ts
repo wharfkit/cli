@@ -183,7 +183,9 @@ export namespace ActionParams {
             producer_name: NameType
             block_signing_key: PublicKeyType
         }
-        export type regproducer2_producer_authority_variant = Types.block_signing_authority_v0
+        export interface variant_block_signing_authority_v0 {
+            value: Types.block_signing_authority_v0
+        }
         export interface block_signing_authority_v0 {
             threshold: UInt32Type
             keys: Types.key_weight[]
@@ -333,7 +335,7 @@ export namespace ActionParams {
     }
     export interface regproducer2 {
         producer: NameType
-        producer_authority: Types.regproducer2_producer_authority_variant
+        producer_authority: Types.variant_block_signing_authority_v0
         url: string
         location: UInt16Type
     }
@@ -486,7 +488,7 @@ export namespace Types {
     }
     @Variant.type('variant_block_signing_authority_v0', [block_signing_authority_v0])
     export class variant_block_signing_authority_v0 extends Variant {
-        value!: block_signing_authority_v0
+        declare value: block_signing_authority_v0
     }
     @Struct.type('abi_hash')
     export class abi_hash extends Struct {
