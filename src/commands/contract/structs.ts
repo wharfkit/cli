@@ -171,12 +171,15 @@ export function generateField(
 ): ts.PropertyDeclaration {
     const fieldName = field.name
 
-    const isArray = field.type.endsWith('[]')
+    let isArray = field.type.endsWith('[]')
 
     // Start with the main type argument
     const decoratorArguments: (ts.ObjectLiteralExpression | ts.StringLiteral | ts.Identifier)[] = [
         findFieldStructType(field.type, namespace, abi),
     ]
+
+    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
+    isArray = isArray || structTypeString.endsWith('[]')
 
     // Build the options object if needed
     const optionsProps: ts.ObjectLiteralElementLike[] = []
@@ -214,8 +217,6 @@ export function generateField(
             )
         ),
     ]
-
-    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
 
     const typeReferenceNode = ts.factory.createTypeReferenceNode(
         extractDecorator(structTypeString).type
