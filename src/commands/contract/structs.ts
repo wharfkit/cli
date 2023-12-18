@@ -95,9 +95,9 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
     ]
 
     const valueField = ts.factory.createPropertyDeclaration(
-        [],
+        [ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword)],
         ts.factory.createIdentifier('value'),
-        ts.factory.createToken(ts.SyntaxKind.ExclamationToken),
+        undefined,
         ts.factory.createUnionTypeNode(
             variant.fields.map((field) => {
                 return ts.factory.createTypeReferenceNode(
@@ -171,12 +171,15 @@ export function generateField(
 ): ts.PropertyDeclaration {
     const fieldName = field.name
 
-    const isArray = field.type.endsWith('[]')
+    let isArray = field.type.endsWith('[]')
 
     // Start with the main type argument
     const decoratorArguments: (ts.ObjectLiteralExpression | ts.StringLiteral | ts.Identifier)[] = [
         findFieldStructType(field.type, namespace, abi),
     ]
+
+    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
+    isArray = isArray || structTypeString.endsWith('[]')
 
     // Build the options object if needed
     const optionsProps: ts.ObjectLiteralElementLike[] = []
@@ -214,8 +217,6 @@ export function generateField(
             )
         ),
     ]
-
-    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
 
     const typeReferenceNode = ts.factory.createTypeReferenceNode(
         extractDecorator(structTypeString).type

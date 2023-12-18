@@ -253,31 +253,33 @@ export namespace ActionParams {
         }
         export interface AtomicAttribute {
             key: string
-            value: Types.AtomicAttribute_value_variant
+            value: Types.AtomicValue
         }
-        export type AtomicAttribute_value_variant =
-            | Int8Type
-            | Int16Type
-            | Int32Type
-            | Int64Type
-            | UInt8Type
-            | UInt16Type
-            | UInt32Type
-            | UInt64Type
-            | Float32Type
-            | Float64Type
-            | string
-            | Int8Type[]
-            | Int16Type[]
-            | Int32Type[]
-            | Int64Type[]
-            | BytesType
-            | UInt16Type[]
-            | UInt32Type[]
-            | UInt64Type[]
-            | Float32Type[]
-            | Float64Type[]
-            | string[]
+        export interface AtomicValue {
+            value:
+                | Int8Type
+                | Int16Type
+                | Int32Type
+                | Int64Type
+                | UInt8Type
+                | UInt16Type
+                | UInt32Type
+                | UInt64Type
+                | Float32Type
+                | Float64Type
+                | string
+                | Int8Type[]
+                | Int16Type[]
+                | Int32Type[]
+                | Int64Type[]
+                | BytesType
+                | UInt16Type[]
+                | UInt32Type[]
+                | UInt64Type[]
+                | Float32Type[]
+                | Float64Type[]
+                | string[]
+        }
         export interface OfferRewards {
             nft_mints: Types.NftMint[]
             balance_deposit: UInt32Type
@@ -562,7 +564,7 @@ export namespace Types {
         'string[]',
     ])
     export class AtomicValue extends Variant {
-        value!:
+        declare value:
             | Int8
             | Int16
             | Int32

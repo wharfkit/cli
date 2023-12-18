@@ -17,10 +17,10 @@ export const ANTELOPE_CLASS_MAPPINGS = {
 export const ANTELOPE_CLASS_WITHOUT_TYPES = ['BlockTimestamp', 'TimePointSec']
 
 export function findTypeFromAlias(typeString: string, abi: ABI.Def): string | undefined {
-    const {type: typeStringWithoutDecorator, decorator} = extractDecorator(typeString)
+    const {type: typeStringWithoutDecorator} = extractDecorator(typeString)
     const alias = abi.types.find((type) => type.new_type_name === typeStringWithoutDecorator)
 
-    return alias?.type && `${alias?.type}${decorator || ''}`
+    return alias?.type
 }
 
 export function findAliasFromType(typeString: string, abi: ABI.Def): string | undefined {
