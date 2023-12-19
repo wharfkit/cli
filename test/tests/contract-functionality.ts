@@ -3,11 +3,14 @@ import {makeClient} from '@wharfkit/mock-data'
 import {assert} from 'chai'
 
 import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
+import * as AtomicAssets from '$test/data/contracts/mock-atomicassets'
 import {PlaceholderName, PlaceholderPermission} from '@wharfkit/signing-request'
 import {Table, TableRowCursor} from '@wharfkit/contract'
 
 const client = makeClient('https://eos.greymass.com')
 const contract = new RewardsGm.Contract({client})
+const atomicassetsContract = new AtomicAssets.Contract({client})
+
 
 suite('functionality', function () {
     suite('Contract', function () {
@@ -77,5 +80,30 @@ suite('functionality', function () {
                 assert.instanceOf(user, RewardsGm.Types.user_row)
             })
         })
+
+        suite('variants', function () {
+            test('any of the acceptaed variant types can be passed to the contract', async function () {
+                const actionData: any = { // casting to any so we can see the test pass without getting the type errors
+                    author: 'teamgreymass',
+                    collection_name: 'teamgreymass',
+                    allow_notify: true,
+                    authorized_accounts: [],
+                    notify_accounts: [],
+                    market_fee: 0,
+                    data: [{
+                        key: 'test',
+                        // value: 'test', // this works
+                        value: {
+                            value: 'string', // this doesn't
+                        }
+                    }],
+                }
+                const action: Action = atomicassetsContract.action('createcol', actionData);
+
+                console.log({decoded: action.decoded.data.data})
+
+                assert.exists(action.decoded.data.data[0])
+            });
+        });
     })
 })
