@@ -126,14 +126,14 @@ export interface ActionNameParams {
     withdraw: ActionParams.withdraw
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Base {
         export interface permission_level {
             actor: NameType
             permission: NameType
         }
         export interface powerup_config {
-            net: Types.powerup_config_resource
-            cpu: Types.powerup_config_resource
+            net: Base.powerup_config_resource
+            cpu: Base.powerup_config_resource
             powerup_days: UInt32Type
             min_powerup_fee: AssetType
         }
@@ -149,16 +149,16 @@ export namespace ActionParams {
         }
         export interface authority {
             threshold: UInt32Type
-            keys: Types.key_weight[]
-            accounts: Types.permission_level_weight[]
-            waits: Types.wait_weight[]
+            keys: Base.key_weight[]
+            accounts: Base.permission_level_weight[]
+            waits: Base.wait_weight[]
         }
         export interface key_weight {
             key: PublicKeyType
             weight: UInt16Type
         }
         export interface permission_level_weight {
-            permission: Types.permission_level
+            permission: Base.permission_level
             weight: UInt16Type
         }
         export interface wait_weight {
@@ -173,22 +173,22 @@ export namespace ActionParams {
             transaction_mroot: Checksum256Type
             action_mroot: Checksum256Type
             schedule_version: UInt32Type
-            new_producers: Types.producer_schedule
+            new_producers: Base.producer_schedule
         }
         export interface producer_schedule {
             version: UInt32Type
-            producers: Types.producer_key[]
+            producers: Base.producer_key[]
         }
         export interface producer_key {
             producer_name: NameType
             block_signing_key: PublicKeyType
         }
-        export interface variant_block_signing_authority_v0 {
-            value: Types.block_signing_authority_v0
-        }
+        export type variant_block_signing_authority_v0 =
+            | Base.block_signing_authority_v0
+            | Types.variant_block_signing_authority_v0
         export interface block_signing_authority_v0 {
             threshold: UInt32Type
-            keys: Types.key_weight[]
+            keys: Base.key_weight[]
         }
         export interface blockchain_parameters_v1 {
             max_action_return_value_size: UInt32Type
@@ -221,11 +221,11 @@ export namespace ActionParams {
         amount: AssetType
     }
     export interface canceldelay {
-        canceling_auth: Types.permission_level
+        canceling_auth: Base.permission_level
         trx_id: Checksum256Type
     }
     export interface cfgpowerup {
-        args: Types.powerup_config
+        args: Base.powerup_config
     }
     export interface claimrewards {
         owner: NameType
@@ -302,11 +302,11 @@ export namespace ActionParams {
     export interface newaccount {
         creator: NameType
         name: NameType
-        owner: Types.authority
-        active: Types.authority
+        owner: Base.authority
+        active: Base.authority
     }
     export interface onblock {
-        header: Types.block_header
+        header: Base.block_header
     }
     export interface onerror {
         sender_id: UInt128Type
@@ -335,7 +335,7 @@ export namespace ActionParams {
     }
     export interface regproducer2 {
         producer: NameType
-        producer_authority: Types.variant_block_signing_authority_v0
+        producer_authority: Base.variant_block_signing_authority_v0
         url: string
         location: UInt16Type
     }
@@ -406,7 +406,7 @@ export namespace ActionParams {
         votepay_factor: Int64Type
     }
     export interface setparams {
-        params: Types.blockchain_parameters_v1
+        params: Base.blockchain_parameters_v1
     }
     export interface setpriv {
         account: NameType
@@ -446,7 +446,7 @@ export namespace ActionParams {
         account: NameType
         permission: NameType
         parent: NameType
-        auth: Types.authority
+        auth: Base.authority
         authorized_by?: NameType
     }
     export interface updaterex {

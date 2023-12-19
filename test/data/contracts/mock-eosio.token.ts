@@ -34,7 +34,7 @@ export interface ActionNameParams {
     transfer: ActionParams.transfer
 }
 export namespace ActionParams {
-    export namespace Types {}
+    export namespace Base {}
     export interface close {
         owner: NameType
         symbol: Asset.SymbolType

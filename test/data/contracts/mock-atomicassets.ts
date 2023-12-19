@@ -96,17 +96,17 @@ export interface ActionNameParams {
     withdraw: ActionParams.withdraw
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Base {
         export interface FORMAT {
             name: string
             type: string
         }
         export interface pair_string_ATOMIC_ATTRIBUTE {
             key: string
-            value: Types.variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
+            value: Base.variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
         }
-        export interface variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC {
-            value:
+        export type variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC =
+
                 | Int8Type
                 | Int16Type
                 | Int32Type
@@ -129,7 +129,7 @@ export namespace ActionParams {
                 | Float32Type[]
                 | Float64Type[]
                 | string[]
-        }
+                | Types.variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
     }
     export interface acceptoffer {
         offer_id: UInt64Type
@@ -147,7 +147,7 @@ export namespace ActionParams {
         account_to_add: NameType
     }
     export interface admincoledit {
-        collection_format_extension: Types.FORMAT[]
+        collection_format_extension: Base.FORMAT[]
     }
     export interface announcedepo {
         owner: NameType
@@ -173,7 +173,7 @@ export namespace ActionParams {
         authorized_accounts: NameType[]
         notify_accounts: NameType[]
         market_fee: Float64Type
-        data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface createoffer {
         sender: NameType
@@ -186,7 +186,7 @@ export namespace ActionParams {
         authorized_creator: NameType
         collection_name: NameType
         schema_name: NameType
-        schema_format: Types.FORMAT[]
+        schema_format: Base.FORMAT[]
     }
     export interface createtempl {
         authorized_creator: NameType
@@ -195,7 +195,7 @@ export namespace ActionParams {
         transferable: boolean
         burnable: boolean
         max_supply: UInt32Type
-        immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        immutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface declineoffer {
         offer_id: UInt64Type
@@ -204,7 +204,7 @@ export namespace ActionParams {
         authorized_editor: NameType
         collection_name: NameType
         schema_name: NameType
-        schema_format_extension: Types.FORMAT[]
+        schema_format_extension: Base.FORMAT[]
     }
     export interface forbidnotify {
         collection_name: NameType
@@ -227,8 +227,8 @@ export namespace ActionParams {
         schema_name: NameType
         template_id: Int32Type
         backed_tokens: AssetType[]
-        old_immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
-        old_mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        old_immutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
+        old_mutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
         asset_ram_payer: NameType
     }
     export interface logmint {
@@ -238,10 +238,10 @@ export namespace ActionParams {
         schema_name: NameType
         template_id: Int32Type
         new_asset_owner: NameType
-        immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
-        mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        immutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
+        mutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
         backed_tokens: AssetType[]
-        immutable_template_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        immutable_template_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface lognewoffer {
         offer_id: UInt64Type
@@ -259,13 +259,13 @@ export namespace ActionParams {
         transferable: boolean
         burnable: boolean
         max_supply: UInt32Type
-        immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        immutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface logsetdata {
         asset_owner: NameType
         asset_id: UInt64Type
-        old_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
-        new_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        old_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
+        new_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface logtransfer {
         collection_name: NameType
@@ -280,8 +280,8 @@ export namespace ActionParams {
         schema_name: NameType
         template_id: Int32Type
         new_asset_owner: NameType
-        immutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
-        mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        immutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
+        mutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
         tokens_to_back: AssetType[]
     }
     export interface payofferram {
@@ -300,11 +300,11 @@ export namespace ActionParams {
         authorized_editor: NameType
         asset_owner: NameType
         asset_id: UInt64Type
-        new_mutable_data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        new_mutable_data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface setcoldata {
         collection_name: NameType
-        data: Types.pair_string_ATOMIC_ATTRIBUTE[]
+        data: Base.pair_string_ATOMIC_ATTRIBUTE[]
     }
     export interface setmarketfee {
         collection_name: NameType

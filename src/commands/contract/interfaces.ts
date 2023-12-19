@@ -46,30 +46,28 @@ export function generateActionInterface(
             types = abiVariant.types
 
             const variantTypeNodes = types.map((type) =>
-                ts.factory.createTypeReferenceNode(parseType(findExternalType(type, 'Types.', abi)))
+                ts.factory.createTypeReferenceNode(parseType(findExternalType(type, 'Base.', abi)))
             )
 
-            const variantInterface = ts.factory.createInterfaceDeclaration(
+            const allTypeNodes = [
+                ...variantTypeNodes,
+                ts.factory.createTypeReferenceNode(`Types.${abiVariant.name}`),
+            ]
+
+            const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
+                undefined,
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-                removeCommas(abiVariant.name),
+                abiVariant.name,
                 undefined,
-                undefined,
-                [
-                    ts.factory.createPropertySignature(
-                        undefined,
-                        'value',
-                        undefined,
-                        ts.factory.createUnionTypeNode(variantTypeNodes)
-                    ),
-                ]
+                ts.factory.createUnionTypeNode(allTypeNodes)
             )
 
-            typeInterfaces.push(variantInterface)
+            typeInterfaces.push(variantTypeAlias)
         } else {
             types = [field.type]
         }
 
-        const variantName = variantType && `Types.${variantType}`
+        const variantName = variantType && `Base.${variantType}`
 
         types.forEach((type) => {
             const typeStruct = findAbiStruct(type, abi)
@@ -82,7 +80,7 @@ export function generateActionInterface(
         })
 
         const typeReferenceNode = ts.factory.createTypeReferenceNode(
-            variantName || findParamTypeString(aliasType || field.type, 'Types.', abi)
+            variantName || findParamTypeString(aliasType || field.type, 'Base.', abi)
         )
 
         return ts.factory.createPropertySignature(
@@ -125,7 +123,7 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
 
     const actionParamsTypes = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        ts.factory.createIdentifier('Types'),
+        ts.factory.createIdentifier('Base'),
         ts.factory.createModuleBlock(removeDuplicateInterfaces(typeInterfaces)),
         ts.NodeFlags.Namespace
     )
