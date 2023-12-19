@@ -41,7 +41,7 @@ export interface ActionNameParams {
     updateuser: ActionParams.updateuser
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Type {
         export interface oracle_pair {
             name: NameType
             precision: UInt16Type
@@ -63,7 +63,7 @@ export namespace ActionParams {
     export interface configure {
         token_symbol: Asset.SymbolType
         oracle_account: NameType
-        oracle_pairs: Types.oracle_pair[]
+        oracle_pairs: Type.oracle_pair[]
     }
     export interface deluser {
         account: NameType
@@ -71,7 +71,7 @@ export namespace ActionParams {
     export interface receipt {
         account: NameType
         amount: AssetType
-        ticker: Types.price_info[]
+        ticker: Type.price_info[]
     }
     export interface updateuser {
         account: NameType

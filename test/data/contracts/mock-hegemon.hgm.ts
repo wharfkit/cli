@@ -136,7 +136,7 @@ export interface ActionNameParams {
     upgradechar: ActionParams.upgradechar
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Type {
         export interface pair_uint32_uint64 {
             first: UInt32Type
             second: UInt64Type
@@ -180,12 +180,12 @@ export namespace ActionParams {
             reputation_level: UInt8Type
             experience_level: UInt32Type
             experience_points: UInt32Type
-            cooldowns: Types.cooldown[]
+            cooldowns: Type.cooldown[]
             active_project: UInt64Type
             faction: UInt64Type
             base_faction_voting_power: Float64Type
             max_inventory_size: UInt32Type
-            inventory: Types.pair_uint32_uint64
+            inventory: Type.pair_uint32_uint64
             currency: AssetType
             last_respawn: TimePointType
             location_tile_id: UInt64Type
@@ -215,7 +215,7 @@ export namespace ActionParams {
     }
     export interface addinventory {
         player: NameType
-        ingredients: Types.pair_uint32_uint64
+        ingredients: Type.pair_uint32_uint64
     }
     export interface addmap {
         area_map: NameType
@@ -307,7 +307,7 @@ export namespace ActionParams {
     export interface doaddmats {
         character_id: UInt64Type
         project_id: UInt64Type
-        materials: Types.pair_uint32_uint64
+        materials: Type.pair_uint32_uint64
     }
     export interface doaddproj {
         character_id: UInt64Type
@@ -356,7 +356,7 @@ export namespace ActionParams {
     }
     export interface dodropoff {
         player: NameType
-        items: Types.pair_uint32_uint64
+        items: Type.pair_uint32_uint64
     }
     export interface doeat {
         character_id: UInt64Type
@@ -376,7 +376,7 @@ export namespace ActionParams {
     export interface dogive {
         owner: NameType
         recipient: NameType
-        items: Types.pair_uint32_uint64
+        items: Type.pair_uint32_uint64
     }
     export interface doheal {
         character_id: UInt64Type
@@ -400,7 +400,7 @@ export namespace ActionParams {
     export interface doload {
         player: NameType
         vehicle_id: UInt64Type
-        items: Types.pair_uint32_uint64
+        items: Type.pair_uint32_uint64
     }
     export interface domobilize {
         player: NameType
@@ -421,7 +421,7 @@ export namespace ActionParams {
     }
     export interface dopickup {
         player: NameType
-        items: Types.pair_uint32_uint64
+        items: Type.pair_uint32_uint64
     }
     export interface dorepair {
         character_id: UInt64Type
@@ -453,7 +453,7 @@ export namespace ActionParams {
     export interface dounload {
         player: NameType
         vehicle_id: UInt64Type
-        items: Types.pair_uint32_uint64
+        items: Type.pair_uint32_uint64
     }
     export interface dowork {
         character_id: UInt64Type
@@ -502,11 +502,11 @@ export namespace ActionParams {
         payer: NameType
     }
     export interface setcharacter {
-        c: Types.character
+        c: Type.character
     }
     export interface setcrew {
         spaceship_id: UInt64Type
-        crew: Types.pair_uint64_CrewRole
+        crew: Type.pair_uint64_CrewRole
     }
     export interface setgm {
         player: NameType
@@ -516,7 +516,7 @@ export namespace ActionParams {
         ship_operator: NameType
     }
     export interface setplayer {
-        p: Types.player
+        p: Type.player
     }
     export interface settilecw {
         tile_id: UInt64Type
