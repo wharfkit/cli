@@ -123,7 +123,7 @@ export interface ActionNameParams {
     withdraw: ActionParams.withdraw
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Type {
         export interface AccountCreate {
             boid_id: NameType
             keys: PublicKeyType[]
@@ -132,7 +132,7 @@ export namespace ActionParams {
         export interface Action {
             account: NameType
             name: NameType
-            authorization: Types.PermissionLevel[]
+            authorization: Type.PermissionLevel[]
             data: BytesType
         }
         export interface PermissionLevel {
@@ -147,14 +147,14 @@ export namespace ActionParams {
             aggregate_pwr_capacity: UInt32Type
         }
         export interface Config {
-            account: Types.ConfigAccount
-            power: Types.ConfigPower
-            mint: Types.ConfigMint
-            team: Types.ConfigTeam
-            stake: Types.ConfigStake
-            time: Types.ConfigTime
-            auth: Types.ConfigAuth
-            nft: Types.ConfigNft
+            account: Type.ConfigAccount
+            power: Type.ConfigPower
+            mint: Type.ConfigMint
+            team: Type.ConfigTeam
+            stake: Type.ConfigStake
+            time: Type.ConfigTime
+            auth: Type.ConfigAuth
+            nft: Type.ConfigNft
             paused: boolean
             allow_deposits: boolean
             allow_withdrawals: boolean
@@ -239,49 +239,48 @@ export namespace ActionParams {
         export interface OfferAction {
             delegated_stake: UInt16Type
             stake_locked_additional_rounds: UInt16Type
-            nft_actions: Types.NftAction[]
+            nft_actions: Type.NftAction[]
             balance_payment: UInt32Type
         }
         export interface NftAction {
             collection_name: NameType
             schema_name: NameType
             template_id: Int32Type
-            match_immutable_attributes: Types.AtomicAttribute[]
-            match_mutable_attributes: Types.AtomicAttribute[]
+            match_immutable_attributes: Type.AtomicAttribute[]
+            match_mutable_attributes: Type.AtomicAttribute[]
             burn: boolean
             lock_rounds: UInt16Type
         }
         export interface AtomicAttribute {
             key: string
-            value: Types.AtomicValue
+            value: Type.AtomicValue
         }
-        export interface AtomicValue {
-            value:
-                | Int8Type
-                | Int16Type
-                | Int32Type
-                | Int64Type
-                | UInt8Type
-                | UInt16Type
-                | UInt32Type
-                | UInt64Type
-                | Float32Type
-                | Float64Type
-                | string
-                | Int8Type[]
-                | Int16Type[]
-                | Int32Type[]
-                | Int64Type[]
-                | BytesType
-                | UInt16Type[]
-                | UInt32Type[]
-                | UInt64Type[]
-                | Float32Type[]
-                | Float64Type[]
-                | string[]
-        }
+        export type AtomicValue =
+            | Int8Type
+            | Int16Type
+            | Int32Type
+            | Int64Type
+            | UInt8Type
+            | UInt16Type
+            | UInt32Type
+            | UInt64Type
+            | Float32Type
+            | Float64Type
+            | string
+            | Int8Type[]
+            | Int16Type[]
+            | Int32Type[]
+            | Int64Type[]
+            | BytesType
+            | UInt16Type[]
+            | UInt32Type[]
+            | UInt64Type[]
+            | Float32Type[]
+            | Float64Type[]
+            | string[]
+            | Types.AtomicValue
         export interface OfferRewards {
-            nft_mints: Types.NftMint[]
+            nft_mints: Type.NftMint[]
             balance_deposit: UInt32Type
             delegated_stake: UInt16Type
             stake_locked_additional_rounds: UInt16Type
@@ -291,8 +290,8 @@ export namespace ActionParams {
             mint_template_id: Int32Type
             mint_schema_name: NameType
             mint_collection_name: NameType
-            immutable_data: Types.AtomicAttribute[]
-            mutable_data: Types.AtomicAttribute[]
+            immutable_data: Type.AtomicAttribute[]
+            mutable_data: Type.AtomicAttribute[]
             quantity: UInt8Type
         }
         export interface OfferLimits {
@@ -316,7 +315,7 @@ export namespace ActionParams {
     }
     export interface accountbuy {
         payer_boid_id: NameType
-        new_account: Types.AccountCreate
+        new_account: Type.AccountCreate
     }
     export interface accountedit {
         boid_id: NameType
@@ -335,7 +334,7 @@ export namespace ActionParams {
     export interface accountsclr {}
     export interface auth {
         boid_id: NameType
-        actions: Types.Action[]
+        actions: Type.Action[]
         sig: SignatureType
         keyIndex: Int32Type
         expires_utc_sec: UInt32Type
@@ -355,7 +354,7 @@ export namespace ActionParams {
         mod_id: UInt8Type
     }
     export interface boosternew {
-        mod: Types.Booster
+        mod: Type.Booster
     }
     export interface boosterrm {
         boid_id: NameType
@@ -363,14 +362,14 @@ export namespace ActionParams {
     }
     export interface configclear {}
     export interface configset {
-        config: Types.Config
+        config: Type.Config
     }
     export interface globalchain {
         chain_name: NameType
     }
     export interface globalclear {}
     export interface globalset {
-        globalData: Types.Global
+        globalData: Type.Global
     }
     export interface internalxfer {
         from_boid_id: NameType
@@ -391,7 +390,7 @@ export namespace ActionParams {
         sponsor_boid_id: NameType
         invite_code: UInt64Type
         sig: SignatureType
-        new_account: Types.AccountCreate
+        new_account: Type.AccountCreate
     }
     export interface inviterm {
         sponsor_boid_id: NameType
@@ -407,8 +406,8 @@ export namespace ActionParams {
     }
     export interface logpwrclaim {
         boid_id: NameType
-        power: Types.PowerClaimLog
-        mint: Types.MintLog
+        power: Type.PowerClaimLog
+        mint: Type.MintLog
     }
     export interface metaclean {}
     export interface mint {
@@ -435,10 +434,10 @@ export namespace ActionParams {
         asset_ids: UInt64Type[]
     }
     export interface offeradd {
-        requirements: Types.OfferRequirements
-        actions: Types.OfferAction
-        rewards: Types.OfferRewards
-        limits: Types.OfferLimits
+        requirements: Type.OfferRequirements
+        actions: Type.OfferAction
+        rewards: Type.OfferRewards
+        limits: Type.OfferLimits
     }
     export interface offerclaim {
         boid_id: NameType
@@ -471,7 +470,7 @@ export namespace ActionParams {
         sponsor_boid_id: NameType
     }
     export interface sponsorset {
-        row: Types.Sponsor
+        row: Type.Sponsor
     }
     export interface stake {
         boid_id: NameType
