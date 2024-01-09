@@ -18,10 +18,56 @@ suite('generateContractFromCommand', () => {
         sandbox.restore()
     })
 
+    test('--url option uses the provided URL', async function () {
+        const contractKitLoadStub = sandbox.stub(ContractKit.prototype, 'load').resolves({
+            name: 'eosio.msig',
+            abi: eosioMsigAbi,
+        })
+
+        await generateContractFromCommand('eosio.msig', {
+            url: 'http://eos.greymass.com',
+        })
+
+        assert(
+            contractKitLoadStub.calledWith('eosio.msig'),
+            'ContractKit.load should be called with correct contract name'
+        )
+    })
+
+    test('throws an error when --url and --json are not provided', async function () {
+        try {
+            await generateContractFromCommand('eosio.msig', {})
+            assert.fail('Error should be thrown when neither --url nor --json are provided.')
+        } catch (error) {
+            assert(
+                (error as unknown as Error).message.includes(
+                    'URL is required when json value is not provided.'
+                ),
+                'Error should be thrown when neither --url nor --json are provided.'
+            )
+        }
+    })
+
+    test('throws an error when --json and contractName are not provided', async function () {
+        try {
+            await generateContractFromCommand(undefined, {
+                url: 'http://eos.greymass.com',
+            })
+
+            assert.fail('Error should be thrown when neither --json nor contractName are provided.')
+        } catch (error) {
+            assert(
+                (error as unknown as Error).message.includes(
+                    'Contract name is required when json value is not provided.'
+                ),
+                'Error should be thrown when neither --json nor contractName are provided.'
+            )
+        }
+    })
+
     test('--json option uses the provided ABI', async function () {
         try {
             await generateContractFromCommand('someContractThatDoesntExist', {
-                url: 'http://eos.example-api.com',
                 json: './test/data/abis/rewards.gm.json',
             })
         } catch (error) {
@@ -34,7 +80,6 @@ suite('generateContractFromCommand', () => {
     test("--json option throws an error when file doesn't exist", async function () {
         try {
             await generateContractFromCommand('someContract', {
-                url: 'http://eos.example-api.com',
                 json: './test/data/abis/does-not-exist.json',
             })
             assert.fail('Error should be thrown when JSON file does not exist.')
