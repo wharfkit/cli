@@ -3,8 +3,7 @@ import * as fs from 'fs'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 
-import type {ABI} from '@wharfkit/session'
-import type {ABIDef} from '@wharfkit/antelope'
+import {ABI} from '@wharfkit/session'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 
 import {log, makeClient} from '../../utils'
@@ -19,46 +18,43 @@ import {generateActionsTypeAlias, generateRowType, generateTablesTypeAlias} from
 const printer = ts.createPrinter()
 
 interface CommandOptions {
-    url: string
+    url?: string
     file?: string
     json?: string
     eslintrc?: string
 }
 
 export async function generateContractFromCommand(
-    contractName,
+    contractName: string | undefined,
     {url, file, json, eslintrc}: CommandOptions
 ) {
-    let abi: ABIDef | undefined
+    let abi: ABI | undefined
 
     if (json) {
         log(`Loading ABI from ${json}...`)
 
         const abiString = fs.readFileSync(json, 'utf8')
 
-        abi = JSON.parse(abiString)
+        abi = ABI.from(JSON.parse(abiString))
     } else {
+        if (!contractName) {
+            throw new Error('Contract name is required when json value is not provided.')
+        }
+
+        if (!url) {
+            throw new Error('URL is required when json value is not provided.')
+        }
         log(`Fetching ABI for ${contractName}...`)
+
+        const contractKit = new ContractKit({client: makeClient(url)})
+
+        const contract = await contractKit.load(contractName)
+
+        abi = contract.abi
     }
 
-    const contractKit = new ContractKit(
-        {client: makeClient(url)},
-        {
-            abis: abi
-                ? [
-                      {
-                          name: contractName,
-                          abi,
-                      },
-                  ]
-                : undefined,
-        }
-    )
-
-    const contract = await contractKit.load(contractName)
-
     log(`Generating Contract helpers for ${contractName}...`)
-    const contractCode = await generateContract(contractName, contract.abi, eslintrc)
+    const contractCode = await generateContract(contractName || 'unknown', abi!, eslintrc)
 
     log(`Generated Contract helper class for ${contractName}...`)
     if (file) {
