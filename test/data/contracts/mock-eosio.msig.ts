@@ -47,20 +47,20 @@ export interface ActionNameParams {
     unapprove: ActionParams.unapprove
 }
 export namespace ActionParams {
-    export namespace Types {
+    export namespace Type {
         export interface permission_level {
             actor: NameType
             permission: NameType
         }
         export interface transaction {
-            context_free_actions: Types.action[]
-            actions: Types.action[]
-            transaction_extensions: Types.extension[]
+            context_free_actions: Type.action[]
+            actions: Type.action[]
+            transaction_extensions: Type.extension[]
         }
         export interface action {
             account: NameType
             name: NameType
-            authorization: Types.permission_level[]
+            authorization: Type.permission_level[]
             data: BytesType
         }
         export interface extension {
@@ -71,7 +71,7 @@ export namespace ActionParams {
     export interface approve {
         proposer: NameType
         proposal_name: NameType
-        level: Types.permission_level
+        level: Type.permission_level
         proposal_hash?: Checksum256Type
     }
     export interface cancel {
@@ -90,13 +90,13 @@ export namespace ActionParams {
     export interface propose {
         proposer: NameType
         proposal_name: NameType
-        requested: Types.permission_level[]
-        trx: Types.transaction
+        requested: Type.permission_level[]
+        trx: Type.transaction
     }
     export interface unapprove {
         proposer: NameType
         proposal_name: NameType
-        level: Types.permission_level
+        level: Type.permission_level
     }
 }
 export namespace Types {
