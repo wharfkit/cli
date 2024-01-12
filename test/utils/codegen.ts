@@ -1,4 +1,4 @@
-import {ABI} from '@wharfkit/session'
+import {ABI} from '@wharfkit/antelope'
 import fs from 'fs'
 import path from 'path'
 import {generateContract} from '../../src/commands/contract'

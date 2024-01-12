@@ -1,4 +1,4 @@
-import type {ABI} from '@wharfkit/session'
+import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {extractDecorator, parseType} from './helpers'
 import {formatClassName} from '../../utils'

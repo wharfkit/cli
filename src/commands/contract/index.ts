@@ -3,7 +3,7 @@ import * as fs from 'fs'
 import * as prettier from 'prettier'
 import * as ts from 'typescript'
 
-import {ABI} from '@wharfkit/session'
+import {ABI} from '@wharfkit/antelope'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
 
 import {log, makeClient} from '../../utils'
