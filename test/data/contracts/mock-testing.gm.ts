@@ -22,7 +22,7 @@ export class Contract extends BaseContract {
         super({
             client: args.client,
             abi: abi,
-            account: args.account || Name.from('rewards.gm'),
+            account: args.account || Name.from('testing.gm'),
         })
     }
     action<T extends ActionNames>(

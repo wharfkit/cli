@@ -31,7 +31,7 @@ update_mock_contracts: node_modules clean lib
 	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com -j test/data/abis/eosio.token.json -f test/data/contracts/mock-eosio.token.ts -e .eslintrc
 	node lib/cli.js generate hegemon.hgm -u https://jungle4.greymass.com -j test/data/abis/hegemon.hgm.json -f test/data/contracts/mock-hegemon.hgm.ts -e .eslintrc
 	node lib/cli.js generate rewards.gm -u https://jungle4.greymass.com -j test/data/abis/rewards.gm.json -f test/data/contracts/mock-rewards.gm.ts -e .eslintrc
-	node lib/cli.js generate rewards.gm -u https://jungle4.greymass.com -j test/data/abis/testing.gm.json -f test/data/contracts/mock-testing.gm.ts -e .eslintrc
+	node lib/cli.js generate testing.gm -u https://jungle4.greymass.com -j test/data/abis/testing.gm.json -f test/data/contracts/mock-testing.gm.ts -e .eslintrc
 
 .PHONY: check
 check: node_modules
