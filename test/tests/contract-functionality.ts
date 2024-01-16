@@ -1,4 +1,13 @@
-import {Action, Asset, Bytes, Name, PermissionLevel, Serializer, Struct} from '@wharfkit/antelope'
+import {
+    Action,
+    Asset,
+    Bytes,
+    Name,
+    PermissionLevel,
+    Serializer,
+    Struct,
+    UInt64,
+} from '@wharfkit/antelope'
 import {makeClient} from '@wharfkit/mock-data'
 import {assert} from 'chai'
 
@@ -79,10 +88,11 @@ suite('functionality', function () {
             })
         })
         suite('return values', function () {
-            test('helper exists', function () {
+            test('helper exists', async function () {
                 const client = makeClient('https://jungle4.greymass.com')
                 const contract = new ReturnValueContract({client})
-                contract.readonly('callapi', {})
+                const result = await contract.readonly('callapi', {})
+                assert.instanceOf(result.foo, UInt64)
             })
         })
     })
