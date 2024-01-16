@@ -3,6 +3,7 @@ import {makeClient} from '@wharfkit/mock-data'
 import {assert} from 'chai'
 
 import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
+import {Contract as ReturnValueContract} from '$test/data/contracts/mock-testing.gm'
 import {PlaceholderName, PlaceholderPermission} from '@wharfkit/signing-request'
 import {Table, TableRowCursor} from '@wharfkit/contract'
 
@@ -75,6 +76,13 @@ suite('functionality', function () {
 
                 const user = await contract.table('users').get()
                 assert.instanceOf(user, RewardsGm.Types.user_row)
+            })
+        })
+        suite('return values', function () {
+            test('helper exists', function () {
+                const client = makeClient('https://jungle4.greymass.com')
+                const contract = new ReturnValueContract({client})
+                contract.readonly('callapi', {})
             })
         })
     })
