@@ -1,7 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {parseType, removeCommas, removeDuplicateInterfaces} from './helpers'
-import {getActionFieldFromAbi} from './structs'
+import {findFieldTypeString, getActionFieldFromAbi} from './structs'
 import {findAbiStruct, findExternalType, findTypeFromAlias, findVariant} from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
@@ -156,4 +156,41 @@ function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): 
     }
 
     return parseType(fieldType)
+}
+
+export function generateActionReturnValuesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
+    const actionResults: ABI.ActionResult[] = abi.action_results
+    const members = actionResults.map((result) => {
+        return ts.factory.createPropertySignature(
+            undefined,
+            String(result.name),
+            undefined,
+            ts.factory.createTypeReferenceNode(
+                findFieldTypeString(result.result_type, 'Types.', abi),
+                undefined
+            )
+        )
+    })
+
+    return ts.factory.createInterfaceDeclaration(
+        undefined,
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'ActionReturnValues',
+        undefined,
+        undefined,
+        members
+    )
+}
+
+export function generateActionReturnNamesType(): ts.TypeAliasDeclaration {
+    return ts.factory.createTypeAliasDeclaration(
+        undefined,
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'ActionReturnNames',
+        undefined,
+        ts.factory.createTypeOperatorNode(
+            ts.SyntaxKind.KeyOfKeyword,
+            ts.factory.createTypeReferenceNode('ActionReturnValues', undefined)
+        )
+    )
 }

@@ -34,7 +34,7 @@ export class Contract extends BaseContract {
     }
     readonly<T extends ActionReturnNames>(
         name: T,
-        data: ActionNameParams[T]
+        data?: ActionNameParams[T]
     ): ActionReturnValues[T] {
         return super.readonly(name, data) as unknown as ActionReturnValues[T]
     }
@@ -310,6 +310,7 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type ActionNames = keyof ActionNameParams
+export type TableNames = keyof TableTypes
 export interface ActionReturnValues {
     callapi: Types.api_response
     advance: Types.epoch_row
@@ -318,4 +319,3 @@ export interface ActionReturnValues {
     generatertrn: Types.generate_return_value
 }
 export type ActionReturnNames = keyof ActionReturnValues
-export type TableNames = keyof TableTypes

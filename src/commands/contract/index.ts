@@ -9,11 +9,16 @@ import {abiToBlob, ContractKit} from '@wharfkit/contract'
 import {log, makeClient} from '../../utils'
 import {generateContractClass} from './class'
 import {generateImportStatement, getCoreImports} from './helpers'
-import {generateActionNamesInterface, generateActionsNamespace} from './interfaces'
+import {
+    generateActionNamesInterface,
+    generateActionReturnValuesInterface,
+    generateActionsNamespace,
+} from './interfaces'
 import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
 import {generateActionsTypeAlias, generateRowType, generateTablesTypeAlias} from './types'
+import {generateActionReturnNamesType} from './interfaces'
 
 const printer = ts.createPrinter()
 
@@ -161,6 +166,14 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
         const actionsTypeAlias = generateActionsTypeAlias()
         const rowTypeAlias = generateRowType()
 
+        let actionResultValuesInterface: ts.InterfaceDeclaration | undefined
+        let actionResultsNamesType: ts.TypeAliasDeclaration | undefined
+
+        if (abi.action_results.length) {
+            actionResultValuesInterface = generateActionReturnValuesInterface(abi)
+            actionResultsNamesType = generateActionReturnNamesType()
+        }
+
         const sourceFile = ts.factory.createSourceFile(
             [
                 importAntelopeTypesStatement,
@@ -178,6 +191,8 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
                 rowTypeAlias,
                 actionsTypeAlias,
                 tablesTypeAlias,
+                ...(actionResultValuesInterface ? [actionResultValuesInterface] : []),
+                ...(actionResultsNamesType ? [actionResultsNamesType] : []),
             ],
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None
