@@ -56,6 +56,13 @@ export function getMockParams(contract: Contract): ActionDataType {
                 keys: ['PUB_K1_6RrvujLQN1x5Tacbep1KAk8zzKpSThAQXBCKYFfGUYeACcSRFs'],
             }
         }
+        case 'testing.gm': {
+            return {
+                oracle: 'foo',
+                epoch: 1,
+                commit: 'bar',
+            }
+        }
         default: {
             throw new Error(`getMockParams not implemented for ${contract.account}`)
         }

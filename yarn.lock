@@ -647,7 +647,7 @@
     pako "^2.0.4"
     tslib "^2.1.0"
 
-"@wharfkit/antelope@^0.7.3", "@wharfkit/antelope@^1.0.0":
+"@wharfkit/antelope@^0.7.3", "@wharfkit/antelope@^1.0.0", "@wharfkit/antelope@^1.0.4":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@wharfkit/antelope/-/antelope-1.0.0.tgz#c3057b70575991be5de3aea19e0c474614783c80"
   integrity sha512-gwc6L3AzceN/menx9HCV22Ekd3it1wRruY6dIkyfCaV2UBGmfvIVJ3wPaDi4Ppj2k50b86ShSSHdd52jOFd+dg==
@@ -673,13 +673,13 @@
   dependencies:
     tslib "^2.1.0"
 
-"@wharfkit/contract@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-1.1.1.tgz#2e96476fac45d06684f90b2a54b3cac39e71c760"
-  integrity sha512-WN6tzVuuacpzD8yo4uZZPdniXk9Q+ZGkBtUQ+mbeOQaEzrsnncOrHJlck20nmSb/EC8ij1EG0xlhnyhKjnvSYQ==
+"@wharfkit/contract@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-1.1.4.tgz#5d65a7effa02bb71c98a7493cfdca2472578e6d5"
+  integrity sha512-7jRgyAHrxg0/RJzOoGn4r1Md2Kho2Bozxzv+sn3c5e7ii8w9nQjyyVnYmFEVRFh6pQ0BtR/pqh6wrYJYTfXQIA==
   dependencies:
     "@wharfkit/abicache" "^1.2.0"
-    "@wharfkit/antelope" "^1.0.0"
+    "@wharfkit/antelope" "^1.0.4"
     "@wharfkit/signing-request" "^3.1.0"
     tslib "^2.1.0"
 

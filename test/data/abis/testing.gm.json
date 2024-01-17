@@ -1,0 +1,539 @@
+{
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "api_response",
+            "base": "",
+            "fields": [
+                {
+                    "name": "foo",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "callapi",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "account_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "seeds",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "addoracle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "advance",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "commit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "commit",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "commit_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "commit",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "compute",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seed",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "destroy",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "to_destroy",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "destroy_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ram_sold",
+                    "type": "uint64"
+                },
+                {
+                    "name": "redeemed",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "destroyall",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "enable",
+            "base": "",
+            "fields": [
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "enroll",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "epoch_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "start",
+                    "type": "time_point"
+                },
+                {
+                    "name": "end",
+                    "type": "time_point"
+                },
+                {
+                    "name": "reveal",
+                    "type": "time_point"
+                },
+                {
+                    "name": "complete",
+                    "type": "time_point"
+                }
+            ]
+        },
+        {
+            "name": "generate_return_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seeds",
+                    "type": "uint32"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cost",
+                    "type": "asset"
+                },
+                {
+                    "name": "refund",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_seeds",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch_seeds",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "generatertrn",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "init",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "oracle_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "removeoracle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "reveal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "reveal",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "reveal_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "oracle",
+                    "type": "name"
+                },
+                {
+                    "name": "reveal",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "seed_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "seed",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "stat_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "seeds",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "state_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint16"
+                },
+                {
+                    "name": "epoch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "transfer",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "to_transfer",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "wipe",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "wipesome",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "callapi",
+            "type": "callapi",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addoracle",
+            "type": "addoracle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "advance",
+            "type": "advance",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "commit",
+            "type": "commit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "compute",
+            "type": "compute",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "destroy",
+            "type": "destroy",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "destroyall",
+            "type": "destroyall",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "enable",
+            "type": "enable",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "enroll",
+            "type": "enroll",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "generatertrn",
+            "type": "generatertrn",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "init",
+            "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "removeoracle",
+            "type": "removeoracle",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "reveal",
+            "type": "reveal",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "transfer",
+            "type": "transfer",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wipe",
+            "type": "wipe",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wipesome",
+            "type": "wipesome",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "accounts",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "account_row"
+        },
+        {
+            "name": "commits",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "commit_row"
+        },
+        {
+            "name": "epochs",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "epoch_row"
+        },
+        {
+            "name": "oracles",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "oracle_row"
+        },
+        {
+            "name": "reveals",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "reveal_row"
+        },
+        {
+            "name": "seeds",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "seed_row"
+        },
+        {
+            "name": "state",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "state_row"
+        },
+        {
+            "name": "stats",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "stat_row"
+        }
+    ],
+    "ricardian_clauses": [],
+    "error_messages": [],
+    "abi_extensions": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "callapi",
+            "result_type": "api_response"
+        },
+        {
+            "name": "advance",
+            "result_type": "epoch_row"
+        },
+        {
+            "name": "compute",
+            "result_type": "checksum256"
+        },
+        {
+            "name": "destroy",
+            "result_type": "destroy_return_value"
+        },
+        {
+            "name": "generatertrn",
+            "result_type": "generate_return_value"
+        }
+    ]
+}
