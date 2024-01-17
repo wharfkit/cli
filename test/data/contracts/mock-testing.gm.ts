@@ -34,7 +34,7 @@ export class Contract extends BaseContract {
     }
     readonly<T extends ActionReturnNames>(
         name: T,
-        data: ActionNameParams[T]
+        data?: ActionNameParams[T]
     ): ActionReturnValues[T] {
         return super.readonly(name, data) as unknown as ActionReturnValues[T]
     }

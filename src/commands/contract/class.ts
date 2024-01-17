@@ -195,7 +195,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
         undefined,
         undefined,
         'data',
-        undefined,
+        ts.factory.createToken(ts.SyntaxKind.QuestionToken),
         ts.factory.createIndexedAccessTypeNode(
             ts.factory.createTypeReferenceNode('ActionNameParams'),
             ts.factory.createTypeReferenceNode('T')
