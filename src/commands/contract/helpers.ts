@@ -46,7 +46,7 @@ export function getCoreImports(abi: ABI.Def) {
         }
     }
 
-    if (abi.variants.length != 0) {
+    if (abi.variants.length) {
         coreImports.push('Variant')
         for (const variant of abi.variants) {
             variant.types.forEach((typeString) => {
@@ -56,6 +56,16 @@ export function getCoreImports(abi: ABI.Def) {
                     coreImports.push(coreClass)
                 }
             })
+        }
+    }
+
+    if (abi.action_results.length) {
+        for (const actionResult of abi.action_results) {
+            const {type: abiType} = findAbiType(actionResult.result_type, abi)
+            const coreClass = findCoreClassImport(abiType)
+            if (coreClass) {
+                coreImports.push(coreClass)
+            }
         }
     }
 

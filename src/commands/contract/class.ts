@@ -47,6 +47,11 @@ export async function generateContractClass(contractName: string, abi: ABI.Def) 
         classMembers.push(actionMethod)
     }
 
+    if (abi.action_results.length) {
+        const readonlyMethod = generateReadonlyMethod()
+        classMembers.push(readonlyMethod)
+    }
+
     if (abi.tables.length) {
         const tableMethod = generateTableMethod()
 
@@ -164,6 +169,81 @@ function generateActionMethod(): ts.MethodDeclaration {
         [typeParameter],
         [nameParameter, dataParameter, optionsParameter],
         ts.factory.createTypeReferenceNode('Action'),
+        methodBody
+    )
+}
+
+function generateReadonlyMethod(): ts.MethodDeclaration {
+    // Create the generic type parameter 'T' with a constraint to 'ActionReturnNames'
+    const typeParameter = ts.factory.createTypeParameterDeclaration(
+        undefined,
+        'T',
+        ts.factory.createTypeReferenceNode('ActionReturnNames')
+    )
+
+    // Create the function parameters.
+    const nameParameter = ts.factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        'name',
+        undefined,
+        ts.factory.createTypeReferenceNode('T'),
+        undefined
+    )
+
+    const dataParameter = ts.factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        'data',
+        undefined,
+        ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createTypeReferenceNode('ActionNameParams'),
+            ts.factory.createTypeReferenceNode('T')
+        ),
+        undefined
+    )
+
+    // Generate the function body.
+    const methodBody = ts.factory.createBlock(
+        [
+            ts.factory.createReturnStatement(
+                ts.factory.createAsExpression(
+                    ts.factory.createAsExpression(
+                        ts.factory.createCallExpression(
+                            ts.factory.createPropertyAccessExpression(
+                                ts.factory.createSuper(),
+                                'readonly'
+                            ),
+                            undefined,
+                            [
+                                ts.factory.createIdentifier('name'),
+                                ts.factory.createIdentifier('data'),
+                            ]
+                        ),
+                        ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword)
+                    ),
+                    ts.factory.createIndexedAccessTypeNode(
+                        ts.factory.createTypeReferenceNode('ActionReturnValues'),
+                        ts.factory.createTypeReferenceNode('T')
+                    )
+                )
+            ),
+        ],
+        true
+    )
+
+    // Create the method declaration
+    return ts.factory.createMethodDeclaration(
+        undefined,
+        undefined,
+        'readonly',
+        undefined,
+        [typeParameter],
+        [nameParameter, dataParameter],
+        ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createTypeReferenceNode('ActionReturnValues'),
+            ts.factory.createTypeReferenceNode('T')
+        ),
         methodBody
     )
 }

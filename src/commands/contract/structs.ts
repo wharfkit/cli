@@ -101,9 +101,7 @@ export function generateVariant(variant, abi: any, isExport = false): ts.ClassDe
         ts.factory.createUnionTypeNode(
             variant.fields.map((field) => {
                 return ts.factory.createTypeReferenceNode(
-                    ts.factory.createIdentifier(
-                        findFieldStructTypeString(field.type, undefined, abi)
-                    ),
+                    ts.factory.createIdentifier(findFieldTypeString(field.type, undefined, abi)),
                     undefined
                 )
             })
@@ -178,7 +176,7 @@ export function generateField(
         findFieldStructType(field.type, namespace, abi),
     ]
 
-    const structTypeString = findFieldStructTypeString(field.type, namespace, abi)
+    const structTypeString = findFieldTypeString(field.type, namespace, abi)
     isArray = isArray || structTypeString.endsWith('[]')
 
     // Build the options object if needed
@@ -304,7 +302,7 @@ function findVariantStructType(
     namespace: string | undefined,
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral | ts.ObjectLiteralExpression {
-    const variantTypeString = findFieldStructTypeString(typeString, namespace, abi)
+    const variantTypeString = findFieldTypeString(typeString, namespace, abi)
 
     if (['string', 'string[]', 'boolean', 'boolean[]'].includes(variantTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(variantTypeString))
@@ -337,9 +335,7 @@ function findFieldStructType(
     namespace: string | undefined,
     abi: ABI.Def
 ): ts.Identifier | ts.StringLiteral {
-    const fieldTypeString = extractDecorator(
-        findFieldStructTypeString(typeString, namespace, abi)
-    ).type
+    const fieldTypeString = extractDecorator(findFieldTypeString(typeString, namespace, abi)).type
 
     if (['string', 'string[]', 'boolean', 'boolean[]'].includes(fieldTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
@@ -348,7 +344,7 @@ function findFieldStructType(
     return ts.factory.createIdentifier(fieldTypeString)
 }
 
-function findFieldStructTypeString(
+export function findFieldTypeString(
     typeString: string,
     namespace: string | undefined,
     abi: ABI.Def
