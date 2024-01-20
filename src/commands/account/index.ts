@@ -124,7 +124,10 @@ async function checkAccountNameExists(accountName: NameType, chainUrl: string): 
     } catch (error: unknown) {
         const errorMessage = (error as {message: string}).message
 
-        if (errorMessage.includes('Account not found')) {
+        if (
+            errorMessage.includes('Account not found') ||
+            errorMessage.includes('Account Query Exception')
+        ) {
             return false
         }
 
