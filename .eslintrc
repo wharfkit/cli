@@ -24,5 +24,14 @@
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-empty-function": "warn",
         "no-inner-declarations": "off"
-    }
+    },
+    "overrides": [
+        {
+            "files": ["test/data/contracts/**/*.ts"],
+            "rules": {
+                "no-use-before-define": "error",
+                "@typescript-eslint/no-use-before-define": "error"
+            }
+        }
+    ]
 }
