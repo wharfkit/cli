@@ -1,4 +1,4 @@
-import {Action, Name, UInt64} from '@wharfkit/antelope'
+import {Action, Bytes, Name, UInt64} from '@wharfkit/antelope'
 import {assert} from 'chai'
 
 import type {ActionDataType, Contract} from '@wharfkit/contract'
@@ -54,6 +54,20 @@ export function getMockParams(contract: Contract): ActionDataType {
                 owners: ['foo'],
                 sponsors: ['foo'],
                 keys: ['PUB_K1_6RrvujLQN1x5Tacbep1KAk8zzKpSThAQXBCKYFfGUYeACcSRFs'],
+            }
+        }
+        case 'payroll.boid': {
+            return {
+                payrollConfig: {
+                    minClaimFrequencySec: 1,
+                    receiverAccount: 'foo',
+                    treasuryAccount: 'bar',
+                    meta: Bytes.from('meta', 'utf8').toString('hex'),
+                    paused: false,
+                    startTime: new Date('2021-01-01T00:00:00Z'),
+                    finishTime: new Date('2021-01-01T00:00:00Z'),
+                    total: '1.0000 BOID',
+                },
             }
         }
         case 'testing.gm': {

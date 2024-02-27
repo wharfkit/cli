@@ -1,0 +1,245 @@
+{
+    "version": "eosio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "Payroll",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total",
+                    "type": "asset"
+                },
+                {
+                    "name": "paid",
+                    "type": "asset"
+                },
+                {
+                    "name": "startTime",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "finishTime",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "lastPayout",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "minClaimFrequencySec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "receiverAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "treasuryAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "paused",
+                    "type": "bool"
+                },
+                {
+                    "name": "meta",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "PayrollConfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total",
+                    "type": "asset"
+                },
+                {
+                    "name": "startTime",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "finishTime",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "minClaimFrequencySec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "receiverAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "treasuryAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "meta",
+                    "type": "bytes"
+                },
+                {
+                    "name": "paused",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "TokensWhitelist",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "payroll.add",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payrollConfig",
+                    "type": "PayrollConfig"
+                }
+            ]
+        },
+        {
+            "name": "payroll.edit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payrollId",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pause",
+                    "type": "bool"
+                },
+                {
+                    "name": "minClaimFrequencySec",
+                    "type": "uint32"
+                },
+                {
+                    "name": "receiverAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "treasuryAccount",
+                    "type": "name"
+                },
+                {
+                    "name": "meta",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "payroll.pay",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payrollId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "payroll.rm",
+            "base": "",
+            "fields": [
+                {
+                    "name": "payrollId",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "tokenwl.add",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "tokenwl.rm",
+            "base": "",
+            "fields": [
+                {
+                    "name": "sym",
+                    "type": "symbol_code"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "payroll.add",
+            "type": "payroll.add",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payroll.edit",
+            "type": "payroll.edit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payroll.pay",
+            "type": "payroll.pay",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "payroll.rm",
+            "type": "payroll.rm",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tokenwl.add",
+            "type": "tokenwl.add",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "tokenwl.rm",
+            "type": "tokenwl.rm",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "payrolls",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "Payroll"
+        },
+        {
+            "name": "tokenwl",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "TokensWhitelist"
+        }
+    ],
+    "ricardian_clauses": [],
+    "error_messages": [],
+    "abi_extensions": [],
+    "variants": [],
+    "action_results": []
+}

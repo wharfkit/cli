@@ -26,6 +26,7 @@ test_generate: node_modules clean lib
 update_mock_contracts: node_modules clean lib
 	node lib/cli.js generate atomicassets -u https://jungle4.greymass.com -j test/data/abis/atomicassets.json -f test/data/contracts/mock-atomicassets.ts -e .eslintrc
 	node lib/cli.js generate boid -u https://jungle4.greymass.com -j test/data/abis/boid.json -f test/data/contracts/mock-boid.ts -e .eslintrc
+	node lib/cli.js generate payroll.boid -u https://telos.api.animus.is -j test/data/abis/payroll.boid.json -f test/data/contracts/mock-payroll.boid.ts -e .eslintrc
 	node lib/cli.js generate eosio -u https://jungle4.greymass.com -j test/data/abis/eosio.json -f test/data/contracts/mock-eosio.ts -e .eslintrc
 	node lib/cli.js generate eosio.msig -u https://jungle4.greymass.com -j test/data/abis/eosio.msig.json -f test/data/contracts/mock-eosio.msig.ts -e .eslintrc
 	node lib/cli.js generate eosio.token -u https://jungle4.greymass.com -j test/data/abis/eosio.token.json -f test/data/contracts/mock-eosio.token.ts -e .eslintrc
