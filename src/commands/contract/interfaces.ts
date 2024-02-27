@@ -139,6 +139,14 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
 function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): string {
     const fieldType = findExternalType(typeString, namespace, abi)
 
+    if (fieldType === 'Symbol_code') {
+        return 'Asset.SymbolCodeType'
+    }
+
+    if (fieldType === 'Symbol_code[]') {
+        return 'Asset.SymbolCodeType[]'
+    }
+
     if (fieldType === 'Symbol') {
         return 'Asset.SymbolType'
     }

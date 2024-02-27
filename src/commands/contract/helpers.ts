@@ -116,7 +116,7 @@ function structIsUsedInActionParams(struct: ABI.Struct, abi: ABI.Def) {
 }
 
 export function findCoreClassImport(type: string) {
-    if (type === 'symbol') {
+    if (type === 'symbol' || type === 'symbol_code') {
         return 'Asset'
     }
 

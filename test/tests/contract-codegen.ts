@@ -13,6 +13,7 @@ import * as RewardsGm from '$test/data/contracts/mock-rewards.gm'
 import * as AtomicAssets from '$test/data/contracts/mock-atomicassets'
 import * as Hegemon from '$test/data/contracts/mock-hegemon.hgm'
 import * as Boid from '$test/data/contracts/mock-boid'
+import * as PayrollBoid from '$test/data/contracts/mock-payroll.boid'
 import * as GreymassTesting from '$test/data/contracts/mock-testing.gm'
 
 import {generateCodegenContract, removeCodegenContracts} from '$test/utils/codegen'
@@ -54,6 +55,10 @@ suite('codegen', async function () {
         },
         boid: {
             mock: Boid,
+            generated: null,
+        },
+        'payroll.boid': {
+            mock: PayrollBoid,
             generated: null,
         },
         'testing.gm': {

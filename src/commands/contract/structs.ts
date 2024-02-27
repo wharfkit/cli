@@ -363,6 +363,10 @@ export function findFieldTypeString(
         return 'Asset.Symbol'
     }
 
+    if (fieldType === 'Symbol_code') {
+        return 'Asset.SymbolCode'
+    }
+
     return parseType(fieldType)
 }
 
