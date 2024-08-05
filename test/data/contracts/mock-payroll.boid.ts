@@ -27,95 +27,95 @@ export namespace Types {
     @Struct.type('Payroll')
     export class Payroll extends Struct {
         @Struct.field(UInt64)
-        id!: UInt64
+        declare id: UInt64
         @Struct.field(Asset)
-        total!: Asset
+        declare total: Asset
         @Struct.field(Asset)
-        paid!: Asset
+        declare paid: Asset
         @Struct.field(TimePointSec)
-        startTime!: TimePointSec
+        declare startTime: TimePointSec
         @Struct.field(TimePointSec)
-        finishTime!: TimePointSec
+        declare finishTime: TimePointSec
         @Struct.field(TimePointSec)
-        lastPayout!: TimePointSec
+        declare lastPayout: TimePointSec
         @Struct.field(UInt32)
-        minClaimFrequencySec!: UInt32
+        declare minClaimFrequencySec: UInt32
         @Struct.field(Name)
-        receiverAccount!: Name
+        declare receiverAccount: Name
         @Struct.field(Name)
-        treasuryAccount!: Name
+        declare treasuryAccount: Name
         @Struct.field('bool')
-        paused!: boolean
+        declare paused: boolean
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('PayrollConfig')
     export class PayrollConfig extends Struct {
         @Struct.field(Asset)
-        total!: Asset
+        declare total: Asset
         @Struct.field(TimePointSec)
-        startTime!: TimePointSec
+        declare startTime: TimePointSec
         @Struct.field(TimePointSec)
-        finishTime!: TimePointSec
+        declare finishTime: TimePointSec
         @Struct.field(UInt32)
-        minClaimFrequencySec!: UInt32
+        declare minClaimFrequencySec: UInt32
         @Struct.field(Name)
-        receiverAccount!: Name
+        declare receiverAccount: Name
         @Struct.field(Name)
-        treasuryAccount!: Name
+        declare treasuryAccount: Name
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
         @Struct.field('bool')
-        paused!: boolean
+        declare paused: boolean
     }
     @Struct.type('TokensWhitelist')
     export class TokensWhitelist extends Struct {
         @Struct.field(Asset.Symbol)
-        sym!: Asset.Symbol
+        declare sym: Asset.Symbol
         @Struct.field(Name)
-        contract!: Name
+        declare contract: Name
     }
     @Struct.type('payroll.add')
     export class payrolladd extends Struct {
         @Struct.field(PayrollConfig)
-        payrollConfig!: PayrollConfig
+        declare payrollConfig: PayrollConfig
     }
     @Struct.type('payroll.edit')
     export class payrolledit extends Struct {
         @Struct.field(UInt64)
-        payrollId!: UInt64
+        declare payrollId: UInt64
         @Struct.field('bool')
-        pause!: boolean
+        declare pause: boolean
         @Struct.field(UInt32)
-        minClaimFrequencySec!: UInt32
+        declare minClaimFrequencySec: UInt32
         @Struct.field(Name)
-        receiverAccount!: Name
+        declare receiverAccount: Name
         @Struct.field(Name)
-        treasuryAccount!: Name
+        declare treasuryAccount: Name
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('payroll.pay')
     export class payrollpay extends Struct {
         @Struct.field(UInt64)
-        payrollId!: UInt64
+        declare payrollId: UInt64
     }
     @Struct.type('payroll.rm')
     export class payrollrm extends Struct {
         @Struct.field(UInt64)
-        payrollId!: UInt64
+        declare payrollId: UInt64
     }
     @Struct.type('tokenwl.add')
     export class tokenwladd extends Struct {
         @Struct.field(Asset.Symbol)
-        sym!: Asset.Symbol
+        declare sym: Asset.Symbol
         @Struct.field(Name)
-        contract!: Name
+        declare contract: Name
     }
     @Struct.type('tokenwl.rm')
     export class tokenwlrm extends Struct {
         @Struct.field(Asset.SymbolCode)
-        sym!: Asset.SymbolCode
+        declare sym: Asset.SymbolCode
     }
 }
 export const TableMap = {

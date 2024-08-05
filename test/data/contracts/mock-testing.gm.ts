@@ -21,106 +21,106 @@ export namespace Types {
     @Struct.type('api_response')
     export class api_response extends Struct {
         @Struct.field(UInt64)
-        foo!: UInt64
+        declare foo: UInt64
     }
     @Struct.type('callapi')
     export class callapi extends Struct {}
     @Struct.type('account_row')
     export class account_row extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt32)
-        seeds!: UInt32
+        declare seeds: UInt32
     }
     @Struct.type('addoracle')
     export class addoracle extends Struct {
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
     }
     @Struct.type('advance')
     export class advance extends Struct {}
     @Struct.type('commit')
     export class commit extends Struct {
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(Checksum256)
-        commit!: Checksum256
+        declare commit: Checksum256
     }
     @Struct.type('commit_row')
     export class commit_row extends Struct {
         @Struct.field(UInt64)
-        id!: UInt64
+        declare id: UInt64
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
         @Struct.field(Checksum256)
-        commit!: Checksum256
+        declare commit: Checksum256
     }
     @Struct.type('compute')
     export class compute extends Struct {
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(UInt64)
-        seed!: UInt64
+        declare seed: UInt64
     }
     @Struct.type('destroy')
     export class destroy extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(UInt64, {array: true})
-        to_destroy!: UInt64[]
+        declare to_destroy: UInt64[]
     }
     @Struct.type('destroy_return_value')
     export class destroy_return_value extends Struct {
         @Struct.field(UInt64)
-        ram_sold!: UInt64
+        declare ram_sold: UInt64
         @Struct.field(Asset)
-        redeemed!: Asset
+        declare redeemed: Asset
     }
     @Struct.type('destroyall')
     export class destroyall extends Struct {}
     @Struct.type('enable')
     export class enable extends Struct {
         @Struct.field('bool')
-        enabled!: boolean
+        declare enabled: boolean
     }
     @Struct.type('enroll')
     export class enroll extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
     }
     @Struct.type('epoch_row')
     export class epoch_row extends Struct {
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(TimePoint)
-        start!: TimePoint
+        declare start: TimePoint
         @Struct.field(TimePoint)
-        end!: TimePoint
+        declare end: TimePoint
         @Struct.field(TimePoint)
-        reveal!: TimePoint
+        declare reveal: TimePoint
         @Struct.field(TimePoint)
-        complete!: TimePoint
+        declare complete: TimePoint
     }
     @Struct.type('generate_return_value')
     export class generate_return_value extends Struct {
         @Struct.field(UInt32)
-        seeds!: UInt32
+        declare seeds: UInt32
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(Asset)
-        cost!: Asset
+        declare cost: Asset
         @Struct.field(Asset)
-        refund!: Asset
+        declare refund: Asset
         @Struct.field(UInt64)
-        total_seeds!: UInt64
+        declare total_seeds: UInt64
         @Struct.field(UInt64)
-        epoch_seeds!: UInt64
+        declare epoch_seeds: UInt64
     }
     @Struct.type('generatertrn')
     export class generatertrn extends Struct {}
@@ -129,70 +129,70 @@ export namespace Types {
     @Struct.type('oracle_row')
     export class oracle_row extends Struct {
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
     }
     @Struct.type('removeoracle')
     export class removeoracle extends Struct {
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
     }
     @Struct.type('reveal')
     export class reveal extends Struct {
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field('string')
-        reveal!: string
+        declare reveal: string
     }
     @Struct.type('reveal_row')
     export class reveal_row extends Struct {
         @Struct.field(UInt64)
-        id!: UInt64
+        declare id: UInt64
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(Name)
-        oracle!: Name
+        declare oracle: Name
         @Struct.field('string')
-        reveal!: string
+        declare reveal: string
     }
     @Struct.type('seed_row')
     export class seed_row extends Struct {
         @Struct.field(UInt64)
-        seed!: UInt64
+        declare seed: UInt64
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
     }
     @Struct.type('stat_row')
     export class stat_row extends Struct {
         @Struct.field(UInt64)
-        id!: UInt64
+        declare id: UInt64
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field(UInt32)
-        seeds!: UInt32
+        declare seeds: UInt32
     }
     @Struct.type('state_row')
     export class state_row extends Struct {
         @Struct.field(UInt16)
-        id!: UInt16
+        declare id: UInt16
         @Struct.field(UInt64)
-        epoch!: UInt64
+        declare epoch: UInt64
         @Struct.field('bool')
-        enabled!: boolean
+        declare enabled: boolean
     }
     @Struct.type('transfer')
     export class transfer extends Struct {
         @Struct.field(Name)
-        from!: Name
+        declare from: Name
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
         @Struct.field(UInt64, {array: true})
-        to_transfer!: UInt64[]
+        declare to_transfer: UInt64[]
     }
     @Struct.type('wipe')
     export class wipe extends Struct {}

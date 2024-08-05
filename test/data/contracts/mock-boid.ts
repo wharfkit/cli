@@ -95,543 +95,543 @@ export namespace Types {
     @Struct.type('AccountAuth')
     export class AccountAuth extends Struct {
         @Struct.field(PublicKey, {array: true})
-        keys!: PublicKey[]
+        declare keys: PublicKey[]
         @Struct.field(UInt8)
-        nonce!: UInt8
+        declare nonce: UInt8
     }
     @Struct.type('TokenUnstake')
     export class TokenUnstake extends Struct {
         @Struct.field(UInt16)
-        redeemable_after_round!: UInt16
+        declare redeemable_after_round: UInt16
         @Struct.field(UInt32)
-        quantity!: UInt32
+        declare quantity: UInt32
     }
     @Struct.type('AccountStake')
     export class AccountStake extends Struct {
         @Struct.field(TokenUnstake, {array: true})
-        unstaking!: TokenUnstake[]
+        declare unstaking: TokenUnstake[]
         @Struct.field(UInt32)
-        self_staked!: UInt32
+        declare self_staked: UInt32
         @Struct.field(UInt16)
-        received_delegated_stake!: UInt16
+        declare received_delegated_stake: UInt16
     }
     @Struct.type('AccountBooster')
     export class AccountBooster extends Struct {
         @Struct.field(UInt8)
-        pwr_multiplier!: UInt8
+        declare pwr_multiplier: UInt8
         @Struct.field(UInt16)
-        pwr_add_per_round!: UInt16
+        declare pwr_add_per_round: UInt16
         @Struct.field(UInt16)
-        expires_round!: UInt16
+        declare expires_round: UInt16
         @Struct.field(UInt32)
-        aggregate_pwr_remaining!: UInt32
+        declare aggregate_pwr_remaining: UInt32
     }
     @Struct.type('AccountPower')
     export class AccountPower extends Struct {
         @Struct.field(UInt16)
-        last_claimed_round!: UInt16
+        declare last_claimed_round: UInt16
         @Struct.field(UInt16)
-        last_added_round!: UInt16
+        declare last_added_round: UInt16
         @Struct.field(UInt32)
-        rating!: UInt32
+        declare rating: UInt32
         @Struct.field(UInt16, {array: true})
-        history!: UInt16[]
+        declare history: UInt16[]
         @Struct.field(AccountBooster, {array: true})
-        mods!: AccountBooster[]
+        declare mods: AccountBooster[]
     }
     @Struct.type('AccountTeam')
     export class AccountTeam extends Struct {
         @Struct.field(UInt8)
-        team_id!: UInt8
+        declare team_id: UInt8
         @Struct.field(UInt16)
-        last_edit_round!: UInt16
+        declare last_edit_round: UInt16
         @Struct.field(UInt8)
-        team_tax_mult!: UInt8
+        declare team_tax_mult: UInt8
         @Struct.field(UInt32)
-        team_cumulative_contribution!: UInt32
+        declare team_cumulative_contribution: UInt32
     }
     @Struct.type('Account')
     export class Account extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Name, {array: true})
-        owners!: Name[]
+        declare owners: Name[]
         @Struct.field(AccountAuth)
-        auth!: AccountAuth
+        declare auth: AccountAuth
         @Struct.field(Name, {array: true})
-        sponsors!: Name[]
+        declare sponsors: Name[]
         @Struct.field(AccountStake)
-        stake!: AccountStake
+        declare stake: AccountStake
         @Struct.field(AccountPower)
-        power!: AccountPower
+        declare power: AccountPower
         @Struct.field(AccountTeam)
-        team!: AccountTeam
+        declare team: AccountTeam
         @Struct.field(UInt32)
-        balance!: UInt32
+        declare balance: UInt32
         @Struct.field(UInt16)
-        nft_balance!: UInt16
+        declare nft_balance: UInt16
         @Struct.field('bool')
-        recoverable!: boolean
+        declare recoverable: boolean
     }
     @Struct.type('AccountCreate')
     export class AccountCreate extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(PublicKey, {array: true})
-        keys!: PublicKey[]
+        declare keys: PublicKey[]
         @Struct.field(Name, {array: true})
-        owners!: Name[]
+        declare owners: Name[]
     }
     @Struct.type('AcctMeta')
     export class AcctMeta extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('PermissionLevel')
     export class PermissionLevel extends Struct {
         @Struct.field(Name)
-        actor!: Name
+        declare actor: Name
         @Struct.field(Name)
-        permission!: Name
+        declare permission: Name
     }
     @Struct.type('Action')
     export class Action extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(Name)
-        name!: Name
+        declare name: Name
         @Struct.field(PermissionLevel, {array: true})
-        authorization!: PermissionLevel[]
+        declare authorization: PermissionLevel[]
         @Struct.field(Bytes)
-        data!: Bytes
+        declare data: Bytes
     }
     @Struct.type('AtomicAttribute')
     export class AtomicAttribute extends Struct {
         @Struct.field('string')
-        key!: string
+        declare key: string
         @Struct.field(AtomicValue)
-        value!: AtomicValue
+        declare value: AtomicValue
     }
     @Struct.type('AtomicFormat')
     export class AtomicFormat extends Struct {
         @Struct.field('string')
-        name!: string
+        declare name: string
         @Struct.field('string')
-        type!: string
+        declare type: string
     }
     @Struct.type('Auth')
     export class Auth extends Struct {
         @Struct.field(Name)
-        boid_id_auth!: Name
+        declare boid_id_auth: Name
     }
     @Struct.type('Booster')
     export class Booster extends Struct {
         @Struct.field(UInt8)
-        mod_id!: UInt8
+        declare mod_id: UInt8
         @Struct.field(UInt8)
-        pwr_multiplier!: UInt8
+        declare pwr_multiplier: UInt8
         @Struct.field(UInt16)
-        pwr_add_per_round!: UInt16
+        declare pwr_add_per_round: UInt16
         @Struct.field(UInt16)
-        expire_after_elapsed_rounds!: UInt16
+        declare expire_after_elapsed_rounds: UInt16
         @Struct.field(UInt32)
-        aggregate_pwr_capacity!: UInt32
+        declare aggregate_pwr_capacity: UInt32
     }
     @Struct.type('ConfigAccount')
     export class ConfigAccount extends Struct {
         @Struct.field(UInt32)
-        invite_price!: UInt32
+        declare invite_price: UInt32
         @Struct.field(UInt32)
-        premium_purchase_price!: UInt32
+        declare premium_purchase_price: UInt32
         @Struct.field(UInt8)
-        max_premium_prefix!: UInt8
+        declare max_premium_prefix: UInt8
         @Struct.field(UInt8)
-        max_owners!: UInt8
+        declare max_owners: UInt8
         @Struct.field(UInt8)
-        max_boosters!: UInt8
+        declare max_boosters: UInt8
         @Struct.field(Name, {array: true})
-        suffix_whitelist!: Name[]
+        declare suffix_whitelist: Name[]
         @Struct.field(UInt32)
-        remove_sponsor_price!: UInt32
+        declare remove_sponsor_price: UInt32
         @Struct.field(UInt8)
-        sponsor_max_invite_codes!: UInt8
+        declare sponsor_max_invite_codes: UInt8
         @Struct.field(UInt16)
-        invite_code_expire_rounds!: UInt16
+        declare invite_code_expire_rounds: UInt16
     }
     @Struct.type('ConfigPower')
     export class ConfigPower extends Struct {
         @Struct.field(Float32)
-        sponsor_tax_mult!: Float32
+        declare sponsor_tax_mult: Float32
         @Struct.field(Float32)
-        powered_stake_mult!: Float32
+        declare powered_stake_mult: Float32
         @Struct.field(UInt16)
-        claim_maximum_elapsed_rounds!: UInt16
+        declare claim_maximum_elapsed_rounds: UInt16
         @Struct.field(UInt16)
-        soft_max_pwr_add!: UInt16
+        declare soft_max_pwr_add: UInt16
         @Struct.field(UInt8)
-        history_slots_length!: UInt8
+        declare history_slots_length: UInt8
     }
     @Struct.type('ConfigMint')
     export class ConfigMint extends Struct {
         @Struct.field(Float32)
-        round_powered_stake_mult!: Float32
+        declare round_powered_stake_mult: Float32
         @Struct.field(Float32)
-        round_power_mult!: Float32
+        declare round_power_mult: Float32
     }
     @Struct.type('ConfigTeam')
     export class ConfigTeam extends Struct {
         @Struct.field(UInt16)
-        change_min_rounds!: UInt16
+        declare change_min_rounds: UInt16
         @Struct.field(UInt16)
-        edit_team_min_rounds!: UInt16
+        declare edit_team_min_rounds: UInt16
         @Struct.field(UInt16)
-        team_edit_max_pct_change!: UInt16
+        declare team_edit_max_pct_change: UInt16
         @Struct.field(UInt32)
-        buy_team_cost!: UInt32
+        declare buy_team_cost: UInt32
         @Struct.field(UInt32)
-        owner_stake_required!: UInt32
+        declare owner_stake_required: UInt32
         @Struct.field(UInt16)
-        owner_future_stake_lock_rounds_required!: UInt16
+        declare owner_future_stake_lock_rounds_required: UInt16
     }
     @Struct.type('ConfigStake')
     export class ConfigStake extends Struct {
         @Struct.field(UInt8)
-        unstake_rounds!: UInt8
+        declare unstake_rounds: UInt8
         @Struct.field(UInt8)
-        extra_stake_min_locked_rounds!: UInt8
+        declare extra_stake_min_locked_rounds: UInt8
     }
     @Struct.type('ConfigTime')
     export class ConfigTime extends Struct {
         @Struct.field(UInt32)
-        rounds_start_sec_since_epoch!: UInt32
+        declare rounds_start_sec_since_epoch: UInt32
         @Struct.field(UInt32)
-        round_length_sec!: UInt32
+        declare round_length_sec: UInt32
     }
     @Struct.type('ConfigAuth')
     export class ConfigAuth extends Struct {
         @Struct.field(Name, {array: true})
-        key_actions_whitelist!: Name[]
+        declare key_actions_whitelist: Name[]
         @Struct.field(UInt32)
-        key_account_max_stake!: UInt32
+        declare key_account_max_stake: UInt32
         @Struct.field(UInt32)
-        key_account_max_balance!: UInt32
+        declare key_account_max_balance: UInt32
         @Struct.field(UInt8)
-        account_max_keys!: UInt8
+        declare account_max_keys: UInt8
         @Struct.field(UInt32)
-        worker_max_bill_per_action!: UInt32
+        declare worker_max_bill_per_action: UInt32
     }
     @Struct.type('ConfigNft')
     export class ConfigNft extends Struct {
         @Struct.field(UInt16)
-        boid_id_maximum_nfts!: UInt16
+        declare boid_id_maximum_nfts: UInt16
         @Struct.field(Name, {array: true})
-        whitelist_collections!: Name[]
+        declare whitelist_collections: Name[]
     }
     @Struct.type('Config')
     export class Config extends Struct {
         @Struct.field(ConfigAccount)
-        account!: ConfigAccount
+        declare account: ConfigAccount
         @Struct.field(ConfigPower)
-        power!: ConfigPower
+        declare power: ConfigPower
         @Struct.field(ConfigMint)
-        mint!: ConfigMint
+        declare mint: ConfigMint
         @Struct.field(ConfigTeam)
-        team!: ConfigTeam
+        declare team: ConfigTeam
         @Struct.field(ConfigStake)
-        stake!: ConfigStake
+        declare stake: ConfigStake
         @Struct.field(ConfigTime)
-        time!: ConfigTime
+        declare time: ConfigTime
         @Struct.field(ConfigAuth)
-        auth!: ConfigAuth
+        declare auth: ConfigAuth
         @Struct.field(ConfigNft)
-        nft!: ConfigNft
+        declare nft: ConfigNft
         @Struct.field('bool')
-        paused!: boolean
+        declare paused: boolean
         @Struct.field('bool')
-        allow_deposits!: boolean
+        declare allow_deposits: boolean
         @Struct.field('bool')
-        allow_withdrawals!: boolean
+        declare allow_withdrawals: boolean
         @Struct.field(Name)
-        recoveryAccount!: Name
+        declare recoveryAccount: Name
     }
     @Struct.type('ExtendedSymbol')
     export class ExtendedSymbol extends Struct {
         @Struct.field(Asset.Symbol)
-        sym!: Asset.Symbol
+        declare sym: Asset.Symbol
         @Struct.field(Name)
-        contract!: Name
+        declare contract: Name
     }
     @Struct.type('Global')
     export class Global extends Struct {
         @Struct.field(Name)
-        chain_name!: Name
+        declare chain_name: Name
         @Struct.field(UInt64)
-        total_power!: UInt64
+        declare total_power: UInt64
         @Struct.field(UInt16)
-        last_inflation_adjust_round!: UInt16
+        declare last_inflation_adjust_round: UInt16
     }
     @Struct.type('Invite')
     export class Invite extends Struct {
         @Struct.field(UInt64)
-        invite_code!: UInt64
+        declare invite_code: UInt64
         @Struct.field(PublicKey)
-        key!: PublicKey
+        declare key: PublicKey
         @Struct.field(UInt16)
-        created_round!: UInt16
+        declare created_round: UInt16
     }
     @Struct.type('MintLog')
     export class MintLog extends Struct {
         @Struct.field(UInt32)
-        power_mint!: UInt32
+        declare power_mint: UInt32
         @Struct.field(UInt32)
-        powered_stake_mint!: UInt32
+        declare powered_stake_mint: UInt32
         @Struct.field(UInt32)
-        account_earned!: UInt32
+        declare account_earned: UInt32
         @Struct.field(UInt32)
-        team_cut!: UInt32
+        declare team_cut: UInt32
         @Struct.field(UInt32)
-        team_owner_earned!: UInt32
+        declare team_owner_earned: UInt32
         @Struct.field(UInt32)
-        overstake_mint!: UInt32
+        declare overstake_mint: UInt32
         @Struct.field(UInt32)
-        total!: UInt32
+        declare total: UInt32
     }
     @Struct.type('NFT')
     export class NFT extends Struct {
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(UInt16)
-        locked_until_round!: UInt16
+        declare locked_until_round: UInt16
     }
     @Struct.type('NFTMint')
     export class NFTMint extends Struct {
         @Struct.field(Name)
-        mint_receiver_boid_id!: Name
+        declare mint_receiver_boid_id: Name
         @Struct.field(UInt16)
-        mint_quantity_remaining!: UInt16
+        declare mint_quantity_remaining: UInt16
     }
     @Struct.type('NftAction')
     export class NftAction extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(AtomicAttribute, {array: true})
-        match_immutable_attributes!: AtomicAttribute[]
+        declare match_immutable_attributes: AtomicAttribute[]
         @Struct.field(AtomicAttribute, {array: true})
-        match_mutable_attributes!: AtomicAttribute[]
+        declare match_mutable_attributes: AtomicAttribute[]
         @Struct.field('bool')
-        burn!: boolean
+        declare burn: boolean
         @Struct.field(UInt16)
-        lock_rounds!: UInt16
+        declare lock_rounds: UInt16
     }
     @Struct.type('NftMint')
     export class NftMint extends Struct {
         @Struct.field(Int32)
-        mint_template_id!: Int32
+        declare mint_template_id: Int32
         @Struct.field(Name)
-        mint_schema_name!: Name
+        declare mint_schema_name: Name
         @Struct.field(Name)
-        mint_collection_name!: Name
+        declare mint_collection_name: Name
         @Struct.field(AtomicAttribute, {array: true})
-        immutable_data!: AtomicAttribute[]
+        declare immutable_data: AtomicAttribute[]
         @Struct.field(AtomicAttribute, {array: true})
-        mutable_data!: AtomicAttribute[]
+        declare mutable_data: AtomicAttribute[]
         @Struct.field(UInt8)
-        quantity!: UInt8
+        declare quantity: UInt8
     }
     @Struct.type('OfferRequirements')
     export class OfferRequirements extends Struct {
         @Struct.field(Bytes)
-        team_id!: Bytes
+        declare team_id: Bytes
         @Struct.field(UInt16)
-        min_power!: UInt16
+        declare min_power: UInt16
         @Struct.field(UInt32)
-        min_balance!: UInt32
+        declare min_balance: UInt32
         @Struct.field(UInt32)
-        min_stake!: UInt32
+        declare min_stake: UInt32
         @Struct.field(UInt32)
-        min_cumulative_team_contribution!: UInt32
+        declare min_cumulative_team_contribution: UInt32
     }
     @Struct.type('OfferAction')
     export class OfferAction extends Struct {
         @Struct.field(UInt16)
-        delegated_stake!: UInt16
+        declare delegated_stake: UInt16
         @Struct.field(UInt16)
-        stake_locked_additional_rounds!: UInt16
+        declare stake_locked_additional_rounds: UInt16
         @Struct.field(NftAction, {array: true})
-        nft_actions!: NftAction[]
+        declare nft_actions: NftAction[]
         @Struct.field(UInt32)
-        balance_payment!: UInt32
+        declare balance_payment: UInt32
     }
     @Struct.type('OfferRewards')
     export class OfferRewards extends Struct {
         @Struct.field(NftMint, {array: true})
-        nft_mints!: NftMint[]
+        declare nft_mints: NftMint[]
         @Struct.field(UInt32)
-        balance_deposit!: UInt32
+        declare balance_deposit: UInt32
         @Struct.field(UInt16)
-        delegated_stake!: UInt16
+        declare delegated_stake: UInt16
         @Struct.field(UInt16)
-        stake_locked_additional_rounds!: UInt16
+        declare stake_locked_additional_rounds: UInt16
         @Struct.field(Bytes)
-        activate_powermod_ids!: Bytes
+        declare activate_powermod_ids: Bytes
     }
     @Struct.type('OfferLimits')
     export class OfferLimits extends Struct {
         @Struct.field(UInt32)
-        offer_quantity_remaining!: UInt32
+        declare offer_quantity_remaining: UInt32
         @Struct.field(UInt16)
-        available_until_round!: UInt16
+        declare available_until_round: UInt16
     }
     @Struct.type('Offer')
     export class Offer extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
         @Struct.field(OfferRequirements)
-        requirements!: OfferRequirements
+        declare requirements: OfferRequirements
         @Struct.field(OfferAction)
-        actions!: OfferAction
+        declare actions: OfferAction
         @Struct.field(OfferRewards)
-        rewards!: OfferRewards
+        declare rewards: OfferRewards
         @Struct.field(OfferLimits)
-        limits!: OfferLimits
+        declare limits: OfferLimits
         @Struct.field(UInt32)
-        total_claimed!: UInt32
+        declare total_claimed: UInt32
     }
     @Struct.type('PowerClaimLog')
     export class PowerClaimLog extends Struct {
         @Struct.field(UInt32)
-        before!: UInt32
+        declare before: UInt32
         @Struct.field(UInt32)
-        after!: UInt32
+        declare after: UInt32
         @Struct.field(UInt32)
-        from_boosters!: UInt32
+        declare from_boosters: UInt32
         @Struct.field(UInt16)
-        elapsed_rounds!: UInt16
+        declare elapsed_rounds: UInt16
     }
     @Struct.type('Sponsor')
     export class Sponsor extends Struct {
         @Struct.field(Name)
-        sponsor_boid_id!: Name
+        declare sponsor_boid_id: Name
         @Struct.field(UInt16)
-        invites_balance!: UInt16
+        declare invites_balance: UInt16
         @Struct.field(UInt16)
-        invite_codes_unclaimed!: UInt16
+        declare invite_codes_unclaimed: UInt16
         @Struct.field(UInt32)
-        invite_codes_claimed!: UInt32
+        declare invite_codes_claimed: UInt32
         @Struct.field(UInt32)
-        sponsored_upgrades!: UInt32
+        declare sponsored_upgrades: UInt32
         @Struct.field(UInt32)
-        upgrades_total_earned!: UInt32
+        declare upgrades_total_earned: UInt32
     }
     @Struct.type('Stake')
     export class Stake extends Struct {
         @Struct.field(UInt64)
-        stake_id!: UInt64
+        declare stake_id: UInt64
         @Struct.field(Name)
-        from_boid_id!: Name
+        declare from_boid_id: Name
         @Struct.field(Name)
-        to_boid_id!: Name
+        declare to_boid_id: Name
         @Struct.field(UInt16)
-        stake_quantity!: UInt16
+        declare stake_quantity: UInt16
         @Struct.field(UInt16)
-        locked_until_round!: UInt16
+        declare locked_until_round: UInt16
     }
     @Struct.type('Team')
     export class Team extends Struct {
         @Struct.field(UInt16)
-        team_id!: UInt16
+        declare team_id: UInt16
         @Struct.field(UInt32)
-        balance!: UInt32
+        declare balance: UInt32
         @Struct.field(AccountStake)
-        stake!: AccountStake
+        declare stake: AccountStake
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(Name, {array: true})
-        managers!: Name[]
+        declare managers: Name[]
         @Struct.field(UInt8)
-        min_pwr_tax_mult!: UInt8
+        declare min_pwr_tax_mult: UInt8
         @Struct.field(UInt8)
-        owner_cut_mult!: UInt8
+        declare owner_cut_mult: UInt8
         @Struct.field('string')
-        url_safe_name!: string
+        declare url_safe_name: string
         @Struct.field(UInt64)
-        power!: UInt64
+        declare power: UInt64
         @Struct.field(UInt32)
-        members!: UInt32
+        declare members: UInt32
         @Struct.field(UInt16)
-        last_edit_round!: UInt16
+        declare last_edit_round: UInt16
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('account.add')
     export class accountadd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Name, {array: true})
-        owners!: Name[]
+        declare owners: Name[]
         @Struct.field(Name, {array: true})
-        sponsors!: Name[]
+        declare sponsors: Name[]
         @Struct.field(PublicKey, {array: true})
-        keys!: PublicKey[]
+        declare keys: PublicKey[]
     }
     @Struct.type('account.buy')
     export class accountbuy extends Struct {
         @Struct.field(Name)
-        payer_boid_id!: Name
+        declare payer_boid_id: Name
         @Struct.field(AccountCreate)
-        new_account!: AccountCreate
+        declare new_account: AccountCreate
     }
     @Struct.type('account.edit')
     export class accountedit extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('account.free')
     export class accountfree extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
     }
     @Struct.type('account.mod')
     export class accountmod extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt16)
-        received_delegated_stake!: UInt16
+        declare received_delegated_stake: UInt16
     }
     @Struct.type('account.rm')
     export class accountrm extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
     }
     @Struct.type('accounts.clr')
     export class accountsclr extends Struct {}
     @Struct.type('auth')
     export class auth extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Action, {array: true})
-        actions!: Action[]
+        declare actions: Action[]
         @Struct.field(Signature)
-        sig!: Signature
+        declare sig: Signature
         @Struct.field(Int32)
-        keyIndex!: Int32
+        declare keyIndex: Int32
         @Struct.field(UInt32)
-        expires_utc_sec!: UInt32
+        declare expires_utc_sec: UInt32
     }
     @Struct.type('auth.addkey')
     export class authaddkey extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(PublicKey)
-        key!: PublicKey
+        declare key: PublicKey
     }
     @Struct.type('auth.clear')
     export class authclear extends Struct {}
@@ -640,341 +640,341 @@ export namespace Types {
     @Struct.type('auth.rmkey')
     export class authrmkey extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Int32)
-        keyIndex!: Int32
+        declare keyIndex: Int32
     }
     @Struct.type('booster.add')
     export class boosteradd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt8)
-        mod_id!: UInt8
+        declare mod_id: UInt8
     }
     @Struct.type('booster.new')
     export class boosternew extends Struct {
         @Struct.field(Booster)
-        mod!: Booster
+        declare mod: Booster
     }
     @Struct.type('booster.rm')
     export class boosterrm extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Int32, {array: true})
-        booster_index!: Int32[]
+        declare booster_index: Int32[]
     }
     @Struct.type('config.clear')
     export class configclear extends Struct {}
     @Struct.type('config.set')
     export class configset extends Struct {
         @Struct.field(Config)
-        config!: Config
+        declare config: Config
     }
     @Struct.type('global.chain')
     export class globalchain extends Struct {
         @Struct.field(Name)
-        chain_name!: Name
+        declare chain_name: Name
     }
     @Struct.type('global.clear')
     export class globalclear extends Struct {}
     @Struct.type('global.set')
     export class globalset extends Struct {
         @Struct.field(Global)
-        globalData!: Global
+        declare globalData: Global
     }
     @Struct.type('internalxfer')
     export class internalxfer extends Struct {
         @Struct.field(Name)
-        from_boid_id!: Name
+        declare from_boid_id: Name
         @Struct.field(Name)
-        to_boid_id!: Name
+        declare to_boid_id: Name
         @Struct.field(UInt32)
-        quantity!: UInt32
+        declare quantity: UInt32
         @Struct.field('string')
-        memo!: string
+        declare memo: string
     }
     @Struct.type('invite.add')
     export class inviteadd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt64)
-        invite_code!: UInt64
+        declare invite_code: UInt64
         @Struct.field(PublicKey)
-        key!: PublicKey
+        declare key: PublicKey
     }
     @Struct.type('invite.buy')
     export class invitebuy extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt16)
-        quantity!: UInt16
+        declare quantity: UInt16
     }
     @Struct.type('invite.claim')
     export class inviteclaim extends Struct {
         @Struct.field(Name)
-        sponsor_boid_id!: Name
+        declare sponsor_boid_id: Name
         @Struct.field(UInt64)
-        invite_code!: UInt64
+        declare invite_code: UInt64
         @Struct.field(Signature)
-        sig!: Signature
+        declare sig: Signature
         @Struct.field(AccountCreate)
-        new_account!: AccountCreate
+        declare new_account: AccountCreate
     }
     @Struct.type('invite.rm')
     export class inviterm extends Struct {
         @Struct.field(Name)
-        sponsor_boid_id!: Name
+        declare sponsor_boid_id: Name
         @Struct.field(UInt64)
-        invite_code!: UInt64
+        declare invite_code: UInt64
     }
     @Struct.type('logpwradd')
     export class logpwradd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt16)
-        received!: UInt16
+        declare received: UInt16
         @Struct.field(UInt16)
-        from_mult_mods!: UInt16
+        declare from_mult_mods: UInt16
         @Struct.field(UInt16)
-        diverted_to_sponsor!: UInt16
+        declare diverted_to_sponsor: UInt16
         @Struct.field(UInt16)
-        power_increased!: UInt16
+        declare power_increased: UInt16
         @Struct.field(Name)
-        orign!: Name
+        declare orign: Name
     }
     @Struct.type('logpwrclaim')
     export class logpwrclaim extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(PowerClaimLog)
-        power!: PowerClaimLog
+        declare power: PowerClaimLog
         @Struct.field(MintLog)
-        mint!: MintLog
+        declare mint: MintLog
     }
     @Struct.type('meta.clean')
     export class metaclean extends Struct {}
     @Struct.type('mint')
     export class mint extends Struct {
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
         @Struct.field(UInt32)
-        whole_quantity!: UInt32
+        declare whole_quantity: UInt32
     }
     @Struct.type('nft.lock')
     export class nftlock extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(UInt16)
-        locked_until_round!: UInt16
+        declare locked_until_round: UInt16
     }
     @Struct.type('nft.receiver')
     export class nftreceiver extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt16)
-        mint_quantity!: UInt16
+        declare mint_quantity: UInt16
     }
     @Struct.type('nft.withdraw')
     export class nftwithdraw extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt64, {array: true})
-        asset_ids!: UInt64[]
+        declare asset_ids: UInt64[]
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
     }
     @Struct.type('nft.xfer')
     export class nftxfer extends Struct {
         @Struct.field(Name)
-        from_boid_id!: Name
+        declare from_boid_id: Name
         @Struct.field(Name)
-        to_boid_id!: Name
+        declare to_boid_id: Name
         @Struct.field(UInt64, {array: true})
-        asset_ids!: UInt64[]
+        declare asset_ids: UInt64[]
     }
     @Struct.type('offer.add')
     export class offeradd extends Struct {
         @Struct.field(OfferRequirements)
-        requirements!: OfferRequirements
+        declare requirements: OfferRequirements
         @Struct.field(OfferAction)
-        actions!: OfferAction
+        declare actions: OfferAction
         @Struct.field(OfferRewards)
-        rewards!: OfferRewards
+        declare rewards: OfferRewards
         @Struct.field(OfferLimits)
-        limits!: OfferLimits
+        declare limits: OfferLimits
     }
     @Struct.type('offer.claim')
     export class offerclaim extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
         @Struct.field(UInt64, {array: true})
-        required_nft_action_ids!: UInt64[]
+        declare required_nft_action_ids: UInt64[]
     }
     @Struct.type('offer.clean')
     export class offerclean extends Struct {}
     @Struct.type('offer.rm')
     export class offerrm extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
     }
     @Struct.type('owner.add')
     export class owneradd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
     }
     @Struct.type('owner.rm')
     export class ownerrm extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
     }
     @Struct.type('power.add')
     export class poweradd extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt16)
-        power!: UInt16
+        declare power: UInt16
     }
     @Struct.type('power.claim')
     export class powerclaim extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
     }
     @Struct.type('rmdelegstake')
     export class rmdelegstake extends Struct {
         @Struct.field(UInt64)
-        stake_id!: UInt64
+        declare stake_id: UInt64
     }
     @Struct.type('sponsor.rm')
     export class sponsorrm extends Struct {
         @Struct.field(Name)
-        sponsor_boid_id!: Name
+        declare sponsor_boid_id: Name
     }
     @Struct.type('sponsor.set')
     export class sponsorset extends Struct {
         @Struct.field(Sponsor)
-        row!: Sponsor
+        declare row: Sponsor
     }
     @Struct.type('stake')
     export class stake extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt32)
-        quantity!: UInt32
+        declare quantity: UInt32
     }
     @Struct.type('stake.deleg')
     export class stakedeleg extends Struct {
         @Struct.field(Name)
-        from_boid_id!: Name
+        declare from_boid_id: Name
         @Struct.field(Name)
-        to_boid_id!: Name
+        declare to_boid_id: Name
         @Struct.field(UInt16)
-        stake_quantity!: UInt16
+        declare stake_quantity: UInt16
         @Struct.field(UInt16)
-        lock_until_round!: UInt16
+        declare lock_until_round: UInt16
     }
     @Struct.type('team.change')
     export class teamchange extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt8)
-        new_team_id!: UInt8
+        declare new_team_id: UInt8
         @Struct.field(UInt8)
-        new_pwr_tax_mult!: UInt8
+        declare new_pwr_tax_mult: UInt8
     }
     @Struct.type('team.create')
     export class teamcreate extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(UInt8)
-        min_pwr_tax_mult!: UInt8
+        declare min_pwr_tax_mult: UInt8
         @Struct.field(UInt8)
-        owner_cut_mult!: UInt8
+        declare owner_cut_mult: UInt8
         @Struct.field('string')
-        url_safe_name!: string
+        declare url_safe_name: string
     }
     @Struct.type('team.edit')
     export class teamedit extends Struct {
         @Struct.field(UInt8)
-        team_id!: UInt8
+        declare team_id: UInt8
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(Name, {array: true})
-        managers!: Name[]
+        declare managers: Name[]
         @Struct.field(UInt8)
-        min_pwr_tax_mult!: UInt8
+        declare min_pwr_tax_mult: UInt8
         @Struct.field(UInt8)
-        owner_cut_mult!: UInt8
+        declare owner_cut_mult: UInt8
         @Struct.field('string')
-        url_safe_name!: string
+        declare url_safe_name: string
         @Struct.field(Bytes)
-        meta!: Bytes
+        declare meta: Bytes
     }
     @Struct.type('team.rm')
     export class teamrm extends Struct {
         @Struct.field(UInt8)
-        team_id!: UInt8
+        declare team_id: UInt8
     }
     @Struct.type('team.setmem')
     export class teamsetmem extends Struct {
         @Struct.field(UInt8)
-        team_id!: UInt8
+        declare team_id: UInt8
         @Struct.field(UInt32)
-        new_members!: UInt32
+        declare new_members: UInt32
     }
     @Struct.type('team.setpwr')
     export class teamsetpwr extends Struct {
         @Struct.field(UInt8)
-        team_id!: UInt8
+        declare team_id: UInt8
         @Struct.field(UInt32)
-        new_power!: UInt32
+        declare new_power: UInt32
     }
     @Struct.type('team.taxrate')
     export class teamtaxrate extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt8)
-        new_pwr_tax_mult!: UInt8
+        declare new_pwr_tax_mult: UInt8
     }
     @Struct.type('thisround')
     export class thisround extends Struct {}
     @Struct.type('unstake.end')
     export class unstakeend extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
     }
     @Struct.type('unstake.init')
     export class unstakeinit extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt32)
-        quantity!: UInt32
+        declare quantity: UInt32
     }
     @Struct.type('unstake.stop')
     export class unstakestop extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
     }
     @Struct.type('unstke.deleg')
     export class unstkedeleg extends Struct {
         @Struct.field(UInt64)
-        stake_id!: UInt64
+        declare stake_id: UInt64
     }
     @Struct.type('withdraw')
     export class withdraw extends Struct {
         @Struct.field(Name)
-        boid_id!: Name
+        declare boid_id: Name
         @Struct.field(UInt32)
-        quantity!: UInt32
+        declare quantity: UInt32
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
     }
 }
 export const TableMap = {
