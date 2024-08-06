@@ -214,6 +214,7 @@ export function generateField(
                 decoratorArguments
             )
         ),
+        ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword),
     ]
 
     const typeReferenceNode = ts.factory.createTypeReferenceNode(
@@ -231,9 +232,7 @@ export function generateField(
     return ts.factory.createPropertyDeclaration(
         decorators,
         ts.factory.createIdentifier(fieldName),
-        ts.factory.createToken(
-            field.optional ? ts.SyntaxKind.QuestionToken : ts.SyntaxKind.ExclamationToken
-        ),
+        field.optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
         typeNode,
         undefined // initializer
     )
@@ -330,6 +329,7 @@ function findVariantStructType(
         return ts.factory.createIdentifier(variantTypeString)
     }
 }
+
 function findFieldStructType(
     typeString: string,
     namespace: string | undefined,

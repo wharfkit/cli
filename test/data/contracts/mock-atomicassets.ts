@@ -95,479 +95,479 @@ export namespace Types {
     @Struct.type('FORMAT')
     export class FORMAT extends Struct {
         @Struct.field('string')
-        name!: string
+        declare name: string
         @Struct.field('string')
-        type!: string
+        declare type: string
     }
     @Struct.type('acceptoffer')
     export class acceptoffer extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
     }
     @Struct.type('addcolauth')
     export class addcolauth extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        account_to_add!: Name
+        declare account_to_add: Name
     }
     @Struct.type('addconftoken')
     export class addconftoken extends Struct {
         @Struct.field(Name)
-        token_contract!: Name
+        declare token_contract: Name
         @Struct.field(Asset.Symbol)
-        token_symbol!: Asset.Symbol
+        declare token_symbol: Asset.Symbol
     }
     @Struct.type('addnotifyacc')
     export class addnotifyacc extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        account_to_add!: Name
+        declare account_to_add: Name
     }
     @Struct.type('admincoledit')
     export class admincoledit extends Struct {
         @Struct.field(FORMAT, {array: true})
-        collection_format_extension!: FORMAT[]
+        declare collection_format_extension: FORMAT[]
     }
     @Struct.type('announcedepo')
     export class announcedepo extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(Asset.Symbol)
-        symbol_to_announce!: Asset.Symbol
+        declare symbol_to_announce: Asset.Symbol
     }
     @Struct.type('assets_s')
     export class assets_s extends Struct {
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Name)
-        ram_payer!: Name
+        declare ram_payer: Name
         @Struct.field(Asset, {array: true})
-        backed_tokens!: Asset[]
+        declare backed_tokens: Asset[]
         @Struct.field(UInt8, {array: true})
-        immutable_serialized_data!: UInt8[]
+        declare immutable_serialized_data: UInt8[]
         @Struct.field(UInt8, {array: true})
-        mutable_serialized_data!: UInt8[]
+        declare mutable_serialized_data: UInt8[]
     }
     @Struct.type('backasset')
     export class backasset extends Struct {
         @Struct.field(Name)
-        payer!: Name
+        declare payer: Name
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(Asset)
-        token_to_back!: Asset
+        declare token_to_back: Asset
     }
     @Struct.type('balances_s')
     export class balances_s extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(Asset, {array: true})
-        quantities!: Asset[]
+        declare quantities: Asset[]
     }
     @Struct.type('burnasset')
     export class burnasset extends Struct {
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
     }
     @Struct.type('canceloffer')
     export class canceloffer extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
     }
     @Struct.type('collections_s')
     export class collections_s extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        author!: Name
+        declare author: Name
         @Struct.field('bool')
-        allow_notify!: boolean
+        declare allow_notify: boolean
         @Struct.field(Name, {array: true})
-        authorized_accounts!: Name[]
+        declare authorized_accounts: Name[]
         @Struct.field(Name, {array: true})
-        notify_accounts!: Name[]
+        declare notify_accounts: Name[]
         @Struct.field(Float64)
-        market_fee!: Float64
+        declare market_fee: Float64
         @Struct.field(UInt8, {array: true})
-        serialized_data!: UInt8[]
+        declare serialized_data: UInt8[]
     }
     @Struct.type('extended_symbol')
     export class extended_symbol extends Struct {
         @Struct.field(Asset.Symbol)
-        sym!: Asset.Symbol
+        declare sym: Asset.Symbol
         @Struct.field(Name)
-        contract!: Name
+        declare contract: Name
     }
     @Struct.type('config_s')
     export class config_s extends Struct {
         @Struct.field(UInt64)
-        asset_counter!: UInt64
+        declare asset_counter: UInt64
         @Struct.field(Int32)
-        template_counter!: Int32
+        declare template_counter: Int32
         @Struct.field(UInt64)
-        offer_counter!: UInt64
+        declare offer_counter: UInt64
         @Struct.field(FORMAT, {array: true})
-        collection_format!: FORMAT[]
+        declare collection_format: FORMAT[]
         @Struct.field(extended_symbol, {array: true})
-        supported_tokens!: extended_symbol[]
+        declare supported_tokens: extended_symbol[]
     }
     @Struct.type('pair_string_ATOMIC_ATTRIBUTE')
     export class pair_string_ATOMIC_ATTRIBUTE extends Struct {
         @Struct.field('string')
-        key!: string
+        declare key: string
         @Struct.field(
             variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
         )
-        value!: variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
+        declare value: variant_int8_int16_int32_int64_uint8_uint16_uint32_uint64_float32_float64_string_INT8_VEC_INT16_VEC_INT32_VEC_INT64_VEC_UINT8_VEC_UINT16_VEC_UINT32_VEC_UINT64_VEC_FLOAT_VEC_DOUBLE_VEC_STRING_VEC
     }
     @Struct.type('createcol')
     export class createcol extends Struct {
         @Struct.field(Name)
-        author!: Name
+        declare author: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field('bool')
-        allow_notify!: boolean
+        declare allow_notify: boolean
         @Struct.field(Name, {array: true})
-        authorized_accounts!: Name[]
+        declare authorized_accounts: Name[]
         @Struct.field(Name, {array: true})
-        notify_accounts!: Name[]
+        declare notify_accounts: Name[]
         @Struct.field(Float64)
-        market_fee!: Float64
+        declare market_fee: Float64
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('createoffer')
     export class createoffer extends Struct {
         @Struct.field(Name)
-        sender!: Name
+        declare sender: Name
         @Struct.field(Name)
-        recipient!: Name
+        declare recipient: Name
         @Struct.field(UInt64, {array: true})
-        sender_asset_ids!: UInt64[]
+        declare sender_asset_ids: UInt64[]
         @Struct.field(UInt64, {array: true})
-        recipient_asset_ids!: UInt64[]
+        declare recipient_asset_ids: UInt64[]
         @Struct.field('string')
-        memo!: string
+        declare memo: string
     }
     @Struct.type('createschema')
     export class createschema extends Struct {
         @Struct.field(Name)
-        authorized_creator!: Name
+        declare authorized_creator: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(FORMAT, {array: true})
-        schema_format!: FORMAT[]
+        declare schema_format: FORMAT[]
     }
     @Struct.type('createtempl')
     export class createtempl extends Struct {
         @Struct.field(Name)
-        authorized_creator!: Name
+        declare authorized_creator: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field('bool')
-        transferable!: boolean
+        declare transferable: boolean
         @Struct.field('bool')
-        burnable!: boolean
+        declare burnable: boolean
         @Struct.field(UInt32)
-        max_supply!: UInt32
+        declare max_supply: UInt32
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare immutable_data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('declineoffer')
     export class declineoffer extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
     }
     @Struct.type('extendschema')
     export class extendschema extends Struct {
         @Struct.field(Name)
-        authorized_editor!: Name
+        declare authorized_editor: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(FORMAT, {array: true})
-        schema_format_extension!: FORMAT[]
+        declare schema_format_extension: FORMAT[]
     }
     @Struct.type('forbidnotify')
     export class forbidnotify extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
     }
     @Struct.type('init')
     export class init extends Struct {}
     @Struct.type('locktemplate')
     export class locktemplate extends Struct {
         @Struct.field(Name)
-        authorized_editor!: Name
+        declare authorized_editor: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
     }
     @Struct.type('logbackasset')
     export class logbackasset extends Struct {
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(Asset)
-        backed_token!: Asset
+        declare backed_token: Asset
     }
     @Struct.type('logburnasset')
     export class logburnasset extends Struct {
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Asset, {array: true})
-        backed_tokens!: Asset[]
+        declare backed_tokens: Asset[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        old_immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare old_immutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        old_mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare old_mutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Name)
-        asset_ram_payer!: Name
+        declare asset_ram_payer: Name
     }
     @Struct.type('logmint')
     export class logmint extends Struct {
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(Name)
-        authorized_minter!: Name
+        declare authorized_minter: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Name)
-        new_asset_owner!: Name
+        declare new_asset_owner: Name
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare immutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare mutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Asset, {array: true})
-        backed_tokens!: Asset[]
+        declare backed_tokens: Asset[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        immutable_template_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare immutable_template_data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('lognewoffer')
     export class lognewoffer extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
         @Struct.field(Name)
-        sender!: Name
+        declare sender: Name
         @Struct.field(Name)
-        recipient!: Name
+        declare recipient: Name
         @Struct.field(UInt64, {array: true})
-        sender_asset_ids!: UInt64[]
+        declare sender_asset_ids: UInt64[]
         @Struct.field(UInt64, {array: true})
-        recipient_asset_ids!: UInt64[]
+        declare recipient_asset_ids: UInt64[]
         @Struct.field('string')
-        memo!: string
+        declare memo: string
     }
     @Struct.type('lognewtempl')
     export class lognewtempl extends Struct {
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Name)
-        authorized_creator!: Name
+        declare authorized_creator: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field('bool')
-        transferable!: boolean
+        declare transferable: boolean
         @Struct.field('bool')
-        burnable!: boolean
+        declare burnable: boolean
         @Struct.field(UInt32)
-        max_supply!: UInt32
+        declare max_supply: UInt32
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare immutable_data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('logsetdata')
     export class logsetdata extends Struct {
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        old_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare old_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        new_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare new_data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('logtransfer')
     export class logtransfer extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        from!: Name
+        declare from: Name
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
         @Struct.field(UInt64, {array: true})
-        asset_ids!: UInt64[]
+        declare asset_ids: UInt64[]
         @Struct.field('string')
-        memo!: string
+        declare memo: string
     }
     @Struct.type('mintasset')
     export class mintasset extends Struct {
         @Struct.field(Name)
-        authorized_minter!: Name
+        declare authorized_minter: Name
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Name)
-        new_asset_owner!: Name
+        declare new_asset_owner: Name
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        immutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare immutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare mutable_data: pair_string_ATOMIC_ATTRIBUTE[]
         @Struct.field(Asset, {array: true})
-        tokens_to_back!: Asset[]
+        declare tokens_to_back: Asset[]
     }
     @Struct.type('offers_s')
     export class offers_s extends Struct {
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
         @Struct.field(Name)
-        sender!: Name
+        declare sender: Name
         @Struct.field(Name)
-        recipient!: Name
+        declare recipient: Name
         @Struct.field(UInt64, {array: true})
-        sender_asset_ids!: UInt64[]
+        declare sender_asset_ids: UInt64[]
         @Struct.field(UInt64, {array: true})
-        recipient_asset_ids!: UInt64[]
+        declare recipient_asset_ids: UInt64[]
         @Struct.field('string')
-        memo!: string
+        declare memo: string
         @Struct.field(Name)
-        ram_payer!: Name
+        declare ram_payer: Name
     }
     @Struct.type('payofferram')
     export class payofferram extends Struct {
         @Struct.field(Name)
-        payer!: Name
+        declare payer: Name
         @Struct.field(UInt64)
-        offer_id!: UInt64
+        declare offer_id: UInt64
     }
     @Struct.type('remcolauth')
     export class remcolauth extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        account_to_remove!: Name
+        declare account_to_remove: Name
     }
     @Struct.type('remnotifyacc')
     export class remnotifyacc extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Name)
-        account_to_remove!: Name
+        declare account_to_remove: Name
     }
     @Struct.type('schemas_s')
     export class schemas_s extends Struct {
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field(FORMAT, {array: true})
-        format!: FORMAT[]
+        declare format: FORMAT[]
     }
     @Struct.type('setassetdata')
     export class setassetdata extends Struct {
         @Struct.field(Name)
-        authorized_editor!: Name
+        declare authorized_editor: Name
         @Struct.field(Name)
-        asset_owner!: Name
+        declare asset_owner: Name
         @Struct.field(UInt64)
-        asset_id!: UInt64
+        declare asset_id: UInt64
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        new_mutable_data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare new_mutable_data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('setcoldata')
     export class setcoldata extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(pair_string_ATOMIC_ATTRIBUTE, {array: true})
-        data!: pair_string_ATOMIC_ATTRIBUTE[]
+        declare data: pair_string_ATOMIC_ATTRIBUTE[]
     }
     @Struct.type('setmarketfee')
     export class setmarketfee extends Struct {
         @Struct.field(Name)
-        collection_name!: Name
+        declare collection_name: Name
         @Struct.field(Float64)
-        market_fee!: Float64
+        declare market_fee: Float64
     }
     @Struct.type('setversion')
     export class setversion extends Struct {
         @Struct.field('string')
-        new_version!: string
+        declare new_version: string
     }
     @Struct.type('templates_s')
     export class templates_s extends Struct {
         @Struct.field(Int32)
-        template_id!: Int32
+        declare template_id: Int32
         @Struct.field(Name)
-        schema_name!: Name
+        declare schema_name: Name
         @Struct.field('bool')
-        transferable!: boolean
+        declare transferable: boolean
         @Struct.field('bool')
-        burnable!: boolean
+        declare burnable: boolean
         @Struct.field(UInt32)
-        max_supply!: UInt32
+        declare max_supply: UInt32
         @Struct.field(UInt32)
-        issued_supply!: UInt32
+        declare issued_supply: UInt32
         @Struct.field(UInt8, {array: true})
-        immutable_serialized_data!: UInt8[]
+        declare immutable_serialized_data: UInt8[]
     }
     @Struct.type('tokenconfigs_s')
     export class tokenconfigs_s extends Struct {
         @Struct.field(Name)
-        standard!: Name
+        declare standard: Name
         @Struct.field('string')
-        version!: string
+        declare version: string
     }
     @Struct.type('transfer')
     export class transfer extends Struct {
         @Struct.field(Name)
-        from!: Name
+        declare from: Name
         @Struct.field(Name)
-        to!: Name
+        declare to: Name
         @Struct.field(UInt64, {array: true})
-        asset_ids!: UInt64[]
+        declare asset_ids: UInt64[]
         @Struct.field('string')
-        memo!: string
+        declare memo: string
     }
     @Struct.type('withdraw')
     export class withdraw extends Struct {
         @Struct.field(Name)
-        owner!: Name
+        declare owner: Name
         @Struct.field(Asset)
-        token_to_withdraw!: Asset
+        declare token_to_withdraw: Asset
     }
 }
 export const TableMap = {

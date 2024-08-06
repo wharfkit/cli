@@ -17,80 +17,80 @@ export namespace Types {
     @Struct.type('adduser')
     export class adduser extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt16)
-        weight!: UInt16
+        declare weight: UInt16
     }
     @Struct.type('claim')
     export class claim extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(Asset, {optional: true})
-        amount?: Asset
+        declare amount?: Asset
     }
     @Struct.type('oracle_pair')
     export class oracle_pair extends Struct {
         @Struct.field(Name)
-        name!: Name
+        declare name: Name
         @Struct.field(UInt16)
-        precision!: UInt16
+        declare precision: UInt16
     }
     @Struct.type('config')
     export class config extends Struct {
         @Struct.field(Asset.Symbol)
-        token_symbol!: Asset.Symbol
+        declare token_symbol: Asset.Symbol
         @Struct.field(Name)
-        oracle_account!: Name
+        declare oracle_account: Name
         @Struct.field(oracle_pair, {array: true})
-        oracle_pairs!: oracle_pair[]
+        declare oracle_pairs: oracle_pair[]
     }
     @Struct.type('configure')
     export class configure extends Struct {
         @Struct.field(Asset.Symbol)
-        token_symbol!: Asset.Symbol
+        declare token_symbol: Asset.Symbol
         @Struct.field(Name)
-        oracle_account!: Name
+        declare oracle_account: Name
         @Struct.field(oracle_pair, {array: true})
-        oracle_pairs!: oracle_pair[]
+        declare oracle_pairs: oracle_pair[]
     }
     @Struct.type('deluser')
     export class deluser extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
     }
     @Struct.type('price_info')
     export class price_info extends Struct {
         @Struct.field('string')
-        pair!: string
+        declare pair: string
         @Struct.field(Float64)
-        price!: Float64
+        declare price: Float64
         @Struct.field(TimePoint)
-        timestamp!: TimePoint
+        declare timestamp: TimePoint
     }
     @Struct.type('receipt')
     export class receipt extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(Asset)
-        amount!: Asset
+        declare amount: Asset
         @Struct.field(price_info, {array: true})
-        ticker!: price_info[]
+        declare ticker: price_info[]
     }
     @Struct.type('updateuser')
     export class updateuser extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt16)
-        weight!: UInt16
+        declare weight: UInt16
     }
     @Struct.type('user_row')
     export class user_row extends Struct {
         @Struct.field(Name)
-        account!: Name
+        declare account: Name
         @Struct.field(UInt16)
-        weight!: UInt16
+        declare weight: UInt16
         @Struct.field(Asset)
-        balance!: Asset
+        declare balance: Asset
     }
 }
 export const TableMap = {
