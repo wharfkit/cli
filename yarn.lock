@@ -666,10 +666,10 @@
   dependencies:
     tslib "^2.1.0"
 
-"@wharfkit/common@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@wharfkit/common/-/common-1.2.0.tgz#147f783f2ba5cc6fa7dd75863ba98dd05880a9aa"
-  integrity sha512-me/BN8D/4UPkY7yt+4v+E/z62PVj4VKY5+iRb7zoWv0epbW4o4nC6Oer8kBVL7xWC6Guucaol3hkxkTMgrnwlQ==
+"@wharfkit/common@^1.2.4":
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/@wharfkit/common/-/common-1.2.4.tgz#a86f10ef6bb9cbe3bacf20330b5383dabca31334"
+  integrity sha512-vSfIM1ydlwd/FbTY8PAU+w3GVYQIh3ywjca2B1FwvNrj6PcIop8AB7OtSfnTnQe0jL0ILitCbhLp1SILBOrXvA==
   dependencies:
     tslib "^2.1.0"
 

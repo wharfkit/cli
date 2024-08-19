@@ -11,7 +11,7 @@ interface CommandOptions {
     chain?: ChainIndices
 }
 
-const supportedChains = ['Jungle4']
+const supportedChains = ['Jungle4', 'KylinTestnet']
 
 export async function createAccountFromCommand(options: CommandOptions) {
     let publicKey
@@ -31,7 +31,9 @@ export async function createAccountFromCommand(options: CommandOptions) {
     const chainDefinition: ChainDefinition = Chains[chainIndex]
 
     // Default to "jungle4" if no chain option is provided
-    const chainUrl = `http://${chainIndex.toLowerCase()}.greymass.com`
+    const chainUrl = chainDefinition
+        ? chainDefinition.url
+        : `http://${chainIndex.toLowerCase()}.greymass.com`
 
     if (options.name) {
         if (!String(options.name).endsWith('.gm')) {
