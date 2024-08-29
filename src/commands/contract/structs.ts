@@ -337,7 +337,7 @@ function findFieldStructType(
 ): ts.Identifier | ts.StringLiteral {
     const fieldTypeString = extractDecorator(findFieldTypeString(typeString, namespace, abi)).type
 
-    if (['string', 'string[]', 'boolean', 'boolean[]'].includes(fieldTypeString.toLowerCase())) {
+    if (['string', 'bool', 'boolean'].includes(fieldTypeString.toLowerCase())) {
         return ts.factory.createStringLiteral(formatFieldString(fieldTypeString))
     }
 
@@ -350,21 +350,22 @@ export function findFieldTypeString(
     abi: ABI.Def
 ): string {
     const fieldType = findInternalType(typeString, namespace, abi)
+    const {type: fieldTypeWithoutDecorator, decorator = ''} = extractDecorator(fieldType)
 
-    if (['String', 'Number'].includes(fieldType)) {
-        return fieldType.toLowerCase()
+    if (['String', 'Number'].includes(fieldTypeWithoutDecorator)) {
+        return `${fieldTypeWithoutDecorator.toLowerCase()}${decorator}`
     }
 
-    if (fieldType === 'Bool') {
-        return 'boolean'
+    if (fieldTypeWithoutDecorator === 'Bool') {
+        return `boolean${decorator}`
     }
 
-    if (fieldType === 'Symbol') {
-        return 'Asset.Symbol'
+    if (fieldTypeWithoutDecorator === 'Symbol') {
+        return `Asset.Symbol${decorator}`
     }
 
-    if (fieldType === 'Symbol_code') {
-        return 'Asset.SymbolCode'
+    if (fieldTypeWithoutDecorator === 'Symbol_code') {
+        return `Asset.SymbolCode${decorator}`
     }
 
     return parseType(fieldType)
