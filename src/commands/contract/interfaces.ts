@@ -124,7 +124,7 @@ export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
         ts.NodeFlags.Namespace
     )
 
-    // Create the namespace with its nested interfaces
+    // Create the namespace with its nested interfaces.
     const actionParamsNamespace = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
@@ -132,16 +132,16 @@ export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
         ts.NodeFlags.Namespace
     )
 
-    // Generate an empty interface that will merge with the namespace.
+    // Create an empty interface for merging.
     const actionParamsInterface = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
         undefined,
         undefined,
-        []
+        [] // no members
     )
 
-    // Now create a const that can be used as a value.
+    // Create a const declaration that merges with the namespace.
     const actionParamsVar = ts.factory.createVariableStatement(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createVariableDeclarationList(
@@ -160,7 +160,7 @@ export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
         )
     )
 
-    // Return the interface, the namespace, and the const in order.
+    // Return the interface, the namespace, and the const as an array of statements.
     return [actionParamsInterface, actionParamsNamespace, actionParamsVar]
 }
 

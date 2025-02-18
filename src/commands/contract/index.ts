@@ -198,6 +198,14 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
             ts.NodeFlags.None
         )
 
+        // Add ESLint disable comment for no-empty-interface at the top of the file
+        ts.addSyntheticLeadingComment(
+            sourceFile,
+            ts.SyntaxKind.MultiLineCommentTrivia,
+            ' eslint-disable @typescript-eslint/no-empty-interface ',
+            true
+        )
+
         return runPrettier(printer.printFile(sourceFile), eslintrc)
     } catch (e) {
         // eslint-disable-next-line no-console
