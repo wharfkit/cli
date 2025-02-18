@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import type {Action, AssetType, NameType} from '@wharfkit/antelope'
 import {ABI, Asset, Blob, Name, Struct} from '@wharfkit/antelope'
 import type {ActionOptions, ContractArgs, PartialBy, Table} from '@wharfkit/contract'

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import type {Action, Checksum256Type, NameType, UInt64Type} from '@wharfkit/antelope'
 import {
     ABI,

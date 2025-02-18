@@ -199,12 +199,14 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
         )
 
         // Add ESLint disable comment for no-empty-interface at the top of the file
-        ts.addSyntheticLeadingComment(
-            sourceFile,
-            ts.SyntaxKind.MultiLineCommentTrivia,
-            ' eslint-disable @typescript-eslint/no-empty-interface ',
-            true
-        )
+        if (sourceFile.statements.length > 0) {
+            ts.addSyntheticLeadingComment(
+                sourceFile.statements[0],
+                ts.SyntaxKind.MultiLineCommentTrivia,
+                ' eslint-disable @typescript-eslint/no-empty-interface ',
+                true
+            )
+        }
 
         return runPrettier(printer.printFile(sourceFile), eslintrc)
     } catch (e) {
