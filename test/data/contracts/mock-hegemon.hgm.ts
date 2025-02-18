@@ -1338,6 +1338,7 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type TableNames = keyof TableTypes
+export interface ActionParams {}
 export namespace ActionParams {
     export namespace Type {
         export interface pair_uint32_uint64 {
@@ -1748,6 +1749,7 @@ export namespace ActionParams {
         new_role: UInt8Type
     }
 }
+export const ActionParams: ActionParams = {} as ActionParams
 export interface ActionNameParams {
     addbuilding: ActionParams.addbuilding
     adddeposit: ActionParams.adddeposit

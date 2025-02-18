@@ -128,6 +128,7 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type TableNames = keyof TableTypes
+export interface ActionParams {}
 export namespace ActionParams {
     export namespace Type {
         export interface PayrollConfig {
@@ -166,6 +167,7 @@ export namespace ActionParams {
         sym: Asset.SymbolCodeType
     }
 }
+export const ActionParams: ActionParams = {} as ActionParams
 export interface ActionNameParams {
     'payroll.add': ActionParams.payrolladd
     'payroll.edit': ActionParams.payrolledit

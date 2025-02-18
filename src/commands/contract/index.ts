@@ -187,7 +187,7 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
                 tableTypes,
                 rowTypeAlias,
                 tablesTypeAlias,
-                actionsNamespace,
+                ...actionsNamespace,
                 actionNamesInterface,
                 actionsTypeAlias,
                 ...(actionResultValuesInterface ? [actionResultValuesInterface] : []),

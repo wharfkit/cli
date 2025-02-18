@@ -102,22 +102,18 @@ export function generateActionInterface(
     return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
-export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
+export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
-
     const typeInterfaces: TypeInterfaceDeclaration[] = []
 
     const actionParamInterfaces = abi.actions.map((action) => {
         const actionStruct = actionStructsWithFields.find(
             (actionStructWithField) => actionStructWithField.name === action.type
         )
-
         const interfaces = generateActionInterface(actionStruct, abi)
-
         if (interfaces.actionInterface) {
             typeInterfaces.push(...interfaces.typeInterfaces)
         }
-
         return interfaces.actionInterface
     })
 
@@ -128,12 +124,44 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
         ts.NodeFlags.Namespace
     )
 
-    return ts.factory.createModuleDeclaration(
+    // Create the namespace with its nested interfaces
+    const actionParamsNamespace = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
         ts.factory.createModuleBlock([actionParamsTypes, ...actionParamInterfaces]),
         ts.NodeFlags.Namespace
     )
+
+    // Generate an empty interface that will merge with the namespace.
+    const actionParamsInterface = ts.factory.createInterfaceDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createIdentifier('ActionParams'),
+        undefined,
+        undefined,
+        []
+    )
+
+    // Now create a const that can be used as a value.
+    const actionParamsVar = ts.factory.createVariableStatement(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createVariableDeclarationList(
+            [
+                ts.factory.createVariableDeclaration(
+                    ts.factory.createIdentifier('ActionParams'),
+                    undefined,
+                    ts.factory.createTypeReferenceNode('ActionParams', undefined),
+                    ts.factory.createAsExpression(
+                        ts.factory.createObjectLiteralExpression([], false),
+                        ts.factory.createTypeReferenceNode('ActionParams', undefined)
+                    )
+                ),
+            ],
+            ts.NodeFlags.Const
+        )
+    )
+
+    // Return the interface, the namespace, and the const in order.
+    return [actionParamsInterface, actionParamsNamespace, actionParamsVar]
 }
 
 function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): string {
