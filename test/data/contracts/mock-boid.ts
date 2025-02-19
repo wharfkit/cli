@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import type {
     Action,
     BytesType,
@@ -1009,6 +1010,7 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type TableNames = keyof TableTypes
+export interface ActionParams {}
 export namespace ActionParams {
     export namespace Type {
         export interface AccountCreate {
@@ -1424,6 +1426,7 @@ export namespace ActionParams {
         to: NameType
     }
 }
+export const ActionParams: ActionParams = {} as ActionParams
 export interface ActionNameParams {
     'account.add': ActionParams.accountadd
     'account.buy': ActionParams.accountbuy

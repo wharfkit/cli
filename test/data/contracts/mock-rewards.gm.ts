@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface */
 import type {
     Action,
     AssetType,
@@ -103,6 +104,7 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type TableNames = keyof TableTypes
+export interface ActionParams {}
 export namespace ActionParams {
     export namespace Type {
         export interface oracle_pair {
@@ -141,6 +143,7 @@ export namespace ActionParams {
         weight: UInt16Type
     }
 }
+export const ActionParams: ActionParams = {} as ActionParams
 export interface ActionNameParams {
     adduser: ActionParams.adduser
     claim: ActionParams.claim

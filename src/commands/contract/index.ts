@@ -187,7 +187,7 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
                 tableTypes,
                 rowTypeAlias,
                 tablesTypeAlias,
-                actionsNamespace,
+                ...actionsNamespace,
                 actionNamesInterface,
                 actionsTypeAlias,
                 ...(actionResultValuesInterface ? [actionResultValuesInterface] : []),
@@ -197,6 +197,16 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
             ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
             ts.NodeFlags.None
         )
+
+        // Add ESLint disable comment for no-empty-interface at the top of the file
+        if (sourceFile.statements.length > 0) {
+            ts.addSyntheticLeadingComment(
+                sourceFile.statements[0],
+                ts.SyntaxKind.MultiLineCommentTrivia,
+                ' eslint-disable @typescript-eslint/no-empty-interface ',
+                true
+            )
+        }
 
         return runPrettier(printer.printFile(sourceFile), eslintrc)
     } catch (e) {
