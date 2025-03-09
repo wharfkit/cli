@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import type {
     Action,
     AssetType,
@@ -1315,7 +1314,6 @@ export interface TableTypes {
 }
 export type RowType<T> = T extends keyof TableTypes ? TableTypes[T] : any
 export type TableNames = keyof TableTypes
-export interface ActionParams {}
 export namespace ActionParams {
     export namespace Type {
         export interface permission_level {
@@ -1734,7 +1732,6 @@ export namespace ActionParams {
         amount: AssetType
     }
 }
-export const ActionParams: ActionParams = {} as ActionParams
 export interface ActionNameParams {
     activate: ActionParams.activate
     bidname: ActionParams.bidname
