@@ -65,7 +65,7 @@ export namespace Types {
         declare proposal_name: Name
         @Struct.field(permission_level)
         declare level: permission_level
-        @Struct.field(Checksum256, {optional: true})
+        @Struct.field(Checksum256, {extension: true})
         declare proposal_hash?: Checksum256
     }
     @Struct.type('cancel')
@@ -120,7 +120,7 @@ export namespace Types {
         declare proposal_name: Name
         @Struct.field(Bytes)
         declare packed_transaction: Bytes
-        @Struct.field(TimePoint, {optional: true})
+        @Struct.field(TimePoint, {extension: true})
         declare earliest_exec_time?: TimePoint
     }
     @Struct.type('transaction_header')
