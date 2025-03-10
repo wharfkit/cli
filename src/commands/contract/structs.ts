@@ -8,6 +8,7 @@ interface FieldType {
     name: string
     type: string
     optional: boolean
+    extension: boolean
 }
 
 interface StructData {
@@ -51,6 +52,7 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
                         name: 'value',
                         type: t,
                         optional: false,
+                        extension: false,
                     }
                 }),
                 variant: true,
@@ -67,6 +69,7 @@ export function getActionFieldFromAbi(abi: any): StructData[] {
                     name: field.name,
                     type: parseType(field.type),
                     optional: field.type.endsWith('?') || field.type.endsWith('$'),
+                    extension: field.type.endsWith('$'),
                 })
             }
 
@@ -191,7 +194,14 @@ export function generateField(
         )
     }
 
-    if (field.optional) {
+    if (field.extension) {
+        optionsProps.push(
+            ts.factory.createPropertyAssignment(
+                ts.factory.createIdentifier('extension'),
+                ts.factory.createTrue()
+            )
+        )
+    } else if (field.optional) {
         optionsProps.push(
             ts.factory.createPropertyAssignment(
                 ts.factory.createIdentifier('optional'),
