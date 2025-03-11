@@ -55,7 +55,6 @@ export function generateActionInterface(
             ]
 
             const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
-                undefined,
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
                 abiVariant.name,
                 undefined,
@@ -102,7 +101,7 @@ export function generateActionInterface(
     return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
-export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
+export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
     const typeInterfaces: TypeInterfaceDeclaration[] = []
@@ -128,12 +127,43 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
         ts.NodeFlags.Namespace
     )
 
-    return ts.factory.createModuleDeclaration(
+    const actionParamsNamespace = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
         ts.factory.createModuleBlock([actionParamsTypes, ...actionParamInterfaces]),
         ts.NodeFlags.Namespace
     )
+
+    // Create an empty interface for merging.
+    const actionParamsInterface = ts.factory.createInterfaceDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'ActionParams',
+        undefined,
+        undefined,
+        [] // no members
+    )
+
+    // Create a const declaration that merges with the namespace.
+    const actionParamsVar = ts.factory.createVariableStatement(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        ts.factory.createVariableDeclarationList(
+            [
+                ts.factory.createVariableDeclaration(
+                    ts.factory.createIdentifier('ActionParams'),
+                    undefined,
+                    ts.factory.createTypeReferenceNode('ActionParams', undefined),
+                    ts.factory.createAsExpression(
+                        ts.factory.createObjectLiteralExpression([], false),
+                        ts.factory.createTypeReferenceNode('ActionParams', undefined)
+                    )
+                ),
+            ],
+            ts.NodeFlags.Const
+        )
+    )
+
+    // Return the interface, the namespace, and the const as an array of statements.
+    return [actionParamsInterface, actionParamsNamespace, actionParamsVar]
 }
 
 function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): string {
@@ -181,7 +211,6 @@ export function generateActionReturnValuesInterface(abi: ABI.Def): ts.InterfaceD
     })
 
     return ts.factory.createInterfaceDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         'ActionReturnValues',
         undefined,
@@ -192,7 +221,6 @@ export function generateActionReturnValuesInterface(abi: ABI.Def): ts.InterfaceD
 
 export function generateActionReturnNamesType(): ts.TypeAliasDeclaration {
     return ts.factory.createTypeAliasDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         'ActionReturnNames',
         undefined,

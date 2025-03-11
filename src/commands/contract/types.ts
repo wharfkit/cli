@@ -25,9 +25,8 @@ export function generateRowType(): ts.TypeAliasDeclaration {
 
     // Create the type alias declaration 'type RowType<T> = ...'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        ts.factory.createIdentifier('RowType'),
+        'RowType',
         [typeParameter],
         conditionalType
     )
@@ -42,13 +41,12 @@ export function generateTablesTypeAlias(): ts.TypeAliasDeclaration {
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes'))
     )
 
-    // Create the type alias declaration 'type tables = keyof TableTypes'
+    // Create the type alias declaration 'type Tables = ...'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
-        undefined, // decorators
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        ts.factory.createIdentifier('TableNames'), // name
-        [], // type parameters
-        keyofTableTypes // type
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'Tables',
+        undefined,
+        keyofTableTypes
     )
 
     return typeAliasDeclaration
@@ -61,13 +59,72 @@ export function generateActionsTypeAlias(): ts.TypeAliasDeclaration {
         ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('ActionNameParams'))
     )
 
-    // Create the type alias declaration 'type actions = keyof ActionNameParams'
+    // Create the type alias declaration 'type Actions = ...'
     const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
-        undefined, // decorators
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], // modifiers
-        ts.factory.createIdentifier('ActionNames'), // name
-        [], // type parameters
-        keyofActionNameParams // type
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'Actions',
+        undefined,
+        keyofActionNameParams
+    )
+
+    return typeAliasDeclaration
+}
+
+export function generateActionNamesTypeAlias(): ts.TypeAliasDeclaration {
+    // Create the 'keyof ActionNameParams' type
+    const keyofActionNameParams = ts.factory.createTypeOperatorNode(
+        ts.SyntaxKind.KeyOfKeyword,
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('ActionNameParams'))
+    )
+
+    // Create the type alias declaration 'type ActionNames = keyof ActionNameParams'
+    const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'ActionNames',
+        undefined,
+        keyofActionNameParams
+    )
+
+    return typeAliasDeclaration
+}
+
+export function generateTableNamesTypeAlias(): ts.TypeAliasDeclaration {
+    // Create the 'keyof TableTypes' type
+    const keyofTableTypes = ts.factory.createTypeOperatorNode(
+        ts.SyntaxKind.KeyOfKeyword,
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('TableTypes'))
+    )
+
+    // Create the type alias declaration 'type TableNames = keyof TableTypes'
+    const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'TableNames',
+        undefined,
+        keyofTableTypes
+    )
+
+    return typeAliasDeclaration
+}
+
+export function generateTableNameTypeAlias(): ts.TypeAliasDeclaration {
+    // Create the type alias declaration 'type TableName = string'
+    const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'TableName',
+        undefined,
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword)
+    )
+
+    return typeAliasDeclaration
+}
+
+export function generateSerializerTypeAlias(): ts.TypeAliasDeclaration {
+    // Create the type alias declaration 'type Serializer = any'
+    const typeAliasDeclaration = ts.factory.createTypeAliasDeclaration(
+        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+        'Serializer',
+        undefined,
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
     )
 
     return typeAliasDeclaration
