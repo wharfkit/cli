@@ -101,7 +101,7 @@ export function generateActionInterface(
     return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
-export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
+export function generateActionsNamespace(abi: ABI.Def): ts.Statement {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
     const typeInterfaces: TypeInterfaceDeclaration[] = []
@@ -134,36 +134,7 @@ export function generateActionsNamespace(abi: ABI.Def): ts.Statement[] {
         ts.NodeFlags.Namespace
     )
 
-    // Create an empty interface for merging.
-    const actionParamsInterface = ts.factory.createInterfaceDeclaration(
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        'ActionParams',
-        undefined,
-        undefined,
-        [] // no members
-    )
-
-    // Create a const declaration that merges with the namespace.
-    const actionParamsVar = ts.factory.createVariableStatement(
-        [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        ts.factory.createVariableDeclarationList(
-            [
-                ts.factory.createVariableDeclaration(
-                    ts.factory.createIdentifier('ActionParams'),
-                    undefined,
-                    ts.factory.createTypeReferenceNode('ActionParams', undefined),
-                    ts.factory.createAsExpression(
-                        ts.factory.createObjectLiteralExpression([], false),
-                        ts.factory.createTypeReferenceNode('ActionParams', undefined)
-                    )
-                ),
-            ],
-            ts.NodeFlags.Const
-        )
-    )
-
-    // Return the interface, the namespace, and the const as an array of statements.
-    return [actionParamsInterface, actionParamsNamespace, actionParamsVar]
+    return actionParamsNamespace
 }
 
 function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): string {

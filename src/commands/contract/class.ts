@@ -240,7 +240,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
         undefined,
         [typeParameter],
         [nameParameter, dataParameter],
-        ts.factory.createTypeReferenceNode('ReadonlyResult'),
+        ts.factory.createTypeReferenceNode('ActionReturnValues[T]'),
         methodBody
     )
 }

@@ -167,16 +167,8 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
 
         const tableMap = generateTableMap(abi)
         const tableTypes = generateTableTypesInterface(abi)
-
-        // const tablesTypeAlias = generateTablesTypeAlias()
-        // const actionsTypeAlias = generateActionsTypeAlias()
-        // const actionNamesTypeAlias = generateActionNamesTypeAlias()
         const rowTypeAlias = generateRowType()
         const tableNamesTypeAlias = generateTableNamesTypeAlias()
-        // const tableNameTypeAlias = generateTableNameTypeAlias()
-        // const serializerTypeAlias = generateSerializerTypeAlias()
-        // const getTableRowsOptionsTypeAlias = generateGetTableRowsOptionsTypeAlias()
-        // const readonlyResultTypeAlias = generateReadonlyResultTypeAlias()
 
         let actionResultValuesInterface: ts.InterfaceDeclaration | undefined
         let actionResultsNamesType: ts.TypeAliasDeclaration | undefined
@@ -198,15 +190,9 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
                 tableMap,
                 tableTypes,
                 rowTypeAlias,
-                // tablesTypeAlias,
                 tableNamesTypeAlias,
-                // tableNameTypeAlias,
-                // serializerTypeAlias,
-                // getTableRowsOptionsTypeAlias,
-                // readonlyResultTypeAlias,
-                ...actionsNamespace,
+                actionsNamespace,
                 actionNamesInterface,
-                // actionsTypeAlias,
                 actionNamesTypeAlias,
                 ...(actionResultValuesInterface ? [actionResultValuesInterface] : []),
                 ...(actionResultsNamesType ? [actionResultsNamesType] : []),
