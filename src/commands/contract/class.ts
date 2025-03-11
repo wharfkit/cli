@@ -195,7 +195,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
         [],
         undefined,
         'data',
-        undefined,
+        ts.factory.createToken(ts.SyntaxKind.QuestionToken),
         ts.factory.createIndexedAccessTypeNode(
             ts.factory.createTypeReferenceNode('ActionNameParams'),
             ts.factory.createTypeReferenceNode('T')
@@ -240,7 +240,10 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
         undefined,
         [typeParameter],
         [nameParameter, dataParameter],
-        ts.factory.createTypeReferenceNode('ActionReturnValues[T]'),
+        ts.factory.createIndexedAccessTypeNode(
+            ts.factory.createTypeReferenceNode('ActionReturnValues'),
+            ts.factory.createTypeReferenceNode('T')
+        ),
         methodBody
     )
 }
