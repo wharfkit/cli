@@ -17,12 +17,7 @@ import {
 import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
-import {
-    generateActionNamesTypeAlias,
-    generateRowType,
-    generateTableNamesTypeAlias,
-    generateTablesTypeAlias,
-} from './types'
+import {generateActionNamesTypeAlias, generateRowType, generateTableNamesTypeAlias} from './types'
 import {generateActionReturnNamesType} from './interfaces'
 
 const printer = ts.createPrinter()
