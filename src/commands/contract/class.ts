@@ -114,16 +114,16 @@ function generateActionMethod(): ts.MethodDeclaration {
 
     // 3. Create the function parameters.
     const nameParameter = ts.factory.createParameterDeclaration(
-        undefined,
+        [],
         undefined,
         'name',
         undefined,
-        ts.factory.createTypeReferenceNode('T'),
+        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
         undefined
     )
 
     const dataParameter = ts.factory.createParameterDeclaration(
-        undefined,
+        [],
         undefined,
         'data',
         undefined,
@@ -132,7 +132,7 @@ function generateActionMethod(): ts.MethodDeclaration {
     )
 
     const optionsParameter = ts.factory.createParameterDeclaration(
-        undefined,
+        [],
         undefined,
         'options',
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
@@ -162,7 +162,7 @@ function generateActionMethod(): ts.MethodDeclaration {
     )
 
     return ts.factory.createMethodDeclaration(
-        undefined,
+        [],
         undefined,
         'action',
         undefined,
@@ -183,7 +183,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
 
     // Create the function parameters.
     const nameParameter = ts.factory.createParameterDeclaration(
-        undefined,
+        [],
         undefined,
         'name',
         undefined,
@@ -192,7 +192,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
     )
 
     const dataParameter = ts.factory.createParameterDeclaration(
-        undefined,
+        [],
         undefined,
         'data',
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
@@ -234,7 +234,7 @@ function generateReadonlyMethod(): ts.MethodDeclaration {
 
     // Create the method declaration
     return ts.factory.createMethodDeclaration(
-        undefined,
+        [],
         undefined,
         'readonly',
         undefined,
@@ -259,22 +259,20 @@ export function generateTableMethod(): ts.MethodDeclaration {
 
     // Create the parameters for the method
     const nameParameter = ts.factory.createParameterDeclaration(
-        undefined,
-        undefined,
+        [],
         undefined,
         ts.factory.createIdentifier('name'),
         undefined,
-        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('T')),
+        ts.factory.createTypeReferenceNode('T'),
         undefined
     )
 
     const scopeParameter = ts.factory.createParameterDeclaration(
+        [],
         undefined,
-        undefined,
-        undefined,
-        ts.factory.createIdentifier('scope'),
+        'scope',
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-        ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('NameType')),
+        ts.factory.createTypeReferenceNode('NameType'),
         undefined
     )
 
@@ -311,15 +309,14 @@ export function generateTableMethod(): ts.MethodDeclaration {
 
     // Create the method declaration
     const methodDeclaration = ts.factory.createMethodDeclaration(
-        undefined, // decorators
-        undefined, // modifiers
-        undefined, // asterisk token
-        ts.factory.createIdentifier('table'), // method name
-        undefined, // question token
-        [typeParameter], // type parameters
-        [nameParameter, scopeParameter], // parameters
-        returnType, // return type
-        methodBody // body
+        [],
+        undefined,
+        'table',
+        undefined,
+        [typeParameter],
+        [nameParameter, scopeParameter],
+        returnType,
+        methodBody
     )
 
     return methodDeclaration

@@ -55,7 +55,6 @@ export function generateActionInterface(
             ]
 
             const variantTypeAlias = ts.factory.createTypeAliasDeclaration(
-                undefined,
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
                 abiVariant.name,
                 undefined,
@@ -102,7 +101,7 @@ export function generateActionInterface(
     return {actionInterface, typeInterfaces: removeDuplicateInterfaces(typeInterfaces)}
 }
 
-export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
+export function generateActionsNamespace(abi: ABI.Def): ts.Statement {
     const actionStructsWithFields = getActionFieldFromAbi(abi)
 
     const typeInterfaces: TypeInterfaceDeclaration[] = []
@@ -128,12 +127,14 @@ export function generateActionsNamespace(abi: ABI.Def): ts.ModuleDeclaration {
         ts.NodeFlags.Namespace
     )
 
-    return ts.factory.createModuleDeclaration(
+    const actionParamsNamespace = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         ts.factory.createIdentifier('ActionParams'),
         ts.factory.createModuleBlock([actionParamsTypes, ...actionParamInterfaces]),
         ts.NodeFlags.Namespace
     )
+
+    return actionParamsNamespace
 }
 
 function findParamTypeString(typeString: string, namespace = '', abi: ABI.Def): string {
@@ -181,7 +182,6 @@ export function generateActionReturnValuesInterface(abi: ABI.Def): ts.InterfaceD
     })
 
     return ts.factory.createInterfaceDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         'ActionReturnValues',
         undefined,
@@ -192,7 +192,6 @@ export function generateActionReturnValuesInterface(abi: ABI.Def): ts.InterfaceD
 
 export function generateActionReturnNamesType(): ts.TypeAliasDeclaration {
     return ts.factory.createTypeAliasDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
         'ActionReturnNames',
         undefined,

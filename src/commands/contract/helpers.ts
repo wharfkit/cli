@@ -185,7 +185,7 @@ export function generateInterface(
 
     return ts.factory.createInterfaceDeclaration(
         modifiers,
-        ts.factory.createIdentifier(interfaceName),
+        interfaceName,
         undefined, // typeParameters
         [], // heritageClauses
         members

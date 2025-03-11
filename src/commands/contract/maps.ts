@@ -46,9 +46,8 @@ export function generateTableTypesInterface(abi: ABI.Def): ts.InterfaceDeclarati
 
     // Create the interface declaration
     const interfaceDeclaration = ts.factory.createInterfaceDeclaration(
-        undefined,
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        ts.factory.createIdentifier('TableTypes'),
+        'TableTypes',
         undefined,
         undefined,
         members

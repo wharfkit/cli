@@ -17,7 +17,7 @@ import {
 import {generateTableMap, generateTableTypesInterface} from './maps'
 import {generateNamespace} from './namespace'
 import {generateStructClasses} from './structs'
-import {generateActionsTypeAlias, generateRowType, generateTablesTypeAlias} from './types'
+import {generateActionNamesTypeAlias, generateRowType, generateTableNamesTypeAlias} from './types'
 import {generateActionReturnNamesType} from './interfaces'
 
 const printer = ts.createPrinter()
@@ -104,6 +104,7 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
         const {classDeclaration} = await generateContractClass(contractName, abi)
 
         const actionNamesInterface = generateActionNamesInterface(abi)
+        const actionNamesTypeAlias = generateActionNamesTypeAlias()
 
         const actionsNamespace = generateActionsNamespace(abi)
 
@@ -161,10 +162,8 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
 
         const tableMap = generateTableMap(abi)
         const tableTypes = generateTableTypesInterface(abi)
-
-        const tablesTypeAlias = generateTablesTypeAlias()
-        const actionsTypeAlias = generateActionsTypeAlias()
         const rowTypeAlias = generateRowType()
+        const tableNamesTypeAlias = generateTableNamesTypeAlias()
 
         let actionResultValuesInterface: ts.InterfaceDeclaration | undefined
         let actionResultsNamesType: ts.TypeAliasDeclaration | undefined
@@ -186,10 +185,10 @@ export async function generateContract(contractName: string, abi: ABI, eslintrc?
                 tableMap,
                 tableTypes,
                 rowTypeAlias,
-                tablesTypeAlias,
+                tableNamesTypeAlias,
                 actionsNamespace,
                 actionNamesInterface,
-                actionsTypeAlias,
+                actionNamesTypeAlias,
                 ...(actionResultValuesInterface ? [actionResultValuesInterface] : []),
                 ...(actionResultsNamesType ? [actionResultsNamesType] : []),
                 classDeclaration,
