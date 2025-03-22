@@ -1,0 +1,18 @@
+{
+    "request": {
+        "path": "https://eos.greymass.com/v1/chain/get_table_rows",
+        "params": {
+            "method": "POST",
+            "body": "{\"table\":\"invals\",\"code\":\"eosio.msig\",\"scope\":\"eosio.msig\",\"limit\":1,\"key_type\":\"name\",\"json\":false}"
+        }
+    },
+    "status": 200,
+    "json": {
+        "rows": [
+            "5033d097ae86b41480d35945dba90500"
+        ],
+        "more": true,
+        "next_key": "2380225041768974400"
+    },
+    "text": "{\"rows\":[\"5033d097ae86b41480d35945dba90500\"],\"more\":true,\"next_key\":\"2380225041768974400\"}"
+}
