@@ -1,0 +1,18 @@
+{
+    "request": {
+        "path": "https://jungle4.greymass.com/v1/chain/get_table_rows",
+        "params": {
+            "method": "POST",
+            "body": "{\"table\":\"proposal\",\"code\":\"eosio.msig\",\"scope\":\"msigtestert1\",\"limit\":1,\"lower_bound\":\"rebrand\",\"upper_bound\":\"rebrand\",\"key_type\":\"name\",\"json\":false}"
+        }
+    },
+    "status": 200,
+    "json": {
+        "rows": [
+            "000000204d738fba3bf7b1be690698af7226cd00000000010000000000ea305500000060bb5bb3c2010000000000ea305500000000a8ed323209004c8eda6ca02e45010000"
+        ],
+        "more": false,
+        "next_key": ""
+    },
+    "text": "{\"rows\":[\"000000204d738fba3bf7b1be690698af7226cd00000000010000000000ea305500000060bb5bb3c2010000000000ea305500000000a8ed323209004c8eda6ca02e45010000\"],\"more\":false,\"next_key\":\"\"}"
+}
