@@ -201,7 +201,8 @@ export function generateField(
                 ts.factory.createTrue()
             )
         )
-    } else if (field.optional) {
+    }
+    if (field.optional) {
         optionsProps.push(
             ts.factory.createPropertyAssignment(
                 ts.factory.createIdentifier('optional'),
