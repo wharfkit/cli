@@ -250,7 +250,7 @@ export namespace Types {
     }
     @Struct.type('blockchain_parameters_v1')
     export class blockchain_parameters_v1 extends blockchain_parameters {
-        @Struct.field(UInt32, {extension: true})
+        @Struct.field(UInt32, {extension: true, optional: true})
         declare max_action_return_value_size?: UInt32
     }
     @Struct.type('buyram')
@@ -411,7 +411,7 @@ export namespace Types {
         declare account: Name
         @Struct.field(Name)
         declare permission: Name
-        @Struct.field(Name, {extension: true})
+        @Struct.field(Name, {extension: true, optional: true})
         declare authorized_by?: Name
     }
     @Struct.type('delschedule')
@@ -548,7 +548,7 @@ export namespace Types {
         declare type: Name
         @Struct.field(Name)
         declare requirement: Name
-        @Struct.field(Name, {extension: true})
+        @Struct.field(Name, {extension: true, optional: true})
         declare authorized_by?: Name
     }
     @Struct.type('logbuyram')
@@ -753,7 +753,7 @@ export namespace Types {
         declare last_claim_time: TimePoint
         @Struct.field(UInt16)
         declare location: UInt16
-        @Struct.field(variant_block_signing_authority_v0, {extension: true})
+        @Struct.field(variant_block_signing_authority_v0, {extension: true, optional: true})
         declare producer_authority?: variant_block_signing_authority_v0
     }
     @Struct.type('producer_info2')
@@ -1003,7 +1003,7 @@ export namespace Types {
         declare account: Name
         @Struct.field(Bytes)
         declare abi: Bytes
-        @Struct.field('string', {extension: true})
+        @Struct.field('string', {extension: true, optional: true})
         declare memo?: string
     }
     @Struct.type('setacctcpu')
@@ -1048,7 +1048,7 @@ export namespace Types {
         declare vmversion: UInt8
         @Struct.field(Bytes)
         declare code: Bytes
-        @Struct.field('string', {extension: true})
+        @Struct.field('string', {extension: true, optional: true})
         declare memo?: string
     }
     @Struct.type('setinflation')
@@ -1129,7 +1129,7 @@ export namespace Types {
         declare code: Name
         @Struct.field(Name)
         declare type: Name
-        @Struct.field(Name, {extension: true})
+        @Struct.field(Name, {extension: true, optional: true})
         declare authorized_by?: Name
     }
     @Struct.type('unregprod')
@@ -1167,7 +1167,7 @@ export namespace Types {
         declare parent: Name
         @Struct.field(authority)
         declare auth: authority
-        @Struct.field(Name, {extension: true})
+        @Struct.field(Name, {extension: true, optional: true})
         declare authorized_by?: Name
     }
     @Struct.type('updaterex')
