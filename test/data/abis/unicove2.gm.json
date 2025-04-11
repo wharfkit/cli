@@ -1,0 +1,1118 @@
+{
+    "version": "eosio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "B_vector_token_definition_E",
+            "type": "token_definition[]"
+        }
+    ],
+    "structs": [
+        {
+            "name": "abi_hash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "hash",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "account",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "tokens",
+                    "type": "B_vector_token_definition_E?"
+                },
+                {
+                    "name": "zerobalances",
+                    "type": "bool?"
+                }
+            ]
+        },
+        {
+            "name": "available",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "balances",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "tokens",
+                    "type": "token_definition[]"
+                },
+                {
+                    "name": "zerobalances",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "blockchain_parameters",
+            "base": "",
+            "fields": [
+                {
+                    "name": "max_block_net_usage",
+                    "type": "uint64"
+                },
+                {
+                    "name": "target_block_net_usage_pct",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_transaction_net_usage",
+                    "type": "uint32"
+                },
+                {
+                    "name": "base_per_transaction_net_usage",
+                    "type": "uint32"
+                },
+                {
+                    "name": "net_usage_leeway",
+                    "type": "uint32"
+                },
+                {
+                    "name": "context_free_discount_net_usage_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "context_free_discount_net_usage_den",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_block_cpu_usage",
+                    "type": "uint32"
+                },
+                {
+                    "name": "target_block_cpu_usage_pct",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_transaction_cpu_usage",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_transaction_cpu_usage",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_transaction_lifetime",
+                    "type": "uint32"
+                },
+                {
+                    "name": "deferred_trx_expiration_window",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_transaction_delay",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_inline_action_size",
+                    "type": "uint32"
+                },
+                {
+                    "name": "max_inline_action_depth",
+                    "type": "uint16"
+                },
+                {
+                    "name": "max_authority_depth",
+                    "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "config_row",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "system_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "system_contract_msig",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_ramcore_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_ram_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_rex_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "gifted_ram_enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "connector",
+            "base": "",
+            "fields": [
+                {
+                    "name": "balance",
+                    "type": "asset"
+                },
+                {
+                    "name": "weight",
+                    "type": "float64"
+                }
+            ]
+        },
+        {
+            "name": "contracthash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "delegated_bandwidth",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "net_weight",
+                    "type": "asset"
+                },
+                {
+                    "name": "cpu_weight",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "delegations",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "def",
+                    "type": "token_definition"
+                }
+            ]
+        },
+        {
+            "name": "eosio_global_state",
+            "base": "blockchain_parameters",
+            "fields": [
+                {
+                    "name": "max_ram_size",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_ram_bytes_reserved",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_ram_stake",
+                    "type": "int64"
+                },
+                {
+                    "name": "last_producer_schedule_update",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "last_pervote_bucket_fill",
+                    "type": "time_point"
+                },
+                {
+                    "name": "pervote_bucket",
+                    "type": "int64"
+                },
+                {
+                    "name": "perblock_bucket",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_unpaid_blocks",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total_activated_stake",
+                    "type": "int64"
+                },
+                {
+                    "name": "thresh_activated_stake_time",
+                    "type": "time_point"
+                },
+                {
+                    "name": "last_producer_schedule_size",
+                    "type": "uint16"
+                },
+                {
+                    "name": "total_producer_vote_weight",
+                    "type": "float64"
+                },
+                {
+                    "name": "last_name_close",
+                    "type": "block_timestamp_type"
+                }
+            ]
+        },
+        {
+            "name": "exchange_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "supply",
+                    "type": "asset"
+                },
+                {
+                    "name": "base",
+                    "type": "connector"
+                },
+                {
+                    "name": "quote",
+                    "type": "connector"
+                }
+            ]
+        },
+        {
+            "name": "get_account_response",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "contracthash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "balance",
+                    "type": "token_balance"
+                },
+                {
+                    "name": "delegations",
+                    "type": "delegated_bandwidth[]"
+                },
+                {
+                    "name": "proposals",
+                    "type": "proposal[]"
+                },
+                {
+                    "name": "refund",
+                    "type": "refund_request"
+                },
+                {
+                    "name": "rexbal",
+                    "type": "rex_balance"
+                },
+                {
+                    "name": "rexfund",
+                    "type": "rex_fund"
+                },
+                {
+                    "name": "vote",
+                    "type": "voter_info"
+                },
+                {
+                    "name": "giftedram",
+                    "type": "gifted_ram"
+                },
+                {
+                    "name": "balances",
+                    "type": "token_balance[]"
+                }
+            ]
+        },
+        {
+            "name": "get_available_response",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "available",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "get_network_response",
+            "base": "",
+            "fields": [
+                {
+                    "name": "global",
+                    "type": "eosio_global_state"
+                },
+                {
+                    "name": "powerup",
+                    "type": "powerup_state"
+                },
+                {
+                    "name": "ram",
+                    "type": "exchange_state"
+                },
+                {
+                    "name": "rex",
+                    "type": "rex_pool"
+                },
+                {
+                    "name": "token",
+                    "type": "token"
+                },
+                {
+                    "name": "ram_gift_bytes",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "gifted_ram",
+            "base": "",
+            "fields": [
+                {
+                    "name": "giftee",
+                    "type": "name"
+                },
+                {
+                    "name": "gifter",
+                    "type": "name"
+                },
+                {
+                    "name": "ram_bytes",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "giftedram",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "global",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "network",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "pair_time_point_sec_int64",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "second",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
+            "name": "powerup",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "powerup_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "net",
+                    "type": "powerup_state_resource"
+                },
+                {
+                    "name": "cpu",
+                    "type": "powerup_state_resource"
+                },
+                {
+                    "name": "powerup_days",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_powerup_fee",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "powerup_state_resource",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "weight",
+                    "type": "int64"
+                },
+                {
+                    "name": "weight_ratio",
+                    "type": "int64"
+                },
+                {
+                    "name": "assumed_stake_weight",
+                    "type": "int64"
+                },
+                {
+                    "name": "initial_weight_ratio",
+                    "type": "int64"
+                },
+                {
+                    "name": "target_weight_ratio",
+                    "type": "int64"
+                },
+                {
+                    "name": "initial_timestamp",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "target_timestamp",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "exponent",
+                    "type": "float64"
+                },
+                {
+                    "name": "decay_secs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_price",
+                    "type": "asset"
+                },
+                {
+                    "name": "max_price",
+                    "type": "asset"
+                },
+                {
+                    "name": "utilization",
+                    "type": "int64"
+                },
+                {
+                    "name": "adjusted_utilization",
+                    "type": "int64"
+                },
+                {
+                    "name": "utilization_timestamp",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "proposal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposal_name",
+                    "type": "name"
+                },
+                {
+                    "name": "packed_transaction",
+                    "type": "bytes"
+                },
+                {
+                    "name": "earliest_exec_time",
+                    "type": "time_point?$"
+                }
+            ]
+        },
+        {
+            "name": "proposals",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "ram",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "refund",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "refund_request",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "request_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "net_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "cpu_amount",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "reset",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rex",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "rex_balance",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "vote_stake",
+                    "type": "asset"
+                },
+                {
+                    "name": "rex_balance",
+                    "type": "asset"
+                },
+                {
+                    "name": "matured_rex",
+                    "type": "int64"
+                },
+                {
+                    "name": "rex_maturities",
+                    "type": "pair_time_point_sec_int64[]"
+                }
+            ]
+        },
+        {
+            "name": "rex_fund",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "rex_pool",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "total_lent",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_unlent",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_rent",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_lendable",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_rex",
+                    "type": "asset"
+                },
+                {
+                    "name": "namebid_proceeds",
+                    "type": "asset"
+                },
+                {
+                    "name": "loan_num",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "rexbal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "rexfund",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "setconfig",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "system_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "system_contract_msig",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "system_token_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_ramcore_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_ram_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "system_rex_symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "gifted_ram_enabled",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "token",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "token_definition"
+                },
+                {
+                    "name": "distribution",
+                    "type": "token_distribution?"
+                }
+            ]
+        },
+        {
+            "name": "token_balance",
+            "base": "",
+            "fields": [
+                {
+                    "name": "token",
+                    "type": "token"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "token_definition",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "checksum256?"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "token_distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "circulating",
+                    "type": "asset"
+                },
+                {
+                    "name": "locked",
+                    "type": "asset"
+                },
+                {
+                    "name": "max",
+                    "type": "asset"
+                },
+                {
+                    "name": "staked",
+                    "type": "asset"
+                },
+                {
+                    "name": "supply",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "voter_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "proxy",
+                    "type": "name"
+                },
+                {
+                    "name": "producers",
+                    "type": "name[]"
+                },
+                {
+                    "name": "staked",
+                    "type": "int64"
+                },
+                {
+                    "name": "last_vote_weight",
+                    "type": "float64"
+                },
+                {
+                    "name": "proxied_vote_weight",
+                    "type": "float64"
+                },
+                {
+                    "name": "is_proxy",
+                    "type": "bool"
+                },
+                {
+                    "name": "flags1",
+                    "type": "uint32"
+                },
+                {
+                    "name": "reserved2",
+                    "type": "uint32"
+                },
+                {
+                    "name": "reserved3",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "votes",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "wipe",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "account",
+            "type": "account",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Account State'\nsummary: 'Read-only action to load the current state of an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "available",
+            "type": "available",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Check Name Available'\nsummary: 'Read-only action to checks the availability of an account name.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "balances",
+            "type": "balances",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Balances'\nsummary: 'Read-only action to load the token balances of the provided token contracts and symbols.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "contracthash",
+            "type": "contracthash",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Contract Hash'\nsummary: 'Read-only action to load the hash of the contract deployed to an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "delegations",
+            "type": "delegations",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Delegations'\nsummary: 'Read-only action to load any tokens delegated by an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "distribution",
+            "type": "distribution",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Token Distribution'\nsummary: 'Read-only action to load the current distribution information of a token.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "giftedram",
+            "type": "giftedram",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Gifted RAM'\nsummary: 'Read-only action to load the gifted RAM state of an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "global",
+            "type": "global",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Global State'\nsummary: 'Read-only action to load global state data.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "network",
+            "type": "network",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Network State'\nsummary: 'Read-only action to load the current state of the network.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "powerup",
+            "type": "powerup",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Powerup State'\nsummary: 'Read-only action to load the current state of the powerup system contracts.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "proposals",
+            "type": "proposals",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Account Proposals'\nsummary: 'Read-only action to load multisig proposals that were proposed by an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "ram",
+            "type": "ram",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load RAM Market State'\nsummary: 'Read-only action to load the current state of the RAM Market.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "refund",
+            "type": "refund",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Refund'\nsummary: 'Read-only action to find any pending refunds for an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "reset",
+            "type": "reset",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'DEBUG: Reset Contract State'\nsummary: 'DEBUG: Resets the contract state to default values.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "rex",
+            "type": "rex",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load REX State'\nsummary: 'Read-only action to load the current state of the REX contract.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "rexbal",
+            "type": "rexbal",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load REX Balance'\nsummary: 'Read-only action to load the EOS balance of an account idle in the REX contract.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "rexfund",
+            "type": "rexfund",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load REX State'\nsummary: 'Read-only action to load the REX state of an account in the REX contract.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "setconfig",
+            "type": "setconfig",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Set Contract Configuration'\nsummary: 'Maintainer action to set the values of the config table to update how this contract operates.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "votes",
+            "type": "votes",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'Load Account Votes'\nsummary: 'Read-only action to load the votes cast by an account.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        },
+        {
+            "name": "wipe",
+            "type": "wipe",
+            "ricardian_contract": "---\n\nspec_version: \"0.2.0\"\ntitle: 'DEBUG: Wipe Contract Data'\nsummary: 'DEBUG: Removes all contract state.'\nicon: https://avatars.githubusercontent.com/u/147292861?s=400&u=3b1af66e90dd851f4d7c096ed6a2fbb4b9e190da\n\n---"
+        }
+    ],
+    "tables": [
+        {
+            "name": "config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": [],
+            "type": "config_row"
+        }
+    ],
+    "ricardian_clauses": [
+        {
+            "id": "api",
+            "body": "api"
+        }
+    ],
+    "error_messages": [],
+    "abi_extensions": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "account",
+            "result_type": "get_account_response"
+        },
+        {
+            "name": "available",
+            "result_type": "get_available_response"
+        },
+        {
+            "name": "balances",
+            "result_type": "token_balance[]"
+        },
+        {
+            "name": "contracthash",
+            "result_type": "abi_hash"
+        },
+        {
+            "name": "delegations",
+            "result_type": "delegated_bandwidth[]"
+        },
+        {
+            "name": "distribution",
+            "result_type": "token"
+        },
+        {
+            "name": "giftedram",
+            "result_type": "gifted_ram"
+        },
+        {
+            "name": "global",
+            "result_type": "eosio_global_state"
+        },
+        {
+            "name": "network",
+            "result_type": "get_network_response"
+        },
+        {
+            "name": "powerup",
+            "result_type": "powerup_state"
+        },
+        {
+            "name": "proposals",
+            "result_type": "proposal[]"
+        },
+        {
+            "name": "ram",
+            "result_type": "exchange_state"
+        },
+        {
+            "name": "refund",
+            "result_type": "refund_request"
+        },
+        {
+            "name": "rex",
+            "result_type": "rex_pool"
+        },
+        {
+            "name": "rexbal",
+            "result_type": "rex_balance"
+        },
+        {
+            "name": "rexfund",
+            "result_type": "rex_fund"
+        },
+        {
+            "name": "votes",
+            "result_type": "voter_info"
+        }
+    ]
+}
