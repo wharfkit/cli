@@ -15,6 +15,7 @@ import * as Hegemon from '$test/data/contracts/mock-hegemon.hgm'
 import * as Boid from '$test/data/contracts/mock-boid'
 import * as PayrollBoid from '$test/data/contracts/mock-payroll.boid'
 import * as GreymassTesting from '$test/data/contracts/mock-testing.gm'
+import * as Unicove2 from '$test/data/contracts/mock-unicove2.gm'
 
 import {generateCodegenContract, removeCodegenContracts} from '$test/utils/codegen'
 import {runGenericContractTests} from './helpers/generic'
@@ -63,6 +64,10 @@ suite('codegen', async function () {
         },
         'testing.gm': {
             mock: GreymassTesting,
+            generated: null,
+        },
+        'unicove2.gm': {
+            mock: Unicove2,
             generated: null,
         },
     }

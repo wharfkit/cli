@@ -1323,18 +1323,18 @@ export namespace ActionParams {
         export interface powerup_config {
             net: Type.powerup_config_resource
             cpu: Type.powerup_config_resource
-            powerup_days: UInt32Type
-            min_powerup_fee: AssetType
+            powerup_days?: UInt32Type
+            min_powerup_fee?: AssetType
         }
         export interface powerup_config_resource {
-            current_weight_ratio: Int64Type
-            target_weight_ratio: Int64Type
-            assumed_stake_weight: Int64Type
-            target_timestamp: TimePointSec
-            exponent: Float64Type
-            decay_secs: UInt32Type
-            min_price: AssetType
-            max_price: AssetType
+            current_weight_ratio?: Int64Type
+            target_weight_ratio?: Int64Type
+            assumed_stake_weight?: Int64Type
+            target_timestamp?: TimePointSec
+            exponent?: Float64Type
+            decay_secs?: UInt32Type
+            min_price?: AssetType
+            max_price?: AssetType
         }
         export interface authority {
             threshold: UInt32Type
@@ -1362,7 +1362,7 @@ export namespace ActionParams {
             transaction_mroot: Checksum256Type
             action_mroot: Checksum256Type
             schedule_version: UInt32Type
-            new_producers: Type.producer_schedule
+            new_producers?: Type.producer_schedule
         }
         export interface producer_schedule {
             version: UInt32Type
@@ -1380,7 +1380,7 @@ export namespace ActionParams {
             keys: Type.key_weight[]
         }
         export interface blockchain_parameters_v1 {
-            max_action_return_value_size: UInt32Type
+            max_action_return_value_size?: UInt32Type
         }
     }
     export interface activate {

@@ -77,6 +77,11 @@ export function getMockParams(contract: Contract): ActionDataType {
                 commit: 'bar',
             }
         }
+        case 'unicove2.gm': {
+            return {
+                account: 'foo',
+            }
+        }
         default: {
             throw new Error(`getMockParams not implemented for ${contract.account}`)
         }
