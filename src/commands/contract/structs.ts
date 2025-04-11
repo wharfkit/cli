@@ -11,7 +11,7 @@ interface FieldType {
     extension: boolean
 }
 
-interface StructData {
+export interface StructData {
     name: string
     base?: string
     fields: FieldType[]

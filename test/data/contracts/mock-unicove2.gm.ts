@@ -491,7 +491,7 @@ export type TableNames = keyof TableTypes
 export namespace ActionParams {
     export namespace Type {
         export interface token_definition {
-            chain: Checksum256Type
+            chain?: Checksum256Type
             contract: NameType
             symbol: Asset.SymbolType
         }

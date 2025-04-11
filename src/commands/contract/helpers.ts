@@ -265,16 +265,18 @@ export function capitalize(string) {
 export function removeDuplicateInterfaces(
     interfaces: TypeInterfaceDeclaration[]
 ): TypeInterfaceDeclaration[] {
+    // Reverted to original logic: Keep the first encountered interface/alias by name
     const seen: string[] = []
-
-    return interfaces.filter((interfaceDeclaration) => {
-        const name = String(interfaceDeclaration.name.escapedText)
-
-        if (seen.includes(name)) {
-            return false
+    return interfaces.filter((declaration) => {
+        if (!declaration.name || !ts.isIdentifier(declaration.name)) {
+            return true // Keep declarations without a simple name (or handle differently if needed)
         }
-        seen.push(name)
-        return true
+        const name = String(declaration.name.escapedText)
+        if (seen.includes(name)) {
+            return false // Discard if name already seen
+        }
+        seen.push(name) // Mark name as seen
+        return true // Keep if name is new
     })
 }
 

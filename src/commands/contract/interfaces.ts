@@ -1,7 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import ts from 'typescript'
 import {parseType, removeCommas, removeDuplicateInterfaces} from './helpers'
-import {findFieldTypeString, getActionFieldFromAbi} from './structs'
+import {findFieldTypeString, getActionFieldFromAbi, type StructData} from './structs'
 import {findAbiStruct, findExternalType, findTypeFromAlias, findVariant} from './finders'
 
 export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclaration {
@@ -30,10 +30,13 @@ export function generateActionNamesInterface(abi: ABI.Def): ts.InterfaceDeclarat
 export type TypeInterfaceDeclaration = ts.InterfaceDeclaration | ts.TypeAliasDeclaration
 
 export function generateActionInterface(
-    struct,
-    abi
+    struct: any,
+    abi: ABI.Def,
+    allStructData: StructData[]
 ): {actionInterface: ts.InterfaceDeclaration; typeInterfaces: TypeInterfaceDeclaration[]} {
     const typeInterfaces: TypeInterfaceDeclaration[] = []
+
+    const structName = typeof struct.name === 'string' ? struct.name : ''
 
     const members = struct.fields.map((field) => {
         const abiVariant = findVariant(field.type, abi)
@@ -60,7 +63,6 @@ export function generateActionInterface(
                 undefined,
                 ts.factory.createUnionTypeNode(allTypeNodes)
             )
-
             typeInterfaces.push(variantTypeAlias)
         } else {
             types = [field.type]
@@ -72,8 +74,7 @@ export function generateActionInterface(
             const typeStruct = findAbiStruct(type, abi)
 
             if (typeStruct) {
-                const interfaces = generateActionInterface(typeStruct, abi)
-
+                const interfaces = generateActionInterface(typeStruct, abi, allStructData)
                 typeInterfaces.push(interfaces.actionInterface, ...interfaces.typeInterfaces)
             }
         })
@@ -82,17 +83,27 @@ export function generateActionInterface(
             variantName || findParamTypeString(aliasType || field.type, 'Type.', abi)
         )
 
+        let isOptional = false
+        const fieldName = field.name
+        const processedStruct = allStructData.find((s) => s.name === structName)
+        if (processedStruct) {
+            const processedField = processedStruct.fields.find((f) => f.name === fieldName)
+            if (processedField) {
+                isOptional = processedField.optional
+            }
+        }
+
         return ts.factory.createPropertySignature(
             undefined,
-            field.name,
-            field.optional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+            fieldName,
+            isOptional ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
             typeReferenceNode
         )
     })
 
     const actionInterface = ts.factory.createInterfaceDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-        removeCommas(struct.name),
+        structName ? removeCommas(structName) : ts.createIdentifier('UnknownStruct'),
         undefined,
         undefined,
         members
@@ -106,19 +117,25 @@ export function generateActionsNamespace(abi: ABI.Def): ts.Statement {
 
     const typeInterfaces: TypeInterfaceDeclaration[] = []
 
-    const actionParamInterfaces = abi.actions.map((action) => {
-        const actionStruct = actionStructsWithFields.find(
-            (actionStructWithField) => actionStructWithField.name === action.type
-        )
+    const actionParamInterfaces = abi.actions
+        .map((action) => {
+            const actionStruct = actionStructsWithFields.find(
+                (actionStructWithField) => actionStructWithField.name === action.type
+            )
 
-        const interfaces = generateActionInterface(actionStruct, abi)
+            if (!actionStruct) {
+                return undefined
+            }
 
-        if (interfaces.actionInterface) {
-            typeInterfaces.push(...interfaces.typeInterfaces)
-        }
+            const interfaces = generateActionInterface(actionStruct, abi, actionStructsWithFields)
 
-        return interfaces.actionInterface
-    })
+            if (interfaces.actionInterface) {
+                typeInterfaces.push(...interfaces.typeInterfaces)
+            }
+
+            return interfaces.actionInterface
+        })
+        .filter((iface): iface is ts.InterfaceDeclaration => !!iface)
 
     const actionParamsTypes = ts.factory.createModuleDeclaration(
         [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
