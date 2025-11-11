@@ -34,9 +34,127 @@ Options:
   -h, --help                    display help for command
 
 Commands:
+  keys                          Generate a new set of public and private keys
+  account [options]             Create a new account with an optional public key
   generate [options] <account>  Generate Contract Kit code for the named smart contract
+  chain                         Manage local LEAP blockchain
+  wharfkit                      Compile C++ contract files
+  wallet                        Manage local wallet and sign transactions
   help [command]                display help for command
 ```
+
+### Managing Wallet Keys
+
+The CLI includes a secure wallet system for managing private keys and signing transactions locally.
+
+#### Creating Keys
+
+Create a new wallet key with default encryption:
+
+```bash
+wharfkit wallet create
+```
+
+Create a key with a custom name and password:
+
+```bash
+wharfkit wallet create --name mykey --password
+```
+
+When the `--password` flag is used, you'll be prompted to enter and confirm a password. Otherwise, keys are encrypted with a default password (not stored in plain text).
+
+#### Listing Keys
+
+View all keys in your wallet:
+
+```bash
+wharfkit wallet keys
+```
+
+Output example:
+```
+Found 2 key(s) in wallet:
+
+1. default
+   Public Key: PUB_K1_5TXDWwucfSa9Ghh49di3vxthzUcLSDE5yuxEMCJvw29Jpjq4mp
+   Created: 11/10/2025, 10:25:34 PM
+
+2. mykey
+   Public Key: PUB_K1_8KL3xG2WPZQAVd1ze2eY3Fgzr9DWF9hDhjusYgPegfHeNQDeF1
+   Created: 11/10/2025, 10:25:47 PM
+```
+
+#### Creating Additional Keys
+
+Create additional keys in your wallet:
+
+```bash
+# With auto-generated name
+wharfkit wallet keys create
+
+# With custom name
+wharfkit wallet keys create --name production
+
+# With custom password
+wharfkit wallet keys create --name production --password
+```
+
+#### Signing Transactions
+
+Sign a transaction using a key from your wallet:
+
+```bash
+# Sign with default key (uses 'default' key or first available)
+wharfkit wallet sign transaction.json
+
+# Sign with specific key
+wharfkit wallet sign transaction.json --key mykey
+
+# Sign with password-protected key
+wharfkit wallet sign transaction.json --key production --password
+
+# Save signed transaction to file
+wharfkit wallet sign transaction.json --output signed.json
+```
+
+The transaction can be provided as:
+- A path to a JSON file containing the transaction
+- A JSON string directly on the command line
+
+Example transaction format:
+```json
+{
+  "expiration": "2025-11-11T00:00:00",
+  "ref_block_num": 12345,
+  "ref_block_prefix": 67890,
+  "max_net_usage_words": 0,
+  "max_cpu_usage_ms": 0,
+  "delay_sec": 0,
+  "context_free_actions": [],
+  "actions": [
+    {
+      "account": "eosio.token",
+      "name": "transfer",
+      "authorization": [
+        {
+          "actor": "testaccount",
+          "permission": "active"
+        }
+      ],
+      "data": "..."
+    }
+  ],
+  "transaction_extensions": []
+}
+```
+
+#### Security Notes
+
+- All keys are stored encrypted in `~/.wharfkit/wallet/keys.json`
+- Keys are **never** stored in plain text
+- If no password is provided, a default encryption password is used
+- For production use, always use custom passwords with the `--password` flag
+- The wallet file has restrictive permissions (0600) to prevent unauthorized access
 
 ### Generating Contract Code
 

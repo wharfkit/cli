@@ -6,6 +6,7 @@ import {generateKeysFromCommand} from './commands/keys/index'
 import {createAccountFromCommand} from './commands/account/index'
 import {createChainCommand} from './commands/chain/index'
 import {createWharfkitCommand} from './commands/wharfkit/index'
+import {createWalletCommand} from './commands/wallet/index'
 
 const program = new Command()
 
@@ -52,5 +53,8 @@ program.addCommand(createChainCommand())
 
 // 5. Command to compile contracts
 program.addCommand(createWharfkitCommand())
+
+// 6. Command to manage wallet
+program.addCommand(createWalletCommand())
 
 program.parse(process.argv)
