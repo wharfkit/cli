@@ -4,6 +4,7 @@ import {version} from '../package.json'
 import {generateContractFromCommand} from './commands/contract'
 import {generateKeysFromCommand} from './commands/keys/index'
 import {createAccountFromCommand} from './commands/account/index'
+import {createChainCommand} from './commands/chain/index'
 
 const program = new Command()
 
@@ -44,5 +45,8 @@ program
         process.env.WHARFKIT_URL
     )
     .action(generateContractFromCommand)
+
+// 4. Command to manage local blockchain
+program.addCommand(createChainCommand())
 
 program.parse(process.argv)
