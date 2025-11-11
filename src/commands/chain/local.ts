@@ -1,4 +1,7 @@
 /* eslint-disable no-console */
+import {ConsoleRenderer} from '@wharfkit/console-rendered'
+import {PrivateKey} from '@wharfkit/antelope'
+import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {spawn} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -6,7 +9,6 @@ import type {ChainStatus} from './utils'
 import {
     cleanDataDir,
     ensureDir,
-    executeCommand,
     getConfigIni,
     getDefaultConfigDir,
     getDefaultDataDir,
@@ -19,8 +21,10 @@ import {
     removePidFile,
     savePid,
     waitForChain,
+    createApiClientForPort,
 } from './utils'
 import {ensureLeapInstalled} from './install'
+import {addKeyToWallet, listWalletKeys} from '../wallet/utils'
 
 export interface LocalStartOptions {
     port: number
@@ -218,11 +222,9 @@ export async function getChainStatus(): Promise<ChainStatus> {
     // Try to get chain info
     if (status.running) {
         try {
-            const {stdout} = await executeCommand(
-                `cleos --url http://127.0.0.1:${status.port} get info 2>/dev/null`
-            )
-            const info = JSON.parse(stdout)
-            status.headBlock = info.head_block_num
+            const client = createApiClientForPort(status.port)
+            const info = await client.v1.chain.get_info()
+            status.headBlock = Number(info.head_block_num)
         } catch (error: any) {
             status.error = 'Could not connect to chain'
         }
@@ -331,40 +333,35 @@ async function setupDevWallet(): Promise<void> {
     console.log('Setting up development wallet...')
 
     const walletName = 'dev'
-    const walletPassword = 'PW5KKbTdHCGmrWXmtHFXz7eVZqzJ3cCJLQ4EwBSbQMKcZpXhsjzKM'
     const devKeys = getDevKeys()
+    const devPrivateKey = PrivateKey.from(devKeys.privateKey)
 
     try {
-        // Create wallet
-        try {
-            await executeCommand(`cleos wallet create -n ${walletName} --to-console`)
-        } catch {
-            // Wallet might already exist
+        const existingKeys = listWalletKeys()
+        const existingEntry = existingKeys.find(
+            (key) => key.name === walletName || key.publicKey === devKeys.publicKey
+        )
+
+        if (!existingEntry) {
+            addKeyToWallet(devPrivateKey, walletName)
+            console.log(`Stored development key in WharfKit wallet as "${walletName}"`)
+        } else if (existingEntry.name !== walletName) {
+            console.log(
+                `Development key already stored as "${existingEntry.name}", keeping existing entry`
+            )
+        } else {
+            console.log('Development key already stored')
         }
 
-        // Unlock wallet
-        try {
-            await executeCommand(
-                `echo "${walletPassword}" | cleos wallet unlock -n ${walletName} --password`
-            )
-        } catch {
-            // Wallet might already be unlocked
-        }
-
-        // Import dev key
-        try {
-            await executeCommand(
-                `cleos wallet import -n ${walletName} --private-key ${devKeys.privateKey}`
-            )
-        } catch {
-            // Key might already be imported
-        }
+        const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
+        const renderer = new ConsoleRenderer()
+        renderer.status('WharfKit wallet plugin initialized for local development')
+        void walletPlugin
 
         console.log('Development wallet ready')
     } catch (error: any) {
         console.log(`Warning: Could not setup dev wallet: ${error.message}`)
-        console.log('You can manually import keys using:')
-        console.log(`  cleos wallet create -n ${walletName}`)
-        console.log(`  cleos wallet import -n ${walletName} --private-key ${devKeys.privateKey}`)
+        console.log('You can manually store the development key with:')
+        console.log(`  wharfkit wallet keys add --name ${walletName} --private ${devKeys.privateKey}`)
     }
 }

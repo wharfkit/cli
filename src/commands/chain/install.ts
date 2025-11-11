@@ -1,15 +1,17 @@
 /* eslint-disable no-console */
-import {executeCommand, getPlatform} from './utils'
+import {ConsoleRenderer} from '@wharfkit/console-rendered'
+import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
+import {executeCommand, getDevKeys, getPlatform} from './utils'
 
 export interface InstallationStatus {
     installed: boolean
     nodeos: boolean
-    cleos: boolean
-    keosd: boolean
     nodeosPath?: string
-    cleosPath?: string
-    keosdPath?: string
     version?: string
+    wharfkit: {
+        consoleRenderer: boolean
+        walletPlugin: boolean
+    }
 }
 
 /**
@@ -19,8 +21,10 @@ export async function checkLeapInstallation(): Promise<InstallationStatus> {
     const status: InstallationStatus = {
         installed: false,
         nodeos: false,
-        cleos: false,
-        keosd: false,
+        wharfkit: {
+            consoleRenderer: false,
+            walletPlugin: false,
+        },
     }
 
     // Check nodeos
@@ -32,23 +36,8 @@ export async function checkLeapInstallation(): Promise<InstallationStatus> {
         // nodeos not found
     }
 
-    // Check cleos
-    try {
-        const {stdout} = await executeCommand('which cleos')
-        status.cleosPath = stdout.trim()
-        status.cleos = true
-    } catch {
-        // cleos not found
-    }
-
-    // Check keosd
-    try {
-        const {stdout} = await executeCommand('which keosd')
-        status.keosdPath = stdout.trim()
-        status.keosd = true
-    } catch {
-        // keosd not found
-    }
+    status.wharfkit.consoleRenderer = checkConsoleRenderer()
+    status.wharfkit.walletPlugin = checkWalletPlugin()
 
     // Get version if nodeos is installed
     if (status.nodeos) {
@@ -63,7 +52,7 @@ export async function checkLeapInstallation(): Promise<InstallationStatus> {
         }
     }
 
-    status.installed = status.nodeos && status.cleos && status.keosd
+    status.installed = status.nodeos && status.wharfkit.consoleRenderer && status.wharfkit.walletPlugin
 
     return status
 }
@@ -203,12 +192,31 @@ export async function ensureLeapInstalled(): Promise<void> {
     if (!status.nodeos) {
         console.log('  - nodeos is not installed')
     }
-    if (!status.cleos) {
-        console.log('  - cleos is not installed')
+    if (!status.wharfkit.consoleRenderer) {
+        console.log('  - WharfKit console renderer is unavailable')
     }
-    if (!status.keosd) {
-        console.log('  - keosd is not installed')
+    if (!status.wharfkit.walletPlugin) {
+        console.log('  - WharfKit private key wallet plugin is unavailable')
     }
 
     await installLeap()
+}
+
+function checkConsoleRenderer(): boolean {
+    try {
+        new ConsoleRenderer()
+        return true
+    } catch {
+        return false
+    }
+}
+
+function checkWalletPlugin(): boolean {
+    try {
+        const devKeys = getDevKeys()
+        new WalletPluginPrivateKey(devKeys.privateKey)
+        return true
+    } catch {
+        return false
+    }
 }

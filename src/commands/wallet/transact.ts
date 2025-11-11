@@ -4,7 +4,7 @@ import {getKeyFromWallet, listWalletKeys} from './utils'
 import * as readline from 'readline'
 import * as fs from 'fs'
 
-interface SignOptions {
+interface TransactOptions {
     key?: string
     password?: boolean
     output?: string
@@ -138,11 +138,11 @@ function selectKey(keyName?: string): string {
 }
 
 /**
- * Sign a transaction
+ * Transact a transaction (sign-only for now)
  */
-export async function signTransaction(
+export async function transactTransaction(
     transactionJson: string,
-    options: SignOptions
+    options: TransactOptions
 ): Promise<void> {
     try {
         // Load the transaction
@@ -189,7 +189,7 @@ export async function signTransaction(
         if (options.output) {
             // Save to file
             fs.writeFileSync(options.output, output, 'utf8')
-            log(`Signed transaction saved to: ${options.output}`, 'info')
+            log(`Transaction output saved to: ${options.output}`, 'info')
         } else {
             // Print to stdout
             log('Signed Transaction:', 'info')
@@ -199,7 +199,7 @@ export async function signTransaction(
         log('', 'info')
         log(`Signature: ${signature.toString()}`, 'info')
     } catch (error) {
-        log(`❌ Failed to sign transaction: ${(error as Error).message}`, 'info')
+        log(`❌ Failed to process transaction: ${(error as Error).message}`, 'info')
         process.exit(1)
     }
 }

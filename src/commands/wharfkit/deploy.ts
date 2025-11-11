@@ -7,6 +7,7 @@ import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
 import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
+import {createConsoleRenderer} from '../../utils/console-renderer'
 
 interface DeployOptions {
     account?: string
@@ -75,6 +76,7 @@ export async function deployContract(
             actor: accountName,
             permission: 'active',
             walletPlugin,
+            ui: createConsoleRenderer(),
         })
 
         console.log('\n🚀 Deploying contract...')

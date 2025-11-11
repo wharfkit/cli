@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import {ConsoleRenderer} from '@wharfkit/console-rendered'
 import {APIClient, FetchProvider, KeyType, PrivateKey} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
@@ -56,6 +57,7 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
             actor: 'eosio',
             permission: 'active',
             walletPlugin,
+            ui: new ConsoleRenderer(),
         })
 
         // Create newaccount action

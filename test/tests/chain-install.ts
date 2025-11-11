@@ -11,12 +11,14 @@ suite('Chain Install', function () {
             assert.isObject(status)
             assert.property(status, 'installed')
             assert.property(status, 'nodeos')
-            assert.property(status, 'cleos')
-            assert.property(status, 'keosd')
+            assert.property(status, 'wharfkit')
             assert.isBoolean(status.installed)
             assert.isBoolean(status.nodeos)
-            assert.isBoolean(status.cleos)
-            assert.isBoolean(status.keosd)
+            assert.isObject(status.wharfkit)
+            assert.property(status.wharfkit, 'consoleRenderer')
+            assert.property(status.wharfkit, 'walletPlugin')
+            assert.isBoolean(status.wharfkit.consoleRenderer)
+            assert.isBoolean(status.wharfkit.walletPlugin)
         })
 
         test('Has paths if binaries are installed', async function () {
@@ -27,16 +29,6 @@ suite('Chain Install', function () {
             if (status.nodeos) {
                 assert.property(status, 'nodeosPath')
                 assert.isString(status.nodeosPath)
-            }
-
-            if (status.cleos) {
-                assert.property(status, 'cleosPath')
-                assert.isString(status.cleosPath)
-            }
-
-            if (status.keosd) {
-                assert.property(status, 'keosdPath')
-                assert.isString(status.keosdPath)
             }
         })
 
@@ -59,8 +51,8 @@ suite('Chain Install', function () {
 
             if (status.installed) {
                 assert.isTrue(status.nodeos)
-                assert.isTrue(status.cleos)
-                assert.isTrue(status.keosd)
+                assert.isTrue(status.wharfkit.consoleRenderer)
+                assert.isTrue(status.wharfkit.walletPlugin)
             }
         })
     })

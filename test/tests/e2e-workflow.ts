@@ -74,8 +74,8 @@ suite('E2E Workflow', () => {
         })
     })
 
-    suite('Transaction Signing', () => {
-        test('can sign a transaction with wallet key', function () {
+    suite('Transaction Transacting', () => {
+        test('can transact (sign) a transaction with wallet key', function () {
             // Create a key first
             execSync(`node ${cliPath} wallet create --name signtest`, {encoding: 'utf8'})
 
@@ -102,12 +102,51 @@ suite('E2E Workflow', () => {
             const txPath = path.join(testDir, 'transaction.json')
             fs.writeFileSync(txPath, JSON.stringify(transaction))
 
-            // Sign the transaction
-            const output = execSync(`node ${cliPath} wallet sign ${txPath}`, {encoding: 'utf8'})
+            // Transact the transaction
+            const output = execSync(`node ${cliPath} wallet transact ${txPath}`, {encoding: 'utf8'})
 
             assert.include(output, '✅ Transaction signed successfully!')
             assert.include(output, 'Signature: SIG_K1_')
             assert.include(output, 'signatures')
+        })
+
+        test('writes signed transaction to file when --output is provided', function () {
+            execSync(`node ${cliPath} wallet create --name outputtest`, {encoding: 'utf8'})
+
+            const transaction = {
+                expiration: '2025-11-11T00:00:00',
+                ref_block_num: 54321,
+                ref_block_prefix: 98765,
+                max_net_usage_words: 0,
+                max_cpu_usage_ms: 0,
+                delay_sec: 0,
+                context_free_actions: [],
+                actions: [
+                    {
+                        account: 'eosio.token',
+                        name: 'transfer',
+                        authorization: [{actor: 'testaccount', permission: 'active'}],
+                        data: '0000000000ea305500000000487a2b9d0100000000000000045359530000000007746573742074',
+                    },
+                ],
+                transaction_extensions: [],
+            }
+
+            const txPath = path.join(testDir, 'transaction-output.json')
+            const signedPath = path.join(testDir, 'signed-transaction.json')
+            fs.writeFileSync(txPath, JSON.stringify(transaction))
+
+            const output = execSync(
+                `node ${cliPath} wallet transact ${txPath} --output ${signedPath}`,
+                {encoding: 'utf8'}
+            )
+
+            assert.include(output, 'Transaction output saved to:')
+            assert.isTrue(fs.existsSync(signedPath))
+
+            const saved = JSON.parse(fs.readFileSync(signedPath, 'utf8'))
+            assert.isArray(saved.signatures, 'signed transaction should include signatures array')
+            assert.isAbove(saved.signatures.length, 0, 'signed transaction should contain at least one signature')
         })
     })
 
@@ -173,7 +212,7 @@ class [[eosio::contract]] hello : public eosio::contract {
             assert.include(output, 'create')
             assert.include(output, 'keys')
             assert.include(output, 'account')
-            assert.include(output, 'sign')
+            assert.include(output, 'transact')
         })
 
         test('wallet account command has create subcommand', function () {

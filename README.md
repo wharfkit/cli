@@ -139,16 +139,16 @@ Sign a transaction using a key from your wallet:
 
 ```bash
 # Sign with default key (uses 'default' key or first available)
-wharfkit wallet sign transaction.json
+    wharfkit wallet transact transaction.json
 
 # Sign with specific key
-wharfkit wallet sign transaction.json --key mykey
+    wharfkit wallet transact transaction.json --key mykey
 
 # Sign with password-protected key
-wharfkit wallet sign transaction.json --key production --password
+    wharfkit wallet transact transaction.json --key production --password
 
 # Save signed transaction to file
-wharfkit wallet sign transaction.json --output signed.json
+    wharfkit wallet transact transaction.json --output signed.json
 ```
 
 The transaction can be provided as:
@@ -376,7 +376,7 @@ The typical development workflow is:
    - The contract will automatically recompile and redeploy
    - Watch the console for compilation and deployment status
 
-4. Test your contract using `cleos` or your preferred tools
+4. Test your contract using WharfKit sessions or your preferred tools
 
 5. Stop development mode with `Ctrl+C`
 
@@ -395,7 +395,7 @@ wharfkit chain local start
 ```
 
 This will:
-- ✅ Automatically detect and install LEAP (nodeos/cleos) if not present
+- ✅ Automatically detect and install LEAP (nodeos) if not present
 - ✅ Create necessary configuration and data directories
 - ✅ Start nodeos with sensible defaults for development
 - ✅ Set up a dev wallet with pre-configured keys

@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
+import {APIClient, FetchProvider} from '@wharfkit/antelope'
 import {exec} from 'child_process'
+import fetch from 'node-fetch'
 import {promisify} from 'util'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -252,13 +254,12 @@ pause-on-startup = false
  */
 export async function waitForChain(port: number, timeoutMs: number = 10000): Promise<boolean> {
     const startTime = Date.now()
+    const client = createApiClientForPort(port)
 
     while (Date.now() - startTime < timeoutMs) {
         try {
-            const {stdout} = await execAsync(
-                `cleos --url http://127.0.0.1:${port} get info 2>/dev/null`
-            )
-            if (stdout.includes('head_block_num')) {
+            const info = await client.v1.chain.get_info()
+            if (Number(info.head_block_num) >= 0) {
                 return true
             }
         } catch {
@@ -268,4 +269,10 @@ export async function waitForChain(port: number, timeoutMs: number = 10000): Pro
     }
 
     return false
+}
+
+export function createApiClientForPort(port: number): APIClient {
+    const url = `http://127.0.0.1:${port}`
+    const provider = new FetchProvider(url, {fetch})
+    return new APIClient({provider})
 }

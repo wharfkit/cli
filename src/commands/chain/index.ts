@@ -89,14 +89,24 @@ export function createChainCommand(): Command {
                     console.log('✅ LEAP is installed')
                     console.log(`   Version: ${status.version}`)
                     console.log(`   nodeos: ${status.nodeosPath}`)
-                    console.log(`   cleos: ${status.cleosPath}`)
-                    console.log(`   keosd: ${status.keosdPath}`)
+                    console.log(
+                        `   WharfKit console renderer: ${
+                            status.wharfkit.consoleRenderer ? 'available' : 'missing'
+                        }`
+                    )
+                    console.log(
+                        `   WharfKit wallet plugin: ${
+                            status.wharfkit.walletPlugin ? 'available' : 'missing'
+                        }`
+                    )
                 } else {
                     console.log('❌ LEAP is not installed\n')
                     console.log('Missing components:')
                     if (!status.nodeos) console.log('   - nodeos')
-                    if (!status.cleos) console.log('   - cleos')
-                    if (!status.keosd) console.log('   - keosd')
+                    if (!status.wharfkit.consoleRenderer)
+                        console.log('   - WharfKit console renderer')
+                    if (!status.wharfkit.walletPlugin)
+                        console.log('   - WharfKit private key wallet plugin')
                     console.log('\n💡 Install automatically with: wharfkit chain local start')
                 }
             } catch (error: any) {
