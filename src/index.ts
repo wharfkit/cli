@@ -5,6 +5,7 @@ import {generateContractFromCommand} from './commands/contract'
 import {generateKeysFromCommand} from './commands/keys/index'
 import {createAccountFromCommand} from './commands/account/index'
 import {createChainCommand} from './commands/chain/index'
+import {createWharfkitCommand} from './commands/wharfkit/index'
 
 const program = new Command()
 
@@ -48,5 +49,8 @@ program
 
 // 4. Command to manage local blockchain
 program.addCommand(createChainCommand())
+
+// 5. Command to compile contracts
+program.addCommand(createWharfkitCommand())
 
 program.parse(process.argv)
