@@ -3,9 +3,8 @@ import {Command} from 'commander'
 import {version} from '../package.json'
 import {generateContractFromCommand} from './commands/contract'
 import {generateKeysFromCommand} from './commands/keys/index'
-import {createAccountFromCommand} from './commands/account/index'
 import {createChainCommand} from './commands/chain/index'
-import {createWharfkitCommand} from './commands/wharfkit/index'
+import {createCompileCommand, createDeployCommand, createDevCommand} from './commands/wharfkit/index'
 import {createWalletCommand} from './commands/wallet/index'
 
 const program = new Command()
@@ -18,22 +17,7 @@ program
     .description('Generate a new set of public and private keys')
     .action(generateKeysFromCommand)
 
-// 2. Command to create an account
-program
-    .command('account')
-    .description('Create a new account with an optional public key')
-    .option('-c, --chain [chain]', 'The chain to create the account on. Defaults to "jungle4".')
-    .option(
-        '-n, --name [name]',
-        'Account name for the new account. Must end with ".gm". If not provided, a random name is generated.'
-    )
-    .option(
-        '-k, --key [key]',
-        'Public key for the new account. If not provided, keys are generated.'
-    )
-    .action(createAccountFromCommand)
-
-// 3. Existing command to generate a contract
+// 2. Existing command to generate a contract
 program
     .command('generate')
     .description('Generate Contract Kit code for the named smart contract')
@@ -48,13 +32,19 @@ program
     )
     .action(generateContractFromCommand)
 
-// 4. Command to manage local blockchain
+// 3. Command to manage local blockchain
 program.addCommand(createChainCommand())
 
-// 5. Command to compile contracts
-program.addCommand(createWharfkitCommand())
+// 4. Command to compile contracts
+program.addCommand(createCompileCommand())
 
-// 6. Command to manage wallet
+// 5. Command to deploy contracts
+program.addCommand(createDeployCommand())
+
+// 6. Command for development mode
+program.addCommand(createDevCommand())
+
+// 7. Command to manage wallet (includes account creation)
 program.addCommand(createWalletCommand())
 
 program.parse(process.argv)

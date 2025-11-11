@@ -1,4 +1,5 @@
 import {Command} from 'commander'
+import {createAccount} from './account'
 import {createWalletKey} from './create'
 import {createKey, listKeys} from './keys'
 import {signTransaction} from './sign'
@@ -40,6 +41,22 @@ export function createWalletCommand(): Command {
         })
 
     walletCommand.addCommand(keysCommand)
+
+    // wallet account - Manage accounts
+    const accountCommand = new Command('account')
+    accountCommand.description('Manage blockchain accounts')
+
+    // wallet account create - Create a new account
+    accountCommand
+        .command('create')
+        .description('Create a new account on the blockchain')
+        .option('-n, --name <name>', 'Account name (default: auto-generated)')
+        .option('-u, --url <url>', 'Blockchain API URL (default: http://127.0.0.1:8888)')
+        .action(async (options) => {
+            await createAccount(options)
+        })
+
+    walletCommand.addCommand(accountCommand)
 
     // wallet sign - Sign a transaction
     walletCommand

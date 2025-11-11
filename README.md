@@ -35,17 +35,51 @@ Options:
 
 Commands:
   keys                          Generate a new set of public and private keys
-  account [options]             Create a new account with an optional public key
   generate [options] <account>  Generate Contract Kit code for the named smart contract
   chain                         Manage local LEAP blockchain
-  wharfkit                      Compile C++ contract files
-  wallet                        Manage local wallet and sign transactions
+  compile [options] [file]      Compile C++ contract files
+  deploy [options] [wasm]       Deploy a compiled contract to the blockchain
+  dev [options]                 Start local chain and watch for changes
+  wallet                        Manage wallet, accounts, and sign transactions
   help [command]                display help for command
 ```
 
+### Creating Accounts
+
+Create new accounts on the local blockchain (requires local chain to be running).
+
+#### Create Account with Auto-generated Name
+
+```bash
+wharfkit wallet account create
+```
+
+This will:
+1. Generate a random 12-character account name
+2. Generate a new key pair for the account
+3. Create the account on the blockchain using the dev keys
+4. Allocate RAM (8192 bytes) and stake CPU/NET (1.0000 SYS each)
+5. Automatically store the private key in your wallet with the account name
+
+#### Create Account with Custom Name
+
+```bash
+wharfkit wallet account create --name mycontract
+```
+
+#### Create Account on Remote Chain
+
+```bash
+wharfkit wallet account create --url https://jungle4.greymass.com --name myaccount
+```
+
+**Note:** The account creation command uses Wharf Session Kit and automatically stores the generated key in your wallet with the account name. This makes it seamless to deploy contracts later - just use `wharfkit deploy --account mycontract` and it will automatically find and use the right key!
+
 ### Managing Wallet Keys
 
-The CLI includes a secure wallet system for managing private keys and signing transactions locally.
+The CLI includes a secure wallet system for managing private keys, creating accounts, and signing transactions locally.
+
+The `wallet` command is your central hub for all key and account management.
 
 #### Creating Keys
 
@@ -200,17 +234,17 @@ wharfkit chain local start
 
 **Compile a single file:**
 ```bash
-wharfkit wharfkit compile mycontract.cpp
+wharfkit compile mycontract.cpp
 ```
 
 **Compile all .cpp files in the current directory:**
 ```bash
-wharfkit wharfkit compile
+wharfkit compile
 ```
 
 **Specify output directory:**
 ```bash
-wharfkit wharfkit compile mycontract.cpp -o ./build
+wharfkit compile mycontract.cpp -o ./build
 ```
 
 #### Output
@@ -219,7 +253,7 @@ By default, compiled WASM files are output to the current directory. You can spe
 
 For example:
 ```bash
-wharfkit wharfkit compile -o ./build
+wharfkit compile -o ./build
 ```
 
 This will compile all .cpp files in the current directory and save the resulting .wasm files to the `./build` directory.
@@ -230,6 +264,123 @@ This will compile all .cpp files in the current directory and save the resulting
 -o, --output <directory>  Output directory for compiled WASM files (default: ".")
 -h, --help                display help for command
 ```
+
+### Deploying Contracts
+
+Deploy compiled smart contracts to a blockchain.
+
+#### Deploy a Specific WASM File
+
+```bash
+wharfkit deploy mycontract.wasm
+```
+
+The command will automatically look for the corresponding `.abi` file alongside the WASM file.
+
+#### Deploy with Custom Account Name
+
+```bash
+wharfkit deploy mycontract.wasm --account myaccount
+```
+
+#### Deploy to a Specific Blockchain
+
+```bash
+# Deploy to local chain (default)
+wharfkit deploy mycontract.wasm
+
+# Deploy to a remote chain
+wharfkit deploy mycontract.wasm --url https://jungle4.greymass.com
+```
+
+#### Auto-detect WASM File
+
+If you have only one `.wasm` file in your current directory, you can omit the filename:
+
+```bash
+wharfkit deploy
+```
+
+#### Deploy Options
+
+```
+-a, --account <name>  Contract account name (default: derived from filename)
+-u, --url <url>       Blockchain API URL (default: http://127.0.0.1:8888)
+-h, --help            display help for command
+```
+
+**Note:** Deploy uses Wharf Session Kit with your wallet keys. The deployment key is automatically selected:
+1. First, tries to find a wallet key with the same name as the account
+2. Falls back to the 'default' key if available
+3. Uses the first available key as a last resort
+
+To ensure smooth deployment, create an account first with `wharfkit wallet account create`, which automatically stores the key in your wallet.
+
+### Development Mode
+
+The `dev` command provides a complete development workflow: it starts a local blockchain and automatically compiles and deploys your contract whenever you make changes to your C++ files.
+
+#### Start Development Mode
+
+```bash
+wharfkit dev
+```
+
+This will:
+1. ✅ Start a local LEAP blockchain (if not already running)
+2. ✅ Compile all `.cpp` files in the current directory
+3. ✅ Deploy the compiled contract using Wharf Session Kit
+4. ✅ Watch for changes to `.cpp`, `.hpp`, and `.h` files
+5. ✅ Automatically recompile and redeploy on changes
+
+#### Development Mode with Options
+
+```bash
+# Start with a clean blockchain state
+wharfkit dev --clean
+
+# Specify contract account name
+wharfkit dev --account mycontract
+
+# Use a custom port
+wharfkit dev --port 9000
+
+# Combine options
+wharfkit dev --clean --account mycontract --port 9000
+```
+
+#### Dev Mode Options
+
+```
+-a, --account <name>  Contract account name (default: derived from filename)
+-p, --port <port>     Port for local blockchain (default: 8888)
+-c, --clean           Start with a clean blockchain state
+-h, --help            display help for command
+```
+
+#### Development Workflow
+
+The typical development workflow is:
+
+1. Navigate to your contract directory:
+   ```bash
+   cd my-contract
+   ```
+
+2. Start development mode:
+   ```bash
+   wharfkit dev
+   ```
+
+3. Edit your contract files (`.cpp`, `.hpp`)
+   - The contract will automatically recompile and redeploy
+   - Watch the console for compilation and deployment status
+
+4. Test your contract using `cleos` or your preferred tools
+
+5. Stop development mode with `Ctrl+C`
+
+**Note:** Development mode is designed for rapid iteration during development. For production deployments, use `wharfkit compile` followed by `wharfkit deploy` with appropriate production settings.
 
 ### Managing a Local Blockchain
 

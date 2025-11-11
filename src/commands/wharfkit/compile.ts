@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import {execSync} from 'child_process'
 import {existsSync, readdirSync} from 'fs'
-import {join, resolve, basename, extname} from 'path'
+import {basename, extname, join, resolve} from 'path'
 import {platform} from 'os'
 import {checkLeapInstallation} from '../chain/install'
 
@@ -127,8 +127,9 @@ async function compileSingleFile(filePath: string, outputDir: string): Promise<v
         console.log(`✓ Successfully compiled: ${wasmOutput}\n`)
     } catch (error: any) {
         throw new Error(
-            `Failed to compile ${filePath}: ${error.message || 'Unknown error'}. Make sure cdt-cpp is installed and in your PATH.`
+            `Failed to compile ${filePath}: ${
+                error.message || 'Unknown error'
+            }. Make sure cdt-cpp is installed and in your PATH.`
         )
     }
 }
-
