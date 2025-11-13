@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import {ConsoleRenderer} from '@wharfkit/console-rendered'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
+import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {executeCommand, getDevKeys, getPlatform} from './utils'
 
 export interface InstallationStatus {
@@ -204,7 +204,7 @@ export async function ensureLeapInstalled(): Promise<void> {
 
 function checkConsoleRenderer(): boolean {
     try {
-        new ConsoleRenderer()
+        new NonInteractiveConsoleUI()
         return true
     } catch {
         return false

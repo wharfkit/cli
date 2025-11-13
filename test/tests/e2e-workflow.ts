@@ -3,6 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import * as http from 'http'
 
 /**
  * E2E tests for the complete workflow:
@@ -147,6 +148,108 @@ suite('E2E Workflow', () => {
             const saved = JSON.parse(fs.readFileSync(signedPath, 'utf8'))
             assert.isArray(saved.signatures, 'signed transaction should include signatures array')
             assert.isAbove(saved.signatures.length, 0, 'signed transaction should contain at least one signature')
+        })
+
+        test('broadcasts transaction when --broadcast is provided', async function () {
+            const chainId =
+                'b94d27b9934d3e08a52e52d7da7dabfade8882abff6b19413ababd9f146e6e1'
+            const requests: Array<{path: string; method: string; body?: any}> = []
+
+            const server = http.createServer((req, res) => {
+                if (!req.url || !req.method) {
+                    res.writeHead(400)
+                    res.end()
+                    return
+                }
+
+                if (req.method === 'GET' && req.url === '/v1/chain/get_info') {
+                    requests.push({path: req.url, method: req.method})
+                    res.writeHead(200, {'Content-Type': 'application/json'})
+                    res.end(JSON.stringify({chain_id: chainId}))
+                    return
+                }
+
+                if (req.method === 'POST' && req.url === '/v1/chain/push_transaction') {
+                    let body = ''
+                    req.on('data', (chunk) => {
+                        body += chunk
+                    })
+                    req.on('end', () => {
+                        requests.push({
+                            path: req.url as string,
+                            method: req.method as string,
+                            body: body ? JSON.parse(body) : undefined,
+                        })
+                        res.writeHead(200, {'Content-Type': 'application/json'})
+                        res.end(
+                            JSON.stringify({
+                                transaction_id: 'abcd1234ef567890',
+                                processed: {receipt: {status: 'executed'}},
+                            })
+                        )
+                    })
+                    return
+                }
+
+                res.writeHead(404)
+                res.end()
+            })
+
+            const port = await new Promise<number>((resolve) => {
+                server.listen(0, () => {
+                    const address = server.address()
+                    if (typeof address === 'object' && address?.port) {
+                        resolve(address.port)
+                    } else {
+                        resolve(0)
+                    }
+                })
+            })
+
+            const txPath = path.join(testDir, 'transaction-broadcast.json')
+            const transaction = {
+                expiration: '2025-11-11T00:00:00',
+                ref_block_num: 1111,
+                ref_block_prefix: 2222,
+                max_net_usage_words: 0,
+                max_cpu_usage_ms: 0,
+                delay_sec: 0,
+                context_free_actions: [],
+                actions: [
+                    {
+                        account: 'eosio.token',
+                        name: 'transfer',
+                        authorization: [{actor: 'broadcastacc', permission: 'active'}],
+                        data: '0000000000ea305500000000487a2b9d010000000000000004535953000000000b62726f616463617374',
+                    },
+                ],
+                transaction_extensions: [],
+            }
+            fs.writeFileSync(txPath, JSON.stringify(transaction))
+
+            execSync(`node ${cliPath} wallet create --name broadcastkey`, {encoding: 'utf8'})
+
+            let output: string | undefined
+            try {
+                output = execSync(
+                    `node ${cliPath} wallet transact ${txPath} --broadcast --url http://127.0.0.1:${port}`,
+                    {encoding: 'utf8'}
+                )
+            } finally {
+                await new Promise((resolve) => server.close(resolve))
+            }
+
+            assert.isString(output)
+            assert.include(output, '🚀 Transaction broadcast successfully!')
+            assert.include(output, 'Transaction ID: abcd1234ef567890')
+            assert.include(output, 'Status: executed')
+
+            const broadcastRequest = requests.find(
+                (request) => request.path === '/v1/chain/push_transaction'
+            )
+            assert.isDefined(broadcastRequest, 'push_transaction should be called')
+            assert.isArray(broadcastRequest?.body?.signatures)
+            assert.isAbove(broadcastRequest?.body?.signatures.length ?? 0, 0)
         })
     })
 

@@ -6,8 +6,8 @@ import {APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
+import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
-import {createConsoleRenderer} from '../../utils/console-renderer'
 
 interface DeployOptions {
     account?: string
@@ -67,6 +67,9 @@ export async function deployContract(
 
         // Create session with private key wallet plugin
         const walletPlugin = new WalletPluginPrivateKey(privateKey)
+        walletPlugin.config.requiresChainSelect = false
+        walletPlugin.config.requiresPermissionSelect = false
+        walletPlugin.config.requiresPermissionEntry = false
 
         const session = new Session({
             chain: {
@@ -76,7 +79,7 @@ export async function deployContract(
             actor: accountName,
             permission: 'active',
             walletPlugin,
-            ui: createConsoleRenderer(),
+            ui: new NonInteractiveConsoleUI(),
         })
 
         console.log('\n🚀 Deploying contract...')

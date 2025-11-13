@@ -61,11 +61,13 @@ export function createWalletCommand(): Command {
     // wallet transact - Sign a transaction
     walletCommand
         .command('transact')
-        .description('Transact (sign) a transaction with a key from the wallet')
+        .description('Transact (sign and optionally broadcast) a transaction with a key from the wallet')
         .argument('<transaction>', 'Transaction JSON string or path to JSON file')
         .option('-k, --key <name>', 'Name or public key of the key to use for signing')
         .option('-p, --password', 'Prompt for password if key is encrypted with custom password')
         .option('-o, --output <file>', 'Output file path for signed transaction (default: stdout)')
+        .option('-b, --broadcast', 'Broadcast the signed transaction to the network')
+        .option('-u, --url <url>', 'API endpoint for broadcasting (default: http://127.0.0.1:8888)')
         .action(async (transaction, options) => {
             await transactTransaction(transaction, options)
         })

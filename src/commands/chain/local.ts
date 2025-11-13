@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import {ConsoleRenderer} from '@wharfkit/console-rendered'
 import {PrivateKey} from '@wharfkit/antelope'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {spawn} from 'child_process'
@@ -25,6 +24,7 @@ import {
 } from './utils'
 import {ensureLeapInstalled} from './install'
 import {addKeyToWallet, listWalletKeys} from '../wallet/utils'
+import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 
 export interface LocalStartOptions {
     port: number
@@ -354,7 +354,7 @@ async function setupDevWallet(): Promise<void> {
         }
 
         const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
-        const renderer = new ConsoleRenderer()
+        const renderer = new NonInteractiveConsoleUI()
         renderer.status('WharfKit wallet plugin initialized for local development')
         void walletPlugin
 

@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
-import {ConsoleRenderer} from '@wharfkit/console-rendered'
 import {APIClient, FetchProvider, KeyType, PrivateKey} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
 import {getDevKeys} from '../chain/utils'
+import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {addKeyToWallet} from './utils'
 
 interface AccountCreateOptions {
@@ -49,6 +49,10 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
 
         // Create session with dev key
         const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
+        walletPlugin.config.requiresChainSelect = false
+        walletPlugin.config.requiresPermissionSelect = false
+        walletPlugin.config.requiresPermissionEntry = false
+
         const session = new Session({
             chain: {
                 id: String(info.chain_id),
@@ -57,7 +61,7 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
             actor: 'eosio',
             permission: 'active',
             walletPlugin,
-            ui: new ConsoleRenderer(),
+            ui: new NonInteractiveConsoleUI(),
         })
 
         // Create newaccount action

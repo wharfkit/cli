@@ -149,6 +149,9 @@ Sign a transaction using a key from your wallet:
 
 # Save signed transaction to file
     wharfkit wallet transact transaction.json --output signed.json
+
+# Sign and broadcast to a local node
+    wharfkit wallet transact transaction.json --broadcast --url http://127.0.0.1:8888
 ```
 
 The transaction can be provided as:
