@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
-import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {executeCommand, getDevKeys, getPlatform} from './utils'
+import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 
 export interface InstallationStatus {
     installed: boolean

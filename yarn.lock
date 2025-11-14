@@ -255,17 +255,6 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.48.0.tgz"
   integrity sha512-ZSjtmelB7IJfWD2Fvb7+Z+ChTIKWq6kjda95fLcQKNS5aheVHn4IkfgRQE3sIIzTcSLwLcLZUD9UBt+V7+h+Pw==
 
-"@greymass/eosio@^0.6.0", "@greymass/eosio@^0.6.9":
-  version "0.6.11"
-  resolved "https://registry.yarnpkg.com/@greymass/eosio/-/eosio-0.6.11.tgz#9bd1783f8467834563ac893d41524c01aba0228c"
-  integrity sha512-Ud6V7+vQJ+OLxqD7QcKTv/ik/Hd5uaRHyGY9Hzc+cJXezYU4sADX4TyQ8sn6XIr8ebVVNZFvWpc5JR0a9lBzKw==
-  dependencies:
-    bn.js "^4.11.9"
-    brorand "^1.1.0"
-    elliptic "^6.5.4"
-    hash.js "^1.0.0"
-    tslib "^2.0.3"
-
 "@humanwhocodes/config-array@^0.11.10":
   version "0.11.10"
   resolved "https://registry.npmjs.org/@humanwhocodes/config-array/-/config-array-0.11.10.tgz"
@@ -701,16 +690,6 @@
   dependencies:
     tslib "^2.1.0"
 
-"@wharfkit/console-renderer@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@wharfkit/console-renderer/-/console-renderer-0.1.1.tgz#dc499c92e6097d230a38e81faff82f2f16fdfde2"
-  integrity sha512-a+eQBoOZFcfjqJLwBPVkfJCiuYJUqD79s6iTMs4zAz+4paogxUR3WHyVBeG1yVvCRBPpxECV53uO9A7mSyeE+A==
-  dependencies:
-    "@wharfkit/session" "0.3.1"
-    prompts "^2.4.2"
-    qrcode-terminal "^0.12.0"
-    tslib "^2.1.0"
-
 "@wharfkit/contract@^1.1.4":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@wharfkit/contract/-/contract-1.1.4.tgz#5d65a7effa02bb71c98a7493cfdca2472578e6d5"
@@ -730,16 +709,6 @@
     "@wharfkit/session" "^1.0.0"
     "@wharfkit/wallet-plugin-privatekey" "^1.0.0"
     node-fetch "^2.6.1"
-    tslib "^2.1.0"
-
-"@wharfkit/session@0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@wharfkit/session/-/session-0.3.1.tgz#7aa8380481925806ba986025cca05bac8a14b773"
-  integrity sha512-ZipRLwPR2/kNDqM9kQvQyijeURJQ0mSiCtEYMOPRL17Chp39bZa3zTeBfFlTZMoY8nkn0M3k7+bkkOh9D+UwBQ==
-  dependencies:
-    "@greymass/eosio" "^0.6.9"
-    eosio-signing-request "^2.5.2"
-    pako "^2.0.4"
     tslib "^2.1.0"
 
 "@wharfkit/session@^1.0.0":
@@ -1230,14 +1199,6 @@ emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.npmjs.org/emoji-regex/-/emoji-regex-8.0.0.tgz"
   integrity sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
-
-eosio-signing-request@^2.5.2:
-  version "2.5.3"
-  resolved "https://registry.yarnpkg.com/eosio-signing-request/-/eosio-signing-request-2.5.3.tgz#4b15bcc67d2814393a83084c45e4473d638b16e1"
-  integrity sha512-jb4cKjQM+NI8+JwtGClYiCDX9sgSeUreRTE7YkIAga0fo21vtLTjTn0ZUH1zyfQU5b4Drdcs/yUMXdPUtqp9bg==
-  dependencies:
-    "@greymass/eosio" "^0.6.0"
-    tslib "^2.0.3"
 
 es6-error@^4.0.1:
   version "4.1.1"
@@ -1914,11 +1875,6 @@ keyv@^4.5.3:
   dependencies:
     json-buffer "3.0.1"
 
-kleur@^3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/kleur/-/kleur-3.0.3.tgz#a79c9ecc86ee1ce3fa6206d1216c501f147fc07e"
-  integrity sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==
-
 levn@^0.4.1:
   version "0.4.1"
   resolved "https://registry.npmjs.org/levn/-/levn-0.4.1.tgz"
@@ -2351,23 +2307,10 @@ process-on-spawn@^1.0.0:
   dependencies:
     fromentries "^1.2.0"
 
-prompts@^2.4.2:
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/prompts/-/prompts-2.4.2.tgz#7b57e73b3a48029ad10ebd44f74b01722a4cb069"
-  integrity sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==
-  dependencies:
-    kleur "^3.0.3"
-    sisteransi "^1.0.5"
-
 punycode@^2.1.0:
   version "2.3.0"
   resolved "https://registry.npmjs.org/punycode/-/punycode-2.3.0.tgz"
   integrity sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==
-
-qrcode-terminal@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/qrcode-terminal/-/qrcode-terminal-0.12.0.tgz#bb5b699ef7f9f0505092a3748be4464fe71b5819"
-  integrity sha512-EXtzRZmC+YGmGlDFbXKxQiMZNwCLEO6BANKXG4iCtSIM0yqc/pappSx3RIKr4r0uh5JsBckOXeKrB3Iz7mdQpQ==
 
 queue-microtask@^1.2.2:
   version "1.2.3"
@@ -2548,11 +2491,6 @@ sinon@^15.2.0:
     diff "^5.1.0"
     nise "^5.1.4"
     supports-color "^7.2.0"
-
-sisteransi@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
-  integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
 skip-regex@^1.0.2:
   version "1.0.2"
