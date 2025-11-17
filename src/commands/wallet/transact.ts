@@ -1,22 +1,13 @@
-import {
-    APIClient,
-    Checksum256,
-    FetchProvider,
-    SignedTransaction,
-    Transaction,
-} from '@wharfkit/antelope'
+import {Checksum256, SignedTransaction, Transaction} from '@wharfkit/antelope'
 import {log} from '../../utils'
 import {getKeyFromWallet, listWalletKeys} from './utils'
 import * as readline from 'readline'
 import * as fs from 'fs'
-import fetch from 'node-fetch'
 
-interface TransactOptions {
+interface SignOptions {
     key?: string
     password?: boolean
     output?: string
-    broadcast?: boolean
-    url?: string
 }
 
 /**
@@ -147,9 +138,12 @@ function selectKey(keyName?: string): string {
 }
 
 /**
- * Transact a transaction (sign-only for now)
+ * Sign a transaction
  */
-export async function transactTransaction(transactionJson: string, options: TransactOptions): Promise<void> {
+export async function signTransaction(
+    transactionJson: string,
+    options: SignOptions
+): Promise<void> {
     try {
         // Load the transaction
         const transaction = loadTransaction(transactionJson)
@@ -157,9 +151,6 @@ export async function transactTransaction(transactionJson: string, options: Tran
         log('Transaction loaded:', 'info')
         log(JSON.stringify(transaction, null, 2), 'info')
         log('', 'info')
-
-        const shouldBroadcast = !!options.broadcast
-        const apiUrl = options.url || 'http://127.0.0.1:8888'
 
         // Select the key to use
         const keyName = selectKey(options.key)
@@ -171,31 +162,14 @@ export async function transactTransaction(transactionJson: string, options: Tran
         // Load the private key
         const privateKey = getKeyFromWallet(keyName, password)
 
-        let client: APIClient | undefined
-        let chainId: Checksum256
-
-        if (shouldBroadcast) {
-            try {
-                client = new APIClient({
-                    provider: new FetchProvider(apiUrl, {fetch}),
-                })
-                const info = await client.v1.chain.get_info()
-                chainId = Checksum256.from(String(info.chain_id))
-                log(`Broadcast target: ${apiUrl}`, 'info')
-                log(`Chain ID: ${chainId.toString()}`, 'info')
-                log('', 'info')
-            } catch (error) {
-                log(`❌ Failed to fetch chain info: ${(error as Error).message}`, 'info')
-                process.exit(1)
-            }
-        } else {
-            // Default placeholder chain IDs for offline signing
-            chainId = Checksum256.from(
-                transaction.ref_block_num
-                    ? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d'
-                    : '0000000000000000000000000000000000000000000000000000000000000000'
-            )
-        }
+        // Create chain ID (you might want to make this configurable)
+        // For now, we'll use a placeholder. In a real scenario, this should come from
+        // the transaction data or be specified by the user
+        const chainId = Checksum256.from(
+            transaction.ref_block_num
+                ? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d' // EOS mainnet as default
+                : '0000000000000000000000000000000000000000000000000000000000000000'
+        )
 
         // Sign the transaction
         const digest = transaction.signingDigest(chainId)
@@ -215,7 +189,7 @@ export async function transactTransaction(transactionJson: string, options: Tran
         if (options.output) {
             // Save to file
             fs.writeFileSync(options.output, output, 'utf8')
-            log(`Transaction output saved to: ${options.output}`, 'info')
+            log(`Signed transaction saved to: ${options.output}`, 'info')
         } else {
             // Print to stdout
             log('Signed Transaction:', 'info')
@@ -224,26 +198,8 @@ export async function transactTransaction(transactionJson: string, options: Tran
 
         log('', 'info')
         log(`Signature: ${signature.toString()}`, 'info')
-
-        if (shouldBroadcast && client) {
-            try {
-                const result = await client.v1.chain.push_transaction(signedTransaction)
-                log('', 'info')
-                log('🚀 Transaction broadcast successfully!', 'info')
-                if (result.transaction_id) {
-                    log(`Transaction ID: ${result.transaction_id}`, 'info')
-                }
-                const status = result.processed?.receipt?.status
-                if (status) {
-                    log(`Status: ${status}`, 'info')
-                }
-            } catch (error) {
-                log(`❌ Failed to broadcast transaction: ${(error as Error).message}`, 'info')
-                process.exit(1)
-            }
-        }
     } catch (error) {
-        log(`❌ Failed to process transaction: ${(error as Error).message}`, 'info')
+        log(`❌ Failed to sign transaction: ${(error as Error).message}`, 'info')
         process.exit(1)
     }
 }

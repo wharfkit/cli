@@ -18,7 +18,7 @@ suite('E2E Workflow', () => {
     let testWalletDir: string
     let originalHome: string
 
-    setup(function () {
+    suiteSetup(function () {
         // Create a temporary test directory
         testDir = path.join(os.tmpdir(), `wharfkit-e2e-test-${Date.now()}`)
         fs.mkdirSync(testDir, {recursive: true})
@@ -30,9 +30,11 @@ suite('E2E Workflow', () => {
         // Mock HOME to use test wallet directory
         originalHome = process.env.HOME || ''
         process.env.HOME = testDir
+
+        execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
     })
 
-    teardown(function () {
+    suiteTeardown(function () {
         // Restore original HOME
         process.env.HOME = originalHome
 
@@ -40,6 +42,8 @@ suite('E2E Workflow', () => {
         if (fs.existsSync(testDir)) {
             fs.rmSync(testDir, {recursive: true, force: true})
         }
+
+        execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
     })
 
     suite('Wallet Key Management', () => {
@@ -147,64 +151,15 @@ suite('E2E Workflow', () => {
 
             const saved = JSON.parse(fs.readFileSync(signedPath, 'utf8'))
             assert.isArray(saved.signatures, 'signed transaction should include signatures array')
-            assert.isAbove(saved.signatures.length, 0, 'signed transaction should contain at least one signature')
+            assert.isAbove(
+                saved.signatures.length,
+                0,
+                'signed transaction should contain at least one signature'
+            )
         })
 
         test('broadcasts transaction when --broadcast is provided', async function () {
-            const chainId =
-                'b94d27b9934d3e08a52e52d7da7dabfade8882abff6b19413ababd9f146e6e1'
             const requests: Array<{path: string; method: string; body?: any}> = []
-
-            const server = http.createServer((req, res) => {
-                if (!req.url || !req.method) {
-                    res.writeHead(400)
-                    res.end()
-                    return
-                }
-
-                if (req.method === 'GET' && req.url === '/v1/chain/get_info') {
-                    requests.push({path: req.url, method: req.method})
-                    res.writeHead(200, {'Content-Type': 'application/json'})
-                    res.end(JSON.stringify({chain_id: chainId}))
-                    return
-                }
-
-                if (req.method === 'POST' && req.url === '/v1/chain/push_transaction') {
-                    let body = ''
-                    req.on('data', (chunk) => {
-                        body += chunk
-                    })
-                    req.on('end', () => {
-                        requests.push({
-                            path: req.url as string,
-                            method: req.method as string,
-                            body: body ? JSON.parse(body) : undefined,
-                        })
-                        res.writeHead(200, {'Content-Type': 'application/json'})
-                        res.end(
-                            JSON.stringify({
-                                transaction_id: 'abcd1234ef567890',
-                                processed: {receipt: {status: 'executed'}},
-                            })
-                        )
-                    })
-                    return
-                }
-
-                res.writeHead(404)
-                res.end()
-            })
-
-            const port = await new Promise<number>((resolve) => {
-                server.listen(0, () => {
-                    const address = server.address()
-                    if (typeof address === 'object' && address?.port) {
-                        resolve(address.port)
-                    } else {
-                        resolve(0)
-                    }
-                })
-            })
 
             const txPath = path.join(testDir, 'transaction-broadcast.json')
             const transaction = {
@@ -230,16 +185,18 @@ suite('E2E Workflow', () => {
             execSync(`node ${cliPath} wallet create --name broadcastkey`, {encoding: 'utf8'})
 
             let output: string | undefined
+
             try {
-                output = execSync(
-                    `node ${cliPath} wallet transact ${txPath} --broadcast --url http://127.0.0.1:${port}`,
-                    {encoding: 'utf8'}
-                )
-            } finally {
-                await new Promise((resolve) => server.close(resolve))
+                output = execSync(`node ${cliPath} wallet transact ${txPath} --broadcast`, {
+                    encoding: 'utf8',
+                })
+            } catch (error: any) {
+                console.error(error)
+                output = error.stdout
             }
 
             assert.isString(output)
+            console.log({output})
             assert.include(output, '🚀 Transaction broadcast successfully!')
             assert.include(output, 'Transaction ID: abcd1234ef567890')
             assert.include(output, 'Status: executed')
@@ -378,4 +335,3 @@ class [[eosio::contract]] hello : public eosio::contract {
         })
     })
 })
-
