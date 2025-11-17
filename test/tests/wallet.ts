@@ -11,6 +11,15 @@ import {
     getWalletDir,
 } from 'src/commands/wallet/utils'
 
+/**
+ * Get a transaction expiration date 1 hour from now
+ */
+function getTransactionExpiration(): string {
+    const now = new Date()
+    now.setHours(now.getHours() + 1)
+    return now.toISOString().slice(0, 19) // Remove milliseconds and timezone
+}
+
 suite('Wallet Utils', () => {
     let testWalletDir: string
 
@@ -215,7 +224,7 @@ suite('Wallet Utils', () => {
 
             // Create a test transaction
             const transaction = Transaction.from({
-                expiration: '2025-11-11T00:00:00',
+                expiration: getTransactionExpiration(),
                 ref_block_num: 12345,
                 ref_block_prefix: 67890,
                 max_net_usage_words: 0,

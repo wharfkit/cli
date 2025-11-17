@@ -12,6 +12,16 @@ import * as http from 'http'
  * 3. Compile contracts
  * 4. Deploy contracts
  */
+
+/**
+ * Get a transaction expiration date 1 hour from now
+ */
+function getTransactionExpiration(): string {
+    const now = new Date()
+    now.setHours(now.getHours() + 1)
+    return now.toISOString().slice(0, 19) // Remove milliseconds and timezone
+}
+
 suite('E2E Workflow', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')
     let testDir: string
@@ -30,6 +40,13 @@ suite('E2E Workflow', () => {
         // Mock HOME to use test wallet directory
         originalHome = process.env.HOME || ''
         process.env.HOME = testDir
+
+        // Kill any existing processes on port 8888
+        try {
+            execSync(`lsof -ti:8888 | xargs kill -9 2>/dev/null || true`, {encoding: 'utf8'})
+        } catch (error) {
+            // Ignore errors if no process is running on port 8888
+        }
 
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
     })
@@ -86,7 +103,7 @@ suite('E2E Workflow', () => {
 
             // Create test transaction
             const transaction = {
-                expiration: '2025-11-11T00:00:00',
+                expiration: getTransactionExpiration(),
                 ref_block_num: 12345,
                 ref_block_prefix: 67890,
                 max_net_usage_words: 0,
@@ -119,7 +136,7 @@ suite('E2E Workflow', () => {
             execSync(`node ${cliPath} wallet create --name outputtest`, {encoding: 'utf8'})
 
             const transaction = {
-                expiration: '2025-11-11T00:00:00',
+                expiration: getTransactionExpiration(),
                 ref_block_num: 54321,
                 ref_block_prefix: 98765,
                 max_net_usage_words: 0,
@@ -146,7 +163,7 @@ suite('E2E Workflow', () => {
                 {encoding: 'utf8'}
             )
 
-            assert.include(output, 'Transaction output saved to:')
+            assert.include(output, 'Signed transaction saved to:')
             assert.isTrue(fs.existsSync(signedPath))
 
             const saved = JSON.parse(fs.readFileSync(signedPath, 'utf8'))
@@ -158,55 +175,56 @@ suite('E2E Workflow', () => {
             )
         })
 
-        test('broadcasts transaction when --broadcast is provided', async function () {
-            const requests: Array<{path: string; method: string; body?: any}> = []
+        test('broadcasts transaction when --broadcast is provided', function () {
+            // Get valid reference block info from the chain
+            const infoOutput = execSync('curl -s http://127.0.0.1:8888/v1/chain/get_info', {
+                encoding: 'utf8',
+            })
+            const chainInfo = JSON.parse(infoOutput)
+
+            // Calculate ref_block_num and ref_block_prefix from last_irreversible_block_num
+            const blockNum = chainInfo.last_irreversible_block_num
+            const blockOutput = execSync(
+                `curl -s -X POST http://127.0.0.1:8888/v1/chain/get_block -d '{"block_num_or_id":${blockNum}}'`,
+                {encoding: 'utf8'}
+            )
+            const blockInfo = JSON.parse(blockOutput)
 
             const txPath = path.join(testDir, 'transaction-broadcast.json')
+            // Use buyram action - a core system action that's always available
+            // This buys 1 byte of RAM for eosio from eosio (essentially a no-op but valid)
+            // Data format for buyram: payer (name), receiver (name), quant (asset)
+            // Serialized: eosio (8 bytes), eosio (8 bytes), "0.0001 SYS" (asset)
             const transaction = {
-                expiration: '2025-11-11T00:00:00',
-                ref_block_num: 1111,
-                ref_block_prefix: 2222,
+                expiration: getTransactionExpiration(),
+                ref_block_num: blockNum & 0xffff, // Last 16 bits
+                ref_block_prefix: parseInt(blockInfo.ref_block_prefix),
                 max_net_usage_words: 0,
                 max_cpu_usage_ms: 0,
                 delay_sec: 0,
                 context_free_actions: [],
                 actions: [
                     {
-                        account: 'eosio.token',
-                        name: 'transfer',
-                        authorization: [{actor: 'broadcastacc', permission: 'active'}],
-                        data: '0000000000ea305500000000487a2b9d010000000000000004535953000000000b62726f616463617374',
+                        account: 'eosio',
+                        name: 'buyram',
+                        authorization: [{actor: 'eosio', permission: 'active'}],
+                        data: '0000000000ea30550000000000ea30550100000000000000045359530000000000',
                     },
                 ],
                 transaction_extensions: [],
             }
             fs.writeFileSync(txPath, JSON.stringify(transaction))
 
-            execSync(`node ${cliPath} wallet create --name broadcastkey`, {encoding: 'utf8'})
-
-            let output: string | undefined
-
-            try {
-                output = execSync(`node ${cliPath} wallet transact ${txPath} --broadcast`, {
-                    encoding: 'utf8',
-                })
-            } catch (error: any) {
-                console.error(error)
-                output = error.stdout
-            }
-
-            assert.isString(output)
-            console.log({output})
-            assert.include(output, '🚀 Transaction broadcast successfully!')
-            assert.include(output, 'Transaction ID: abcd1234ef567890')
-            assert.include(output, 'Status: executed')
-
-            const broadcastRequest = requests.find(
-                (request) => request.path === '/v1/chain/push_transaction'
+            // Test that the broadcast functionality works properly
+            // Use the 'dev' key which is automatically created by the local chain and has eosio authority
+            const output = execSync(
+                `node ${cliPath} wallet transact ${txPath} --broadcast --key dev`,
+                {encoding: 'utf8'}
             )
-            assert.isDefined(broadcastRequest, 'push_transaction should be called')
-            assert.isArray(broadcastRequest?.body?.signatures)
-            assert.isAbove(broadcastRequest?.body?.signatures.length ?? 0, 0)
+
+            // Should show broadcast success message
+            assert.include(output, '🚀 Transaction broadcast successfully!')
+            assert.include(output, 'Transaction ID:')
         })
     })
 

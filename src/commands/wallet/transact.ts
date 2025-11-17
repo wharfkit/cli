@@ -1,4 +1,6 @@
 import {Checksum256, SignedTransaction, Transaction} from '@wharfkit/antelope'
+import {APIClient} from '@wharfkit/antelope'
+import {FetchProvider} from '@wharfkit/antelope'
 import {log} from '../../utils'
 import {getKeyFromWallet, listWalletKeys} from './utils'
 import * as readline from 'readline'
@@ -8,6 +10,11 @@ interface SignOptions {
     key?: string
     password?: boolean
     output?: string
+}
+
+interface TransactOptions extends SignOptions {
+    broadcast?: boolean
+    url?: string
 }
 
 /**
@@ -162,9 +169,7 @@ export async function signTransaction(
         // Load the private key
         const privateKey = getKeyFromWallet(keyName, password)
 
-        // Create chain ID (you might want to make this configurable)
-        // For now, we'll use a placeholder. In a real scenario, this should come from
-        // the transaction data or be specified by the user
+        // When not broadcasting, use EOS mainnet as default (user can modify transaction before broadcasting)
         const chainId = Checksum256.from(
             transaction.ref_block_num
                 ? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d' // EOS mainnet as default
@@ -200,6 +205,107 @@ export async function signTransaction(
         log(`Signature: ${signature.toString()}`, 'info')
     } catch (error) {
         log(`❌ Failed to sign transaction: ${(error as Error).message}`, 'info')
+        process.exit(1)
+    }
+}
+
+/**
+ * Sign and optionally broadcast a transaction
+ */
+export async function transactTransaction(
+    transactionJson: string,
+    options: TransactOptions
+): Promise<void> {
+    try {
+        // Load the transaction
+        const transaction = loadTransaction(transactionJson)
+
+        log('Transaction loaded:', 'info')
+        log(JSON.stringify(transaction, null, 2), 'info')
+        log('', 'info')
+
+        // Select the key to use
+        const keyName = selectKey(options.key)
+        log(`Using key: ${keyName}`, 'info')
+
+        // Get password if needed
+        const password = await getPassword(!!options.password)
+
+        // Load the private key
+        const privateKey = getKeyFromWallet(keyName, password)
+
+        // Get chain ID - fetch from blockchain if broadcasting, otherwise use a default
+        let chainId: Checksum256
+        if (options.broadcast) {
+            const url = options.url || 'http://127.0.0.1:8888'
+            const client = new APIClient({
+                provider: new FetchProvider(url, {fetch: globalThis.fetch}),
+            })
+            const info = await client.v1.chain.get_info()
+            chainId = Checksum256.from(info.chain_id)
+            log(`Chain ID: ${chainId}`, 'info')
+        } else {
+            // When not broadcasting, use EOS mainnet as default (user can modify transaction before broadcasting)
+            chainId = Checksum256.from(
+                transaction.ref_block_num
+                    ? '73e4385a2708e6d7048834fbc1079f2fabb17b3c125b146af438971e90716c4d' // EOS mainnet
+                    : '0000000000000000000000000000000000000000000000000000000000000000'
+            )
+        }
+
+        // Sign the transaction
+        const digest = transaction.signingDigest(chainId)
+        const signature = privateKey.signDigest(digest)
+
+        // Create signed transaction
+        const signedTransaction = SignedTransaction.from({
+            ...transaction,
+            signatures: [signature],
+        })
+
+        log('✅ Transaction signed successfully!', 'info')
+        log('', 'info')
+
+        if (options.broadcast) {
+            // Broadcast the transaction
+            const url = options.url || 'http://127.0.0.1:8888'
+            log(`Broadcast target: ${url}`, 'info')
+
+            try {
+                // Create API client
+                const client = new APIClient({
+                    provider: new FetchProvider(url, {fetch: globalThis.fetch}),
+                })
+
+                // Push the transaction
+                const result = await client.v1.chain.push_transaction(signedTransaction)
+
+                log('🚀 Transaction broadcast successfully!', 'info')
+                log(`Transaction ID: ${result.transaction_id}`, 'info')
+                log(`Status: ${result.processed.receipt.status}`, 'info')
+            } catch (error: any) {
+                log(`❌ Failed to broadcast transaction: ${error.message}`, 'info')
+                process.exit(1)
+            }
+        } else {
+            // Just output the signed transaction
+            const output = JSON.stringify(signedTransaction, null, 2)
+
+            if (options.output) {
+                // Save to file
+                fs.writeFileSync(options.output, output, 'utf8')
+                log(`Signed transaction saved to: ${options.output}`, 'info')
+            } else {
+                // Print to stdout
+                log('Signed Transaction:', 'info')
+                log(output, 'info')
+            }
+
+            log('', 'info')
+            log(`Signature: ${signature.toString()}`, 'info')
+        }
+    } catch (error) {
+        log(`❌ Failed to transact: ${(error as Error).message}`, 'info')
         process.exit(1)
     }
 }
