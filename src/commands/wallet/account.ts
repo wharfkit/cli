@@ -47,6 +47,19 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
         // Get chain info
         const info = await client.v1.chain.get_info()
 
+        // Check if system contract is deployed (for buyram/delegatebw)
+        let hasSystemContract = false
+        try {
+            const abiResponse = await client.v1.chain.get_abi('eosio')
+            if (abiResponse.abi) {
+                const actionNames = abiResponse.abi.actions.map((a) => String(a.name))
+                hasSystemContract =
+                    actionNames.includes('buyrambytes') && actionNames.includes('delegatebw')
+            }
+        } catch (e) {
+            // Ignore error, assume no system contract
+        }
+
         // Create session with dev key
         const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
         walletPlugin.config.requiresChainSelect = false
@@ -64,79 +77,84 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
             ui: new NonInteractiveConsoleUI(),
         })
 
+        const actions: any[] = [
+            {
+                account: 'eosio',
+                name: 'newaccount',
+                authorization: [
+                    {
+                        actor: 'eosio',
+                        permission: 'active',
+                    },
+                ],
+                data: {
+                    creator: 'eosio',
+                    name: accountName,
+                    owner: {
+                        threshold: 1,
+                        keys: [
+                            {
+                                key: newPublicKey,
+                                weight: 1,
+                            },
+                        ],
+                        accounts: [],
+                        waits: [],
+                    },
+                    active: {
+                        threshold: 1,
+                        keys: [
+                            {
+                                key: newPublicKey,
+                                weight: 1,
+                            },
+                        ],
+                        accounts: [],
+                        waits: [],
+                    },
+                },
+            },
+        ]
+
+        if (hasSystemContract) {
+            actions.push({
+                account: 'eosio',
+                name: 'buyrambytes',
+                authorization: [
+                    {
+                        actor: 'eosio',
+                        permission: 'active',
+                    },
+                ],
+                data: {
+                    payer: 'eosio',
+                    receiver: accountName,
+                    bytes: 8192,
+                },
+            })
+            actions.push({
+                account: 'eosio',
+                name: 'delegatebw',
+                authorization: [
+                    {
+                        actor: 'eosio',
+                        permission: 'active',
+                    },
+                ],
+                data: {
+                    from: 'eosio',
+                    receiver: accountName,
+                    stake_net_quantity: '1.0000 SYS',
+                    stake_cpu_quantity: '1.0000 SYS',
+                    transfer: false,
+                },
+            })
+        }
+
         // Create newaccount action
         const result = await session.transact(
             {
-                actions: [
-                    {
-                        account: 'eosio',
-                        name: 'newaccount',
-                        authorization: [
-                            {
-                                actor: 'eosio',
-                                permission: 'active',
-                            },
-                        ],
-                        data: {
-                            creator: 'eosio',
-                            name: accountName,
-                            owner: {
-                                threshold: 1,
-                                keys: [
-                                    {
-                                        key: newPublicKey,
-                                        weight: 1,
-                                    },
-                                ],
-                                accounts: [],
-                                waits: [],
-                            },
-                            active: {
-                                threshold: 1,
-                                keys: [
-                                    {
-                                        key: newPublicKey,
-                                        weight: 1,
-                                    },
-                                ],
-                                accounts: [],
-                                waits: [],
-                            },
-                        },
-                    },
-                    {
-                        account: 'eosio',
-                        name: 'buyrambytes',
-                        authorization: [
-                            {
-                                actor: 'eosio',
-                                permission: 'active',
-                            },
-                        ],
-                        data: {
-                            payer: 'eosio',
-                            receiver: accountName,
-                            bytes: 8192,
-                        },
-                    },
-                    {
-                        account: 'eosio',
-                        name: 'delegatebw',
-                        authorization: [
-                            {
-                                actor: 'eosio',
-                                permission: 'active',
-                            },
-                        ],
-                        data: {
-                            from: 'eosio',
-                            receiver: accountName,
-                            stake_net_quantity: '1.0000 SYS',
-                            stake_cpu_quantity: '1.0000 SYS',
-                            transfer: false,
-                        },
-                    },
-                ],
+                actions,
             },
             {
                 broadcast: true,

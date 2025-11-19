@@ -2,7 +2,7 @@
 import {existsSync, readdirSync, readFileSync} from 'fs'
 import {basename, extname, resolve} from 'path'
 import type {PrivateKey} from '@wharfkit/antelope'
-import {APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
+import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
@@ -114,7 +114,7 @@ export async function deployContract(
             ],
             data: {
                 account: accountName,
-                abi: Serializer.encode({object: abiJson}).hexString,
+                abi: Serializer.encode({object: ABI.from(abiJson), type: ABI}).hexString,
             },
         }
 
