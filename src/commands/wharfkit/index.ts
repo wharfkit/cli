@@ -37,6 +37,8 @@ export function createDeployCommand(): Command {
         .argument('[wasm]', 'WASM file to deploy (auto-detects if not specified)')
         .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
         .option('-u, --url <url>', 'Blockchain API URL (default: http://127.0.0.1:8888)')
+        .option('--force', 'Force deployment even if safety checks fail')
+        .option('--validate', 'Validate deployment safety without deploying')
         .action(async (wasm, options) => {
             try {
                 await deployContract(wasm, options)

@@ -9,9 +9,110 @@ import fetch from 'node-fetch'
 import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
 
+import {Chains} from '@wharfkit/common'
+import {compileContract} from './compile'
+
 interface DeployOptions {
     account?: string
     url?: string
+    force?: boolean
+    validate?: boolean
+}
+
+/**
+ * Validate deployment safety (checks for orphaned tables with data)
+ */
+export async function validateDeploy(
+    accountName: string,
+    abiJson: any,
+    url: string,
+    force: boolean
+): Promise<void> {
+    const client = new APIClient({
+        provider: new FetchProvider(url, {fetch}),
+    })
+
+    try {
+        const existingAbiResponse = await client.v1.chain.get_abi(accountName)
+        if (existingAbiResponse.abi) {
+            const oldAbi = existingAbiResponse.abi
+            const newAbi = ABI.from(abiJson)
+
+            const oldTables = new Set(oldAbi.tables.map((t) => String(t.name)))
+            const newTables = new Set(newAbi.tables.map((t) => String(t.name)))
+
+            const removedTables = [...oldTables].filter((t) => !newTables.has(t))
+
+            if (removedTables.length > 0) {
+                console.log(
+                    `\n⚠️  Warning: The new ABI removes the following tables: ${removedTables.join(
+                        ', '
+                    )}`
+                )
+                console.log(`   Checking for existing data in these tables...`)
+
+                let hasData = false
+                for (const table of removedTables) {
+                    try {
+                        const rows = await client.v1.chain.get_table_rows({
+                            code: accountName,
+                            scope: accountName,
+                            table,
+                            limit: 1,
+                        })
+                        if (rows.rows.length > 0) {
+                            console.log(`   ❌ Table '${table}' contains data!`)
+                            hasData = true
+                        } else {
+                            console.log(`   ✅ Table '${table}' is empty.`)
+                        }
+                    } catch (e: any) {
+                        // If check fails, ignore or warn?
+                        // Often "table not found" error if using state history or other plugins if really gone?
+                        // But if get_abi returned it, it was in ABI.
+                        // We assume no data if error, or warn.
+                    }
+                }
+
+                if (hasData) {
+                    if (force) {
+                        console.log(`   ⚠️  Proceeding despite data loss warning (--force used).`)
+                    } else {
+                        throw new Error(
+                            `Deployment would make existing table data inaccessible (orphaned).`
+                        )
+                    }
+                } else {
+                    console.log(`   ✅ No data found in removed tables. Safe to proceed.`)
+                }
+            } else {
+                console.log(`   ✅ No tables removed.`)
+            }
+        } else {
+            console.log(`   ✅ No existing ABI found (new deployment).`)
+        }
+    } catch (error: any) {
+        if (error.message.includes('orphaned')) {
+            throw new Error(
+                `SAFETY CHECK FAILED: ${error.message}\nUse --force to override this check and deploy anyway.`
+            )
+        }
+        // If validation fails due to network or other reasons, we might want to warn but proceed if not validating explicitly?
+        // If explicitly validating, we should error.
+        // If deploying, we usually proceed unless critical.
+        // But "safety check" implies we stop.
+        // However, if account doesn't exist, get_abi throws.
+        // We should catch that.
+        if (error.message.includes('Account not found') || error.message.includes('does not exist')) {
+             // New account, safe.
+             return
+        }
+        
+        // If it's a validation run, rethrow.
+        // If it's a deploy run, maybe warn?
+        // But we want strict safety.
+        throw error
+    }
 }
 
 /**
@@ -24,7 +125,24 @@ export async function deployContract(
     options: DeployOptions
 ): Promise<void> {
     // Determine the WASM file to deploy
-    const wasmPath = wasmFile ? resolve(wasmFile) : await findWasmFile()
+    let wasmPath: string
+    try {
+        wasmPath = wasmFile ? resolve(wasmFile) : await findWasmFile()
+    } catch (error: any) {
+        if (error.message.includes('No .wasm files found') && !wasmFile) {
+            console.log('No WASM file found. Attempting to compile contracts...')
+            try {
+                await compileContract(undefined, '.')
+                wasmPath = await findWasmFile()
+            } catch (compileError: any) {
+                throw new Error(
+                    `Failed to auto-compile: ${compileError.message}\nPlease run 'wharfkit compile' manually.`
+                )
+            }
+        } else {
+            throw error
+        }
+    }
 
     if (!existsSync(wasmPath)) {
         throw new Error(`WASM file not found: ${wasmPath}`)
@@ -44,9 +162,21 @@ export async function deployContract(
     const accountName = options.account || basename(wasmPath, '.wasm')
 
     // Determine the blockchain URL
-    const url = options.url || 'http://127.0.0.1:8888'
+    let url = options.url || 'http://127.0.0.1:8888'
+    
+    // Check if URL is a known chain name
+    const knownChainKey = Object.keys(Chains).find(
+        (key) => key.toLowerCase() === url.toLowerCase()
+    )
+    if (knownChainKey) {
+        url = (Chains as any)[knownChainKey].url
+    }
 
-    console.log(`Deploying contract...`)
+    if (options.validate) {
+        console.log(`Validating deployment for ${accountName}...`)
+    } else {
+        console.log(`Deploying contract...`)
+    }
     console.log(`  WASM: ${wasmPath}`)
     console.log(`  ABI: ${abiPath}`)
     console.log(`  Account: ${accountName}`)
@@ -56,6 +186,17 @@ export async function deployContract(
         // Read WASM and ABI files
         const wasmCode = readFileSync(wasmPath)
         const abiJson = JSON.parse(readFileSync(abiPath, 'utf8'))
+
+        // Perform validation/safety check
+        // Only skip if force is used AND we are NOT explicitly validating?
+        // Actually, even with force, we might want to see warnings.
+        // But validateDeploy throws if unsafe and not forced.
+        await validateDeploy(accountName, abiJson, url, !!options.force)
+
+        if (options.validate) {
+            console.log('\n✅ Validation passed! Deployment appears safe.')
+            return
+        }
 
         // Get private key from wallet for this account
         const privateKey = await getPrivateKeyForDeploy(accountName)

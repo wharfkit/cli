@@ -3,7 +3,8 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import * as http from 'http'
+import {APIClient, FetchProvider} from '@wharfkit/antelope'
+import fetch from 'node-fetch'
 
 /**
  * E2E tests for the complete workflow:
@@ -175,20 +176,16 @@ suite('E2E Workflow', () => {
             )
         })
 
-        test('broadcasts transaction when --broadcast is provided', function () {
+        test('broadcasts transaction when --broadcast is provided', async function () {
             // Get valid reference block info from the chain
-            const infoOutput = execSync('curl -s http://127.0.0.1:8888/v1/chain/get_info', {
-                encoding: 'utf8',
+            const client = new APIClient({
+                provider: new FetchProvider('http://127.0.0.1:8888', {fetch}),
             })
-            const chainInfo = JSON.parse(infoOutput)
+            const chainInfo = await client.v1.chain.get_info()
 
             // Calculate ref_block_num and ref_block_prefix from last_irreversible_block_num
-            const blockNum = chainInfo.last_irreversible_block_num
-            const blockOutput = execSync(
-                `curl -s -X POST http://127.0.0.1:8888/v1/chain/get_block -d '{"block_num_or_id":${blockNum}}'`,
-                {encoding: 'utf8'}
-            )
-            const blockInfo = JSON.parse(blockOutput)
+            const blockNum = chainInfo.last_irreversible_block_num.toNumber()
+            const blockInfo = await client.v1.chain.get_block(blockNum)
 
             const txPath = path.join(testDir, 'transaction-broadcast.json')
             // Use buyram action - a core system action that's always available
@@ -198,7 +195,7 @@ suite('E2E Workflow', () => {
             const transaction = {
                 expiration: getTransactionExpiration(),
                 ref_block_num: blockNum & 0xffff, // Last 16 bits
-                ref_block_prefix: parseInt(blockInfo.ref_block_prefix),
+                ref_block_prefix: blockInfo.ref_block_prefix.toNumber(),
                 max_net_usage_words: 0,
                 max_cpu_usage_ms: 0,
                 delay_sec: 0,
@@ -363,21 +360,29 @@ class [[eosio::contract]] hello : public eosio::contract {
                 encoding: 'utf8',
             })
 
-            // 2. Create contract file
-            const contractCode = `
-#include <eosio/eosio.hpp>
-class [[eosio::contract]] hello : public eosio::contract {
-  public:
-    using eosio::contract::contract;
-    [[eosio::action]]
-    void hi(eosio::name user) {
-        print("Hello, ", user);
-    }
-};
-`
-            const cppPath = path.join(testDir, 'hello.cpp')
-            const wasmPath = path.join(testDir, 'hello.wasm')
-            fs.writeFileSync(cppPath, contractCode)
+            // 2. Use persistent contract file
+            // Copy test.cpp from root to testDir
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'test.cpp')
+            const wasmPath = path.join(testDir, 'test.wasm')
+            
+            if (fs.existsSync(rootCppPath)) {
+                fs.copyFileSync(rootCppPath, cppPath)
+            } else {
+                // Fallback if root file missing (shouldn't happen if we just created it)
+                const contractCode = `
+                #include <eosio/eosio.hpp>
+                class [[eosio::contract]] hello : public eosio::contract {
+                  public:
+                    using eosio::contract::contract;
+                    [[eosio::action]]
+                    void hi(eosio::name user) {
+                        print("Hello, ", user);
+                    }
+                };
+                `
+                fs.writeFileSync(cppPath, contractCode)
+            }
 
             // 3. Compile contract
             execSync(`node ${cliPath} compile`, {
