@@ -2,6 +2,7 @@
 import {Command} from 'commander'
 import {showChainLogs, showChainStatus, startLocalChain, stopLocalChain} from './local'
 import {checkLeapInstallation} from './install'
+import {addInteractCommands, addInteractSubcommands} from './interact'
 
 /**
  * Create the chain command with subcommands
@@ -12,6 +13,9 @@ export function createChainCommand(): Command {
 
     // Local subcommand
     const local = chain.command('local').description('Manage local blockchain instance')
+
+    // Add interact commands to local
+    addInteractSubcommands(local, 'local')
 
     // Local start
     local
@@ -114,6 +118,9 @@ export function createChainCommand(): Command {
                 process.exit(1)
             }
         })
+
+    // Add dynamic chain commands
+    addInteractCommands(chain)
 
     return chain
 }
