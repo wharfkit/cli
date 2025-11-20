@@ -337,6 +337,67 @@ class [[eosio::contract]] hello : public eosio::contract {
         })
     })
 
+    suite('Integration: Account and Deployment', () => {
+        test('can create an account on the local chain', function () {
+            const accountName = 'acc' + Math.random().toString(36).substring(2, 8)
+            const output = execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
+                encoding: 'utf8',
+            })
+
+            assert.include(output, '✅ Account created successfully!')
+            assert.include(output, `Account: ${accountName}`)
+            assert.include(output, 'Key stored in wallet')
+        })
+
+        test('can deploy a contract to the account', function () {
+            // Check if cdt-cpp is installed before running this test
+            try {
+                execSync('which cdt-cpp')
+            } catch (e) {
+                this.skip()
+            }
+
+            // 1. Create an account
+            const accountName = 'deploy' + Math.random().toString(36).substring(2, 8)
+            execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
+                encoding: 'utf8',
+            })
+
+            // 2. Create contract file
+            const contractCode = `
+#include <eosio/eosio.hpp>
+class [[eosio::contract]] hello : public eosio::contract {
+  public:
+    using eosio::contract::contract;
+    [[eosio::action]]
+    void hi(eosio::name user) {
+        print("Hello, ", user);
+    }
+};
+`
+            const cppPath = path.join(testDir, 'hello.cpp')
+            const wasmPath = path.join(testDir, 'hello.wasm')
+            fs.writeFileSync(cppPath, contractCode)
+
+            // 3. Compile contract
+            execSync(`node ${cliPath} compile`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 4. Deploy contract
+            const output = execSync(`node ${cliPath} deploy ${wasmPath} --account ${accountName}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.include(output, '✅ Contract deployed successfully!')
+            assert.include(output, 'Transaction ID:')
+        })
+    })
+
     suite('Integration: Wallet Key Storage', () => {
         test('created keys are persisted in wallet', function () {
             const keyName = `persistent-${Date.now()}`
