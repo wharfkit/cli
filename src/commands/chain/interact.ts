@@ -2,7 +2,7 @@
 import {APIClient, Name} from '@wharfkit/antelope'
 import {Chains} from '@wharfkit/common'
 import {Contract} from '@wharfkit/contract'
-import {Command} from 'commander'
+import type {Command} from 'commander'
 import fetch from 'node-fetch'
 
 interface ChainInteractOptions {
@@ -36,7 +36,9 @@ function getApiUrl(chainName: string): string {
             if (chainName.startsWith('http')) {
                 return chainName
             }
-            throw new Error(`Unknown chain: ${chainName}. Please provide a full URL or a known chain name.`)
+            throw new Error(
+                `Unknown chain: ${chainName}. Please provide a full URL or a known chain name.`
+            )
     }
 }
 
@@ -64,7 +66,9 @@ export async function lookupTable(
         tableName = parts[1]
     } else {
         if (!options.scope) {
-             throw new Error('Please specify contract in format contract::table or use --scope to specify contract')
+            throw new Error(
+                'Please specify contract in format contract::table or use --scope to specify contract'
+            )
         }
         accountName = options.scope
         tableName = tableNameInput
@@ -86,12 +90,12 @@ export async function lookupTable(
         if (options.filter) {
             queryOptions.from = options.filter
         }
-        
+
         // Default limit to 4 rows unless specified
         const userLimit = options.limit ? parseInt(options.limit, 10) : 4
         // Fetch one extra row to detect if there are more
         queryOptions.limit = userLimit + 1
-        
+
         // scope defaults to contract name if not provided
         // If user provided --scope, we use it.
         // Note: In our logic above, if :: is used, accountName is contract.
@@ -105,20 +109,20 @@ export async function lookupTable(
         // We will assume scope = contract name unless specified?
         // options.scope is currently used for contract name if :: is missing.
         // If :: is present, options.scope could be the data scope.
-        
+
         let dataScope = accountName
         if (tableNameInput.includes('::') && options.scope) {
             dataScope = options.scope
         }
-        
+
         const tableInstance = contract.table(tableName, dataScope)
 
         const cursor = await tableInstance.query(queryOptions)
         const allRows = await cursor.all()
-        
+
         const hasMoreRows = allRows.length > userLimit
         const rows = hasMoreRows ? allRows.slice(0, userLimit) : allRows
-        
+
         if (options.json) {
             console.log(JSON.stringify(rows, null, 2))
         } else if (options.columns) {
@@ -127,13 +131,13 @@ export async function lookupTable(
                 const firstRow = rows[0]
                 const rowObj = (firstRow as any).toJSON ? (firstRow as any).toJSON() : firstRow
                 console.log('Available columns:')
-                Object.keys(rowObj).forEach(key => console.log(`- ${key}`))
+                Object.keys(rowObj).forEach((key) => console.log(`- ${key}`))
             } else {
                 console.log('No data available to determine columns.')
             }
         } else {
             // If rows are complex objects (like Wharf structs), they might need toJSON()
-            // But console.table handles objects well usually. 
+            // But console.table handles objects well usually.
             // Wharfkit structs have toJSON() which returns the plain object.
             const plainRows = rows.map((r) => {
                 const row = (r as any).toJSON ? (r as any).toJSON() : r
@@ -158,28 +162,28 @@ export async function lookupTable(
             })
 
             // Limit columns displayed unless --all is used
-            const displayedRows = plainRows.map(row => {
+            const displayedRows = plainRows.map((row) => {
                 if (options.all) return row
-                
+
                 const newRow: any = {}
                 const keys = Object.keys(row)
-                
+
                 // Filter by --fields if provided
                 if (options.fields) {
-                    const selectedFields = options.fields.split(',').map(f => f.trim())
-                    selectedFields.forEach(key => {
+                    const selectedFields = options.fields.split(',').map((f) => f.trim())
+                    selectedFields.forEach((key) => {
                         if (key in row) {
                             newRow[key] = row[key]
                         }
                     })
                     return newRow
                 }
-                
+
                 if (keys.length <= 5) return row
-                
+
                 const visibleKeys = keys.slice(0, 4)
-                visibleKeys.forEach(key => newRow[key] = row[key])
-                
+                visibleKeys.forEach((key) => (newRow[key] = row[key]))
+
                 // Add summary of hidden columns
                 const hiddenCount = keys.length - 4
                 newRow['...'] = `+${hiddenCount} more fields`
@@ -187,15 +191,23 @@ export async function lookupTable(
             })
 
             console.table(displayedRows)
-            
+
             if (hasMoreRows) {
-                console.log(`\n... and more rows (showing first ${userLimit}). Use --limit <number> to see more.`)
+                console.log(
+                    `\n... and more rows (showing first ${userLimit}). Use --limit <number> to see more.`
+                )
             }
-            if (!options.all && !options.fields && plainRows.length > 0 && Object.keys(plainRows[0]).length > 5) {
-                 console.log(`\nSome columns hidden. Use --all to see all, --fields to select specific columns, or --columns to list them.`)
+            if (
+                !options.all &&
+                !options.fields &&
+                plainRows.length > 0 &&
+                Object.keys(plainRows[0]).length > 5
+            ) {
+                console.log(
+                    `\nSome columns hidden. Use --all to see all, --fields to select specific columns, or --columns to list them.`
+                )
             }
         }
-
     } catch (error: any) {
         console.error(`Error fetching table data: ${error.message}`)
         process.exit(1)
@@ -221,31 +233,37 @@ export async function lookupAccount(
             console.log(`Created: ${account.created}`)
             console.log(`Privileged: ${account.privileged}`)
             console.log(`Last code update: ${account.last_code_update}`)
-            
+
             if (account.core_liquid_balance) {
                 console.log(`Liquid Balance: ${account.core_liquid_balance}`)
             }
-            
+
             console.log('\nResources:')
             console.log(`  RAM: ${account.ram_usage} / ${account.ram_quota} bytes`)
             if (account.net_limit) {
-                 console.log(`  NET: ${account.net_limit.used} / ${account.net_limit.max} bytes (${account.net_limit.available} available)`)
+                console.log(
+                    `  NET: ${account.net_limit.used} / ${account.net_limit.max} bytes (${account.net_limit.available} available)`
+                )
             }
             if (account.cpu_limit) {
-                 console.log(`  CPU: ${account.cpu_limit.used} / ${account.cpu_limit.max} us (${account.cpu_limit.available} available)`)
+                console.log(
+                    `  CPU: ${account.cpu_limit.used} / ${account.cpu_limit.max} us (${account.cpu_limit.available} available)`
+                )
             }
-            
+
             if (account.permissions.length > 0) {
                 console.log('\nPermissions:')
                 for (const perm of account.permissions) {
-                     console.log(`  ${perm.perm_name} (${perm.parent}):`)
-                     console.log(`    Threshold: ${perm.required_auth.threshold}`)
-                     for (const key of perm.required_auth.keys) {
-                         console.log(`    Key: ${key.key} (weight: ${key.weight})`)
-                     }
-                     for (const acc of perm.required_auth.accounts) {
-                         console.log(`    Account: ${acc.permission.actor}@${acc.permission.permission} (weight: ${acc.weight})`)
-                     }
+                    console.log(`  ${perm.perm_name} (${perm.parent}):`)
+                    console.log(`    Threshold: ${perm.required_auth.threshold}`)
+                    for (const key of perm.required_auth.keys) {
+                        console.log(`    Key: ${key.key} (weight: ${key.weight})`)
+                    }
+                    for (const acc of perm.required_auth.accounts) {
+                        console.log(
+                            `    Account: ${acc.permission.actor}@${acc.permission.permission} (weight: ${acc.weight})`
+                        )
+                    }
                 }
             }
         }
@@ -267,32 +285,32 @@ export function addInteractSubcommands(command: Command, fixedChainName?: string
         .option('--columns', 'List available columns')
         .option('--json', 'Output as JSON')
         .action(async (tableName, extraFields, options, cmd) => {
-             // Handle variadic args being shifted if extraFields is empty/present
-             // Commander passes (arg1, arg2..., options, cmd)
-             // If extraFields is provided, it's the second arg.
-             // If NOT provided, options is the second arg? NO, extraFields is an array, potentially empty.
-             // Wait, with [extraFields...], it is ALWAYS passed as an array (second arg).
-             // But we need to be careful if 'options' is the 3rd arg.
-             
-             let opts = options
-             let extras = extraFields
-             
-             // Commander 7+ usually guarantees order for defined args.
-             // (tableName, extras, options, cmd)
-             
-             const chainName = fixedChainName || cmd.parent?.args[0]
-             if (!chainName) {
-                 console.error('Chain name is required')
-                 process.exit(1)
-             }
-             
-             // If user provided spaced fields like "--fields a, b", 'b' ends up in extras.
-             // We should append them to fields.
-             if (opts.fields && extras && extras.length > 0) {
-                 opts.fields = [opts.fields, ...extras].join(' ')
-             }
-             
-             await lookupTable(chainName, tableName, opts)
+            // Handle variadic args being shifted if extraFields is empty/present
+            // Commander passes (arg1, arg2..., options, cmd)
+            // If extraFields is provided, it's the second arg.
+            // If NOT provided, options is the second arg? NO, extraFields is an array, potentially empty.
+            // Wait, with [extraFields...], it is ALWAYS passed as an array (second arg).
+            // But we need to be careful if 'options' is the 3rd arg.
+
+            const opts = options
+            const extras = extraFields
+
+            // Commander 7+ usually guarantees order for defined args.
+            // (tableName, extras, options, cmd)
+
+            const chainName = fixedChainName || cmd.parent?.args[0]
+            if (!chainName) {
+                console.error('Chain name is required')
+                process.exit(1)
+            }
+
+            // If user provided spaced fields like "--fields a, b", 'b' ends up in extras.
+            // We should append them to fields.
+            if (opts.fields && extras && extras.length > 0) {
+                opts.fields = [opts.fields, ...extras].join(' ')
+            }
+
+            await lookupTable(chainName, tableName, opts)
         })
 
     command
@@ -300,12 +318,12 @@ export function addInteractSubcommands(command: Command, fixedChainName?: string
         .description('Lookup account data')
         .option('--json', 'Output as JSON')
         .action(async (accountName, options, cmd) => {
-             const chainName = fixedChainName || cmd.parent?.args[0]
-             if (!chainName) {
-                 console.error('Chain name is required')
-                 process.exit(1)
-             }
-             await lookupAccount(chainName, accountName, options)
+            const chainName = fixedChainName || cmd.parent?.args[0]
+            if (!chainName) {
+                console.error('Chain name is required')
+                process.exit(1)
+            }
+            await lookupAccount(chainName, accountName, options)
         })
 }
 
@@ -313,21 +331,21 @@ export function addInteractCommands(chain: Command) {
     // Register known chains from @wharfkit/common as explicit subcommands
     // This ensures they are discoverable and work without 'remote' prefix
     const knownChains = Object.keys(Chains)
-    
+
     for (const chainKey of knownChains) {
         const chainName = chainKey.toLowerCase() // register as lowercase (jungle4, eos, etc)
-        
-        // Skip if it conflicts with existing commands (like 'local') - though 'local' isn't in Chains
-        if (chainName === 'local') continue 
 
-        const cmd = chain.command(chainName)
-            .description(`Interact with ${chainKey} chain`)
-        
+        // Skip if it conflicts with existing commands (like 'local') - though 'local' isn't in Chains
+        if (chainName === 'local') continue
+
+        const cmd = chain.command(chainName).description(`Interact with ${chainKey} chain`)
+
         addInteractSubcommands(cmd, chainKey) // Pass the PascalCase key or lowercase? getApiUrl handles both.
     }
 
     // For arbitrary URLs, we still want a catch-all or 'remote' command.
-    const chainContext = chain.command('remote <chainName>')
+    const chainContext = chain
+        .command('remote <chainName>')
         .description('Interact with a custom chain URL')
     addInteractSubcommands(chainContext)
 }

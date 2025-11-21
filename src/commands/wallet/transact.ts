@@ -112,15 +112,16 @@ function loadTransaction(transactionJson: string): Transaction {
 }
 
 /**
- * Select a key from the wallet
+ * Select a key from the wallet, optionally using transaction authorization to find a match
  */
-function selectKey(keyName?: string): string {
+function selectKey(keyName?: string, transaction?: Transaction): string {
     const keys = listWalletKeys()
 
     if (keys.length === 0) {
         throw new Error('No keys found in wallet. Create one with: wharfkit wallet keys create')
     }
 
+    // 1. Use explicit key name if provided
     if (keyName) {
         const key = keys.find((k) => k.name === keyName || k.publicKey === keyName)
         if (!key) {
@@ -129,18 +130,41 @@ function selectKey(keyName?: string): string {
         return key.name
     }
 
-    // If only one key, use it
+    // 2. Try to match based on transaction authorization
+    if (transaction && transaction.actions.length > 0) {
+        // Check authorizations of the first action
+        // (A more complex logic could check all actions, but usually the first one dictates the primary signer)
+        const auths = transaction.actions[0].authorization
+        for (const auth of auths) {
+            const actorName = String(auth.actor)
+            // Check if we have a key for this actor
+            const actorKey = keys.find((k) => k.name === actorName)
+            if (actorKey) {
+                log(`Auto-selected key for actor: ${actorName}`, 'info')
+                return actorKey.name
+            } else {
+                log(
+                    `No key found for actor: ${actorName}. Available keys: ${keys
+                        .map((k) => k.name)
+                        .join(', ')}`,
+                    'info'
+                )
+            }
+        }
+    }
+
+    // 3. If only one key, use it
     if (keys.length === 1) {
         return keys[0].name
     }
 
-    // If multiple keys and no key specified, use 'default' if it exists
+    // 4. If multiple keys and no key specified, use 'default' if it exists
     const defaultKey = keys.find((k) => k.name === 'default')
     if (defaultKey) {
         return defaultKey.name
     }
 
-    // Otherwise, use the first key
+    // 5. Otherwise, use the first key
     return keys[0].name
 }
 

@@ -52,7 +52,8 @@ export async function checkLeapInstallation(): Promise<InstallationStatus> {
         }
     }
 
-    status.installed = status.nodeos && status.wharfkit.consoleRenderer && status.wharfkit.walletPlugin
+    status.installed =
+        status.nodeos && status.wharfkit.consoleRenderer && status.wharfkit.walletPlugin
 
     return status
 }

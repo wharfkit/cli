@@ -2,7 +2,7 @@
 import {watch} from 'fs'
 import {extname} from 'path'
 import {compileContract} from './compile'
-import {deployContract} from './deploy'
+import {deployContract} from '../contract/deploy'
 import {getChainStatus, startLocalChain, stopLocalChain} from '../chain/local'
 
 interface DevOptions {

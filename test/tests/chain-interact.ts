@@ -12,7 +12,7 @@ suite('Chain Interaction', () => {
 
     suiteSetup(function () {
         this.timeout(120000) // Increase timeout for chain startup and deploy
-        
+
         // Create a temporary test directory
         testDir = path.join(os.tmpdir(), `wharfkit-interact-test-${Date.now()}`)
         fs.mkdirSync(testDir, {recursive: true})
@@ -30,18 +30,20 @@ suite('Chain Interaction', () => {
 
         // Start local chain
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
-        
+
         // Wait for chain
         execSync('sleep 5')
 
         // Check if cdt-cpp is installed
         try {
             execSync('which cdt-cpp')
-            
+
             // Deploy a test contract
             contractAccount = 'testcontract'
-            execSync(`node ${cliPath} wallet account create --name ${contractAccount}`, {encoding: 'utf8'})
-            
+            execSync(`node ${cliPath} wallet account create --name ${contractAccount}`, {
+                encoding: 'utf8',
+            })
+
             const contractCode = `
             #include <eosio/eosio.hpp>
             class [[eosio::contract]] testcontract : public eosio::contract {
@@ -68,11 +70,14 @@ suite('Chain Interaction', () => {
             const cppPath = path.join(testDir, 'testcontract.cpp')
             const wasmPath = path.join(testDir, 'testcontract.wasm')
             fs.writeFileSync(cppPath, contractCode)
-            
+
             execSync(`node ${cliPath} compile`, {encoding: 'utf8', cwd: testDir})
-            execSync(`node ${cliPath} deploy ${wasmPath} --account ${contractAccount}`, {encoding: 'utf8', cwd: testDir})
-            
+            execSync(`node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.log('Skipping contract deployment (cdt-cpp not found or failed)')
             contractAccount = ''
         }
@@ -86,31 +91,32 @@ suite('Chain Interaction', () => {
         }
         try {
             execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
-        } catch (e) { }
+        } catch (e) {
+            // Ignore error
+        }
     })
 
     test('can lookup table data on deployed contract', function () {
         if (!contractAccount) this.skip()
-        
-        const output = execSync(`node ${cliPath} chain local table ${contractAccount}::items`, {
+
+        execSync(`node ${cliPath} chain local table ${contractAccount}::items`, {
             encoding: 'utf8',
         })
-        assert.doesNotThrow(() => {})
     })
 
     test('can lookup table data with scope option', function () {
         if (!contractAccount) this.skip()
-        
-        const output = execSync(`node ${cliPath} chain local table items --scope ${contractAccount}`, {
+
+        execSync(`node ${cliPath} chain local table items --scope ${contractAccount}`, {
             encoding: 'utf8',
         })
     })
-    
+
     test('can lookup single account', function () {
         const output = execSync(`node ${cliPath} chain local account eosio`, {
             encoding: 'utf8',
         })
-        
+
         assert.include(output, 'Account: eosio')
         assert.include(output, 'RAM:')
         assert.include(output, 'Permissions:')
@@ -120,7 +126,7 @@ suite('Chain Interaction', () => {
         const output = execSync(`node ${cliPath} chain local account eosio --json`, {
             encoding: 'utf8',
         })
-        
+
         const account = JSON.parse(output)
         assert.equal(account.account_name, 'eosio')
         assert.property(account, 'permissions')
@@ -129,12 +135,12 @@ suite('Chain Interaction', () => {
     test('can access known remote chain (jungle4) directly for account', function () {
         try {
             execSync(`node ${cliPath} chain jungle4 account teamgreymass`, {
-                encoding: 'utf8'
+                encoding: 'utf8',
             })
         } catch (error: any) {
             const output = (error.stderr || '').toString() + (error.stdout || '').toString()
             if (output.includes('unknown command')) {
-                 throw new Error('Commander failed to match jungle4: ' + output)
+                throw new Error('Commander failed to match jungle4: ' + output)
             }
         }
     })
@@ -142,12 +148,12 @@ suite('Chain Interaction', () => {
     test('can access known remote chain (jungle4) directly for table', function () {
         try {
             execSync(`node ${cliPath} chain jungle4 table eosio::global`, {
-                encoding: 'utf8'
+                encoding: 'utf8',
             })
         } catch (error: any) {
             const output = (error.stderr || '').toString() + (error.stdout || '').toString()
             if (output.includes('unknown command')) {
-                 throw new Error('Commander failed to match jungle4 for table command: ' + output)
+                throw new Error('Commander failed to match jungle4 for table command: ' + output)
             }
         }
     })

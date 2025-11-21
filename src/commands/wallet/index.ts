@@ -61,7 +61,9 @@ export function createWalletCommand(): Command {
     // wallet transact - Sign a transaction
     walletCommand
         .command('transact')
-        .description('Transact (sign and optionally broadcast) a transaction with a key from the wallet')
+        .description(
+            'Transact (sign and optionally broadcast) a transaction with a key from the wallet'
+        )
         .argument('<transaction>', 'Transaction JSON string or path to JSON file')
         .option('-k, --key <name>', 'Name or public key of the key to use for signing')
         .option('-p, --password', 'Prompt for password if key is encrypted with custom password')

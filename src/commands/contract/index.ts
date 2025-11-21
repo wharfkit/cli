@@ -5,9 +5,11 @@ import * as ts from 'typescript'
 
 import {ABI} from '@wharfkit/antelope'
 import {abiToBlob, ContractKit} from '@wharfkit/contract'
+import {Command} from 'commander'
 
 import {log, makeClient} from '../../utils'
 import {generateContractClass} from './class'
+import {deployContract} from './deploy'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {
     generateActionNamesInterface,
@@ -27,6 +29,49 @@ interface CommandOptions {
     file?: string
     json?: string
     eslintrc?: string
+}
+
+export function createContractCommand(): Command {
+    const contract = new Command('contract')
+    contract.description('Contract management commands')
+
+    contract
+        .command('deploy')
+        .description('Deploy a compiled contract to the blockchain')
+        .argument(
+            '[network]',
+            'Network name or URL to deploy to (e.g. jungle4, http://localhost:8888)'
+        )
+        .argument('[wasm]', 'WASM file to deploy (auto-detects if not specified)')
+        .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
+        .option('-u, --url <url>', 'Blockchain API URL (override network argument)')
+        .option('--force', 'Force deployment even if safety checks fail')
+        .option('--validate', 'Validate deployment safety without deploying')
+        .action(async (networkOrWasm, wasmFile, options) => {
+            let network = networkOrWasm
+            let wasm = wasmFile
+
+            // Handle ambiguity if first argument is a wasm file
+            if (network && (network.endsWith('.wasm') || network.includes('.wasm'))) {
+                wasm = network
+                network = undefined
+            }
+
+            // If network is provided, it sets/overrides options.url if not explicitly set
+            if (network && !options.url) {
+                options.url = network
+            }
+
+            try {
+                await deployContract(wasm, options)
+            } catch (error: any) {
+                // eslint-disable-next-line no-console
+                console.error(`Error: ${error.message}`)
+                process.exit(1)
+            }
+        })
+
+    return contract
 }
 
 export async function generateContractFromCommand(

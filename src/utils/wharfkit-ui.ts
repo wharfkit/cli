@@ -2,10 +2,7 @@ import {
     AbstractUserInterface,
     cancelable,
     type Cancelable,
-    type CreateAccountContext,
-    type LocaleDefinitions,
     type LoginContext,
-    type LoginOptions,
     type PromptArgs,
     type PromptResponse,
     type UserInterfaceAccountCreationResponse,
@@ -27,12 +24,11 @@ export class NonInteractiveConsoleUI extends AbstractUserInterface {
     }
 
     async onError(error: Error): Promise<void> {
+        // eslint-disable-next-line no-console
         console.error(`[wharfkit] ${error.message}`)
     }
 
-    async onAccountCreate(
-        _context: CreateAccountContext
-    ): Promise<UserInterfaceAccountCreationResponse> {
+    async onAccountCreate(): Promise<UserInterfaceAccountCreationResponse> {
         return {}
     }
 
@@ -40,7 +36,7 @@ export class NonInteractiveConsoleUI extends AbstractUserInterface {
         // No-op
     }
 
-    async onLogin(_options?: LoginOptions): Promise<void> {
+    async onLogin(): Promise<void> {
         // No-op
     }
 
@@ -74,9 +70,11 @@ export class NonInteractiveConsoleUI extends AbstractUserInterface {
 
     prompt(args: PromptArgs): Cancelable<PromptResponse> {
         if (args.title) {
+            // eslint-disable-next-line no-console
             console.log(`[wharfkit] ${args.title}`)
         }
         if (args.body) {
+            // eslint-disable-next-line no-console
             console.log(args.body)
         }
         return cancelable(Promise.resolve({} as PromptResponse), () => {
@@ -85,15 +83,15 @@ export class NonInteractiveConsoleUI extends AbstractUserInterface {
     }
 
     status(message: string): void {
+        // eslint-disable-next-line no-console
         console.log(`[wharfkit] ${message}`)
     }
 
-    translate(key: string, options?: UserInterfaceTranslateOptions, _namespace?: string): string {
+    translate(key: string, options?: UserInterfaceTranslateOptions): string {
         return String(options?.default ?? key)
     }
 
-    addTranslations(_translations: LocaleDefinitions): void {
+    addTranslations(): void {
         // No-op
     }
 }
-

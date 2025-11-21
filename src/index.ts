@@ -1,14 +1,10 @@
 import {Command} from 'commander'
 
 import {version} from '../package.json'
-import {generateContractFromCommand} from './commands/contract'
+import {createContractCommand, generateContractFromCommand} from './commands/contract'
 import {generateKeysFromCommand} from './commands/keys/index'
 import {createChainCommand} from './commands/chain/index'
-import {
-    createCompileCommand,
-    createDeployCommand,
-    createDevCommand,
-} from './commands/wharfkit/index'
+import {createCompileCommand, createDevCommand} from './commands/wharfkit/index'
 import {createWalletCommand} from './commands/wallet/index'
 
 const program = new Command()
@@ -42,8 +38,8 @@ program.addCommand(createChainCommand())
 // 4. Command to compile contracts
 program.addCommand(createCompileCommand())
 
-// 5. Command to deploy contracts
-program.addCommand(createDeployCommand())
+// 5. Command to manage contracts (deploy, etc)
+program.addCommand(createContractCommand())
 
 // 6. Command for development mode
 program.addCommand(createDevCommand())

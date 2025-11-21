@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import {Command} from 'commander'
 import {compileContract} from './compile'
-import {deployContract} from './deploy'
 import {startDevMode} from './dev'
 
 /**
@@ -25,30 +24,6 @@ export function createCompileCommand(): Command {
         })
 
     return compile
-}
-
-/**
- * Create the deploy command
- */
-export function createDeployCommand(): Command {
-    const deploy = new Command('deploy')
-    deploy
-        .description('Deploy a compiled contract to the blockchain')
-        .argument('[wasm]', 'WASM file to deploy (auto-detects if not specified)')
-        .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
-        .option('-u, --url <url>', 'Blockchain API URL (default: http://127.0.0.1:8888)')
-        .option('--force', 'Force deployment even if safety checks fail')
-        .option('--validate', 'Validate deployment safety without deploying')
-        .action(async (wasm, options) => {
-            try {
-                await deployContract(wasm, options)
-            } catch (error: any) {
-                console.error(`Error: ${error.message}`)
-                process.exit(1)
-            }
-        })
-
-    return deploy
 }
 
 /**

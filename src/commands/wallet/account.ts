@@ -172,7 +172,7 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
             addKeyToWallet(newPrivateKey, accountName)
             console.log(`\n🔐 Key stored in wallet as: ${accountName}`)
             console.log(
-                'You can now deploy contracts with: wharfkit deploy --account ' + accountName
+                'You can now deploy contracts with: wharfkit contract deploy --account ' + accountName
             )
         } catch (error) {
             console.log(
@@ -196,4 +196,3 @@ function generateRandomAccountName(): string {
     }
     return result
 }
-

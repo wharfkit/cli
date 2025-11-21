@@ -7,6 +7,7 @@ import * as path from 'path'
 import type {ChainStatus} from './utils'
 import {
     cleanDataDir,
+    createApiClientForPort,
     ensureDir,
     getConfigIni,
     getDefaultConfigDir,
@@ -20,7 +21,6 @@ import {
     removePidFile,
     savePid,
     waitForChain,
-    createApiClientForPort,
 } from './utils'
 import {ensureLeapInstalled} from './install'
 import {addKeyToWallet, listWalletKeys} from '../wallet/utils'
@@ -362,6 +362,8 @@ async function setupDevWallet(): Promise<void> {
     } catch (error: any) {
         console.log(`Warning: Could not setup dev wallet: ${error.message}`)
         console.log('You can manually store the development key with:')
-        console.log(`  wharfkit wallet keys add --name ${walletName} --private ${devKeys.privateKey}`)
+        console.log(
+            `  wharfkit wallet keys add --name ${walletName} --private ${devKeys.privateKey}`
+        )
     }
 }

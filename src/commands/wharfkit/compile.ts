@@ -2,12 +2,7 @@
 import {execSync} from 'child_process'
 import {existsSync, readdirSync} from 'fs'
 import {basename, extname, join, resolve} from 'path'
-import {platform} from 'os'
 import {checkLeapInstallation} from '../chain/install'
-
-interface CompileOptions {
-    output: string
-}
 
 /**
  * Compile a single C++ file or all .cpp files in the current directory

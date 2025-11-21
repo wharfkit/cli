@@ -3,7 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {APIClient, FetchProvider} from '@wharfkit/antelope'
+import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 
 /**
@@ -297,8 +297,8 @@ class [[eosio::contract]] hello : public eosio::contract {
             assert.include(output, 'Create a new account on the blockchain')
         })
 
-        test('deploy command is at top level', function () {
-            const output = execSync(`node ${cliPath} deploy --help`, {encoding: 'utf8'})
+        test('contract deploy command works', function () {
+            const output = execSync(`node ${cliPath} contract deploy --help`, {encoding: 'utf8'})
 
             assert.include(output, 'Deploy a compiled contract')
             assert.include(output, '--account')
@@ -327,7 +327,9 @@ class [[eosio::contract]] hello : public eosio::contract {
         test('deploy uses account-named key if available', function () {
             // This test verifies the key selection logic exists
             // Actual deployment would require a running chain
-            const deployHelp = execSync(`node ${cliPath} deploy --help`, {encoding: 'utf8'})
+            const deployHelp = execSync(`node ${cliPath} contract deploy --help`, {
+                encoding: 'utf8',
+            })
 
             // Verify --account option exists (used for key selection)
             assert.include(deployHelp, '--account')
@@ -365,7 +367,7 @@ class [[eosio::contract]] hello : public eosio::contract {
             const rootCppPath = path.join(__dirname, '../../test.cpp')
             const cppPath = path.join(testDir, 'test.cpp')
             const wasmPath = path.join(testDir, 'test.wasm')
-            
+
             if (fs.existsSync(rootCppPath)) {
                 fs.copyFileSync(rootCppPath, cppPath)
             } else {
@@ -393,13 +395,158 @@ class [[eosio::contract]] hello : public eosio::contract {
             assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
 
             // 4. Deploy contract
-            const output = execSync(`node ${cliPath} deploy ${wasmPath} --account ${accountName}`, {
-                encoding: 'utf8',
-                cwd: testDir,
-            })
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName}`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
 
             assert.include(output, '✅ Contract deployed successfully!')
             assert.include(output, 'Transaction ID:')
+        })
+
+        test('validates table removal safety', async function () {
+            // Check if cdt-cpp is installed
+            try {
+                execSync('which cdt-cpp')
+            } catch (e) {
+                this.skip()
+            }
+
+            const accountName = 'val' + Math.random().toString(36).substring(2, 8)
+            execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
+                encoding: 'utf8',
+            })
+
+            // 1. Deploy contract V1 (with table)
+            const v1Code = `
+            #include <eosio/eosio.hpp>
+            using namespace eosio;
+            class [[eosio::contract]] v1 : public contract {
+              public:
+                using contract::contract;
+                struct [[eosio::table]] data {
+                    uint64_t id;
+                    std::string val;
+                    uint64_t primary_key() const { return id; }
+                };
+                typedef eosio::multi_index<"data"_n, data> data_table;
+
+                [[eosio::action]]
+                void insert(uint64_t id, std::string val) {
+                    data_table table(get_self(), get_self().value);
+                    table.emplace(get_self(), [&](auto& row) {
+                        row.id = id;
+                        row.val = val;
+                    });
+                }
+            };
+            `
+            const cppPath = path.join(testDir, 'v1.cpp')
+            fs.writeFileSync(cppPath, v1Code)
+
+            // Compile & Deploy V1
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {encoding: 'utf8'})
+            execSync(
+                `node ${cliPath} contract deploy ${path.join(
+                    testDir,
+                    'v1.wasm'
+                )} --account ${accountName}`,
+                {encoding: 'utf8', cwd: testDir}
+            )
+
+            // 2. Add data to the table
+            // Read ABI to serialize action data
+            const abiPath = path.join(testDir, 'v1.abi')
+            const abi = ABI.from(JSON.parse(fs.readFileSync(abiPath, 'utf8')))
+            const actionData = {
+                id: 1,
+                val: 'unsafe to remove',
+            }
+            const hexData = Serializer.encode({object: actionData, abi, type: 'insert'}).hexString
+
+            // Fetch chain info for valid TAPOS
+            const client = new APIClient({
+                provider: new FetchProvider('http://127.0.0.1:8888', {fetch}),
+            })
+            const chainInfo = await client.v1.chain.get_info()
+            const blockNum = chainInfo.last_irreversible_block_num.toNumber()
+            const blockInfo = await client.v1.chain.get_block(blockNum)
+
+            // We need to push an action. We can use wallet transact.
+            const tx = {
+                expiration: getTransactionExpiration(),
+                ref_block_num: blockNum & 0xffff,
+                ref_block_prefix: blockInfo.ref_block_prefix.toNumber(),
+                actions: [
+                    {
+                        account: accountName,
+                        name: 'insert',
+                        authorization: [{actor: accountName, permission: 'active'}],
+                        data: hexData,
+                    },
+                ],
+            }
+            const txPath = path.join(testDir, 'insert_data.json')
+            fs.writeFileSync(txPath, JSON.stringify(tx))
+
+            // Use --broadcast to push to chain
+            // wallet transact should auto-detect the key from authorization
+            try {
+                execSync(`node ${cliPath} wallet transact ${txPath} --broadcast`, {
+                    encoding: 'utf8',
+                })
+            } catch (e: any) {
+                console.log('Transact failed:')
+                console.log(e.stdout)
+                console.log(e.stderr)
+                throw e
+            }
+
+            // 3. Create contract V2 (WITHOUT table)
+            const v2Code = `
+            #include <eosio/eosio.hpp>
+            using namespace eosio;
+            class [[eosio::contract]] v2 : public contract {
+              public:
+                using contract::contract;
+                [[eosio::action]]
+                void hi() { print("hi"); }
+            };
+            `
+            const v2CppPath = path.join(testDir, 'v2.cpp')
+            fs.writeFileSync(v2CppPath, v2Code)
+
+            // Compile V2
+            execSync(`node ${cliPath} compile ${v2CppPath} --output ${testDir}`, {encoding: 'utf8'})
+            const v2Wasm = path.join(testDir, 'v2.wasm')
+
+            // 4. Try to deploy V2 - SHOULD FAIL due to safety check
+            try {
+                execSync(`node ${cliPath} contract deploy ${v2Wasm} --account ${accountName}`, {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                    stdio: 'pipe', // Capture stderr
+                })
+                assert.fail('Should have failed validation')
+            } catch (error: any) {
+                const output = (error.stderr || '').toString() + (error.stdout || '').toString()
+                assert.include(output, 'SAFETY CHECK FAILED')
+                assert.include(output, "Table 'data' contains data")
+            }
+
+            // 5. Try to deploy V2 with --force - SHOULD SUCCEED
+            const output = execSync(
+                `node ${cliPath} contract deploy ${v2Wasm} --account ${accountName} --force`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
+            assert.include(output, 'Contract deployed successfully')
+            assert.include(output, 'Proceeding despite data loss warning')
         })
     })
 
