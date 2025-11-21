@@ -5,6 +5,7 @@ import * as path from 'path'
 import * as os from 'os'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
+import {log} from '../../src/utils'
 
 /**
  * E2E tests for the complete workflow:
@@ -499,9 +500,9 @@ class [[eosio::contract]] hello : public eosio::contract {
                     encoding: 'utf8',
                 })
             } catch (e: any) {
-                console.log('Transact failed:')
-                console.log(e.stdout)
-                console.log(e.stderr)
+                log('Transact failed:', 'info')
+                log(e.stdout, 'info')
+                log(e.stderr, 'info')
                 throw e
             }
 

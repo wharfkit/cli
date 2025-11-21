@@ -103,11 +103,14 @@ export async function validateDeploy(
         // But "safety check" implies we stop.
         // However, if account doesn't exist, get_abi throws.
         // We should catch that.
-        if (error.message.includes('Account not found') || error.message.includes('does not exist')) {
-             // New account, safe.
-             return
+        if (
+            error.message.includes('Account not found') ||
+            error.message.includes('does not exist')
+        ) {
+            // New account, safe.
+            return
         }
-        
+
         // If it's a validation run, rethrow.
         // If it's a deploy run, maybe warn?
         // But we want strict safety.
@@ -163,11 +166,9 @@ export async function deployContract(
 
     // Determine the blockchain URL
     let url = options.url || 'http://127.0.0.1:8888'
-    
+
     // Check if URL is a known chain name
-    const knownChainKey = Object.keys(Chains).find(
-        (key) => key.toLowerCase() === url.toLowerCase()
-    )
+    const knownChainKey = Object.keys(Chains).find((key) => key.toLowerCase() === url.toLowerCase())
     if (knownChainKey) {
         url = (Chains as any)[knownChainKey].url
     }
