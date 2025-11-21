@@ -241,22 +241,10 @@ suite('E2E Workflow', () => {
         })
 
         test('can compile a cpp file when cdt is installed', function () {
-            // Create a simple contract
-            const contractCode = `
-#include <eosio/eosio.hpp>
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'test.cpp')
 
-class [[eosio::contract]] hello : public eosio::contract {
-  public:
-    using eosio::contract::contract;
-    
-    [[eosio::action]]
-    void hi(eosio::name user) {
-        print("Hello, ", user);
-    }
-};
-`
-            const cppPath = path.join(testDir, 'hello.cpp')
-            fs.writeFileSync(cppPath, contractCode)
+            fs.copyFileSync(rootCppPath, cppPath)
 
             try {
                 const output = execSync(`node ${cliPath} compile`, {
@@ -369,23 +357,7 @@ class [[eosio::contract]] hello : public eosio::contract {
             const cppPath = path.join(testDir, 'test.cpp')
             const wasmPath = path.join(testDir, 'test.wasm')
 
-            if (fs.existsSync(rootCppPath)) {
-                fs.copyFileSync(rootCppPath, cppPath)
-            } else {
-                // Fallback if root file missing (shouldn't happen if we just created it)
-                const contractCode = `
-                #include <eosio/eosio.hpp>
-                class [[eosio::contract]] hello : public eosio::contract {
-                  public:
-                    using eosio::contract::contract;
-                    [[eosio::action]]
-                    void hi(eosio::name user) {
-                        print("Hello, ", user);
-                    }
-                };
-                `
-                fs.writeFileSync(cppPath, contractCode)
-            }
+            fs.copyFileSync(rootCppPath, cppPath)
 
             // 3. Compile contract
             execSync(`node ${cliPath} compile`, {
