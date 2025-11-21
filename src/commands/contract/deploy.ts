@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/// <reference path="../../types/wharfkit-session.d.ts" />
 import {existsSync, readdirSync, readFileSync} from 'fs'
 import {basename, extname, resolve} from 'path'
 import type {PrivateKey} from '@wharfkit/antelope'

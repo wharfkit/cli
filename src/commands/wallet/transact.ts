@@ -184,7 +184,7 @@ export async function signTransaction(
         log('', 'info')
 
         // Select the key to use
-        const keyName = selectKey(options.key)
+        const keyName = selectKey(options.key, transaction)
         log(`Using key: ${keyName}`, 'info')
 
         // Get password if needed
@@ -249,7 +249,7 @@ export async function transactTransaction(
         log('', 'info')
 
         // Select the key to use
-        const keyName = selectKey(options.key)
+        const keyName = selectKey(options.key, transaction)
         log(`Using key: ${keyName}`, 'info')
 
         // Get password if needed
