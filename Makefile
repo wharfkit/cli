@@ -8,12 +8,12 @@ lib: ${SRC_FILES} package.json tsconfig.json node_modules rollup.config.js
 	@${BIN}/rollup -c && touch lib
 
 .PHONY: test
-test: node_modules
+test: node_modules lib
 	@WHARFKIT_TEST=1 TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
 		${BIN}/mocha ${MOCHA_OPTS} ${TEST_FILES} --no-timeout --grep '$(grep)' --exit
 
 .PHONY: ci-test
-ci-test: node_modules
+ci-test: node_modules lib
 	@WHARFKIT_TEST=1 TS_NODE_PROJECT='./test/tsconfig.json' MOCK_DIR='./test/data/requests' \
 		${BIN}/nyc ${NYC_OPTS} --reporter=text \
 		${BIN}/mocha ${MOCHA_OPTS} -R list ${TEST_FILES} --no-timeout --exit

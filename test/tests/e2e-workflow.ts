@@ -24,6 +24,15 @@ function getTransactionExpiration(): string {
     return now.toISOString().slice(0, 19) // Remove milliseconds and timezone
 }
 
+function getRandomName(prefix: string): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyz12345'
+    let result = prefix
+    for (let i = 0; i < 6; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return result
+}
+
 suite('E2E Workflow', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')
     let testDir: string
@@ -327,7 +336,7 @@ suite('E2E Workflow', () => {
 
     suite('Integration: Account and Deployment', () => {
         test('can create an account on the local chain', function () {
-            const accountName = 'acc' + Math.random().toString(36).substring(2, 8)
+            const accountName = getRandomName('acc')
             const output = execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
                 encoding: 'utf8',
             })
@@ -346,7 +355,7 @@ suite('E2E Workflow', () => {
             }
 
             // 1. Create an account
-            const accountName = 'deploy' + Math.random().toString(36).substring(2, 8)
+            const accountName = getRandomName('deploy')
             execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
                 encoding: 'utf8',
             })
@@ -388,7 +397,7 @@ suite('E2E Workflow', () => {
                 this.skip()
             }
 
-            const accountName = 'val' + Math.random().toString(36).substring(2, 8)
+            const accountName = getRandomName('val')
             execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
                 encoding: 'utf8',
             })
