@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import '../../types/wharfkit-session'
 import {existsSync, readdirSync, readFileSync} from 'fs'
 import {basename, extname, resolve} from 'path'
 import type {PrivateKey} from '@wharfkit/antelope'
