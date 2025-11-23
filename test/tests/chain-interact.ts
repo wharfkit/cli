@@ -38,7 +38,7 @@ suite('Chain Interaction', () => {
                 const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim(), 10)
                 if (!isNaN(pid) && pid > 0) {
                     try {
-                        process.kill(pid, 'SIGKILL')
+                        execSync(`kill -9 ${pid}`, {encoding: 'utf8', stdio: 'ignore'})
                         // Remove the PID file
                         fs.unlinkSync(pidFile)
                         // Give it a moment to fully shut down
@@ -69,7 +69,7 @@ suite('Chain Interaction', () => {
                     const cmd = execSync(`ps -p ${pidNum} -o command=`, {encoding: 'utf8'}).trim()
                     if (cmd.includes('nodeos')) {
                         // Only kill nodeos processes
-                        process.kill(pidNum, 'SIGKILL')
+                        execSync(`kill -9 ${pidNum}`, {encoding: 'utf8', stdio: 'ignore'})
                     } else {
                         // Log what we found but didn't kill
                         // eslint-disable-next-line no-console

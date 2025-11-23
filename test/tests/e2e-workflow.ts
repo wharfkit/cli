@@ -56,6 +56,29 @@ suite('E2E Workflow', () => {
         try {
             // Try to stop cleanly first
             execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8', stdio: 'ignore'})
+            // Give it a moment to fully shut down
+            execSync('sleep 1', {encoding: 'utf8', stdio: 'ignore'})
+        } catch (error) {
+            // Ignore errors
+        }
+
+        // Also check for PID file and kill that process directly
+        try {
+            const pidFile = path.join(os.homedir(), '.wharfkit', 'chain', 'nodeos.pid')
+            if (fs.existsSync(pidFile)) {
+                const pid = parseInt(fs.readFileSync(pidFile, 'utf-8').trim(), 10)
+                if (!isNaN(pid) && pid > 0) {
+                    try {
+                        execSync(`kill -9 ${pid}`, {encoding: 'utf8', stdio: 'ignore'})
+                        // Remove the PID file
+                        fs.unlinkSync(pidFile)
+                        // Give it a moment to fully shut down
+                        execSync('sleep 0.5', {encoding: 'utf8', stdio: 'ignore'})
+                    } catch {
+                        // Process might be gone already
+                    }
+                }
+            }
         } catch (error) {
             // Ignore errors
         }
@@ -63,40 +86,56 @@ suite('E2E Workflow', () => {
         // Force kill only if it's nodeos (only check for LISTENING processes, not client connections)
         try {
             // Use -sTCP:LISTEN to only find processes LISTENING on the port, not clients
-            const pids = execSync(`lsof -ti:8888 -sTCP:LISTEN`, {encoding: 'utf8'}).trim().split('\n')
+            const pids = execSync(`lsof -ti:8888 -sTCP:LISTEN`, {encoding: 'utf8'})
+                .trim()
+                .split('\n')
             for (const pid of pids) {
                 if (!pid) continue
                 const pidNum = parseInt(pid)
                 if (isNaN(pidNum)) continue
-                
+
                 // Never kill our own process tree
                 if (pidNum === process.pid || pidNum === process.ppid) continue
-                
+
                 try {
                     // Check if process is nodeos
                     const cmd = execSync(`ps -p ${pidNum} -o command=`, {encoding: 'utf8'}).trim()
                     if (cmd.includes('nodeos')) {
                         // Only kill nodeos processes
-                        process.kill(pidNum, 'SIGKILL')
+                        execSync(`kill -9 ${pidNum}`, {encoding: 'utf8', stdio: 'ignore'})
                     } else {
                         // Log what we found but didn't kill
                         // eslint-disable-next-line no-console
-                        console.log(`Found non-nodeos process ${pidNum} listening on port 8888: ${cmd}`)
+                        console.log(
+                            `Found non-nodeos process ${pidNum} listening on port 8888: ${cmd}`
+                        )
                     }
                 } catch {
                     // Process might be gone already
                 }
             }
         } catch (error) {
-            // Ignore errors if no process is running on port 8888
+            // Ignore errors (lsof fails if no process found)
         }
 
         // Wait for port 8888 to be free (only check for LISTENING processes)
         const startTime = Date.now()
-        while (Date.now() - startTime < 10000) {
+        while (Date.now() - startTime < 20000) {
+            // Increased wait to 20s
             try {
                 execSync('lsof -ti:8888 -sTCP:LISTEN', {encoding: 'utf8', stdio: 'ignore'})
-                // Port is still in use, wait
+                // Port is still in use, wait for it to be released
+                // If it's been more than 2 seconds, try stopping again
+                if (Date.now() - startTime > 2000) {
+                    try {
+                        execSync(`node ${cliPath} chain local stop`, {
+                            encoding: 'utf8',
+                            stdio: 'ignore',
+                        })
+                    } catch {
+                        // Ignore errors
+                    }
+                }
                 execSync('sleep 0.5')
             } catch {
                 // lsof failed, meaning port is free
@@ -104,10 +143,36 @@ suite('E2E Workflow', () => {
             }
         }
 
+        // Final check - verify port is free (only LISTENING processes)
+        try {
+            const remainingPids = execSync('lsof -ti:8888 -sTCP:LISTEN', {encoding: 'utf8'}).trim()
+            if (remainingPids) {
+                // Check what's still holding the port
+                const pids = remainingPids.split('\n')
+                const processes: string[] = []
+                for (const pid of pids) {
+                    if (!pid) continue
+                    try {
+                        const cmd = execSync(`ps -p ${pid} -o command=`, {encoding: 'utf8'}).trim()
+                        processes.push(`${pid}: ${cmd}`)
+                    } catch {
+                        processes.push(`${pid}: (unknown)`)
+                    }
+                }
+                throw new Error(
+                    `Port 8888 is still in use after cleanup by: ${processes.join(', ')}`
+                )
+            }
+        } catch (e: any) {
+            if (e.message && e.message.includes('Port 8888 is still in use')) throw e
+            // lsof failed, meaning port is free - this is what we want
+        }
+
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
     })
 
     suiteTeardown(function () {
+        this.timeout(30000)
         // Restore original HOME
         process.env.HOME = originalHome
 
@@ -116,7 +181,11 @@ suite('E2E Workflow', () => {
             fs.rmSync(testDir, {recursive: true, force: true})
         }
 
-        execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
+        try {
+            execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
+        } catch (e) {
+            // Ignore error
+        }
     })
 
     suite('Wallet Key Management', () => {

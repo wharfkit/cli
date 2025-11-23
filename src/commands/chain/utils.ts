@@ -127,7 +127,8 @@ export async function removePidFile(): Promise<void> {
  */
 export async function isPortAvailable(port: number): Promise<boolean> {
     try {
-        const {stdout} = await execAsync(`lsof -i :${port} || echo "free"`)
+        // Only check for LISTENING processes, not client connections
+        const {stdout} = await execAsync(`lsof -ti:${port} -sTCP:LISTEN || echo "free"`)
         return stdout.includes('free')
     } catch {
         return true
