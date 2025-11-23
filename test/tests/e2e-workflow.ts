@@ -54,9 +54,54 @@ suite('E2E Workflow', () => {
 
         // Kill any existing processes on port 8888
         try {
-            execSync(`lsof -ti:8888 | xargs kill -9 2>/dev/null || true`, {encoding: 'utf8'})
+            // Try to stop cleanly first
+            execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8', stdio: 'ignore'})
+        } catch (error) {
+            // Ignore errors
+        }
+
+        // Force kill only if it's nodeos (only check for LISTENING processes, not client connections)
+        try {
+            // Use -sTCP:LISTEN to only find processes LISTENING on the port, not clients
+            const pids = execSync(`lsof -ti:8888 -sTCP:LISTEN`, {encoding: 'utf8'}).trim().split('\n')
+            for (const pid of pids) {
+                if (!pid) continue
+                const pidNum = parseInt(pid)
+                if (isNaN(pidNum)) continue
+                
+                // Never kill our own process tree
+                if (pidNum === process.pid || pidNum === process.ppid) continue
+                
+                try {
+                    // Check if process is nodeos
+                    const cmd = execSync(`ps -p ${pidNum} -o command=`, {encoding: 'utf8'}).trim()
+                    if (cmd.includes('nodeos')) {
+                        // Only kill nodeos processes
+                        process.kill(pidNum, 'SIGKILL')
+                    } else {
+                        // Log what we found but didn't kill
+                        // eslint-disable-next-line no-console
+                        console.log(`Found non-nodeos process ${pidNum} listening on port 8888: ${cmd}`)
+                    }
+                } catch {
+                    // Process might be gone already
+                }
+            }
         } catch (error) {
             // Ignore errors if no process is running on port 8888
+        }
+
+        // Wait for port 8888 to be free (only check for LISTENING processes)
+        const startTime = Date.now()
+        while (Date.now() - startTime < 10000) {
+            try {
+                execSync('lsof -ti:8888 -sTCP:LISTEN', {encoding: 'utf8', stdio: 'ignore'})
+                // Port is still in use, wait
+                execSync('sleep 0.5')
+            } catch {
+                // lsof failed, meaning port is free
+                break
+            }
         }
 
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})

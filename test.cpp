@@ -30,3 +30,4 @@ class [[eosio::contract]] test : public contract {
     }
 };
 
+

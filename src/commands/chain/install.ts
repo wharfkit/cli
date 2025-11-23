@@ -120,7 +120,7 @@ async function installLeapLinux(): Promise<void> {
     console.log('Adding AntelopeIO repository...')
     try {
         await executeCommand(
-            'wget -qO - https://apt.antelope.io/repos/antelope.gpg.key | sudo apt-key add -'
+            'wget -O - https://apt.antelope.io/repos/antelope.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/antelope.gpg > /dev/null'
         )
         await executeCommand(
             `echo "deb [arch=amd64] https://apt.antelope.io ${distro} ${version}" | sudo tee /etc/apt/sources.list.d/antelope.list`
