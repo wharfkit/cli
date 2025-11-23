@@ -6,7 +6,7 @@ import * as os from 'os'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 import {log} from '../../src/utils'
-import {killProcessAtPort} from '../utils/test-helpers'
+import {killProcessAtPort, isNodeosAvailable} from '../utils/test-helpers'
 
 /**
  * E2E tests for the complete workflow:
@@ -41,6 +41,14 @@ suite('E2E Workflow', () => {
     let originalHome: string
 
     suiteSetup(function () {
+        // Skip suite if nodeos is not available
+        if (!isNodeosAvailable()) {
+            // eslint-disable-next-line no-console
+            console.log('Skipping E2E Workflow tests: nodeos is not available')
+            this.skip()
+            return
+        }
+
         // Create a temporary test directory
         testDir = path.join(os.tmpdir(), `wharfkit-e2e-test-${Date.now()}`)
         fs.mkdirSync(testDir, {recursive: true})

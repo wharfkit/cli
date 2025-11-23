@@ -3,7 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {killProcessAtPort} from '../utils/test-helpers'
+import {killProcessAtPort, isNodeosAvailable} from '../utils/test-helpers'
 
 suite('Chain Interaction', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')
@@ -12,6 +12,14 @@ suite('Chain Interaction', () => {
     let contractAccount: string
 
     suiteSetup(function () {
+        // Skip suite if nodeos is not available
+        if (!isNodeosAvailable()) {
+            // eslint-disable-next-line no-console
+            console.log('Skipping Chain Interaction tests: nodeos is not available')
+            this.skip()
+            return
+        }
+
         this.timeout(120000) // Increase timeout for chain startup and deploy
 
         // Create a temporary test directory

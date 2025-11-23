@@ -1,6 +1,18 @@
 import {execSync} from 'child_process'
 
 /**
+ * Check if nodeos is available in PATH
+ */
+export function isNodeosAvailable(): boolean {
+    try {
+        execSync('which nodeos', {encoding: 'utf8', stdio: 'ignore'})
+        return true
+    } catch {
+        return false
+    }
+}
+
+/**
  * Kill any nodeos processes listening on the specified port
  * @param port - The port number to check
  */
