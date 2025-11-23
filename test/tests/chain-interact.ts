@@ -3,6 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import {killProcessAtPort} from '../utils/test-helpers'
 
 suite('Chain Interaction', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')
@@ -52,36 +53,8 @@ suite('Chain Interaction', () => {
             // Ignore errors
         }
 
-        // Force kill only if it's nodeos (only check for LISTENING processes, not client connections)
-        try {
-            // Use -sTCP:LISTEN to only find processes LISTENING on the port, not clients
-            const pids = execSync(`lsof -ti:8888 -sTCP:LISTEN`, {encoding: 'utf8'}).trim().split('\n')
-            for (const pid of pids) {
-                if (!pid) continue
-                const pidNum = parseInt(pid)
-                if (isNaN(pidNum)) continue
-                
-                // Never kill our own process tree
-                if (pidNum === process.pid || pidNum === process.ppid) continue
-                
-                try {
-                    // Check if process is nodeos
-                    const cmd = execSync(`ps -p ${pidNum} -o command=`, {encoding: 'utf8'}).trim()
-                    if (cmd.includes('nodeos')) {
-                        // Only kill nodeos processes
-                        execSync(`kill -9 ${pidNum}`, {encoding: 'utf8', stdio: 'ignore'})
-                    } else {
-                        // Log what we found but didn't kill
-                        // eslint-disable-next-line no-console
-                        console.log(`Found non-nodeos process ${pidNum} listening on port 8888: ${cmd}`)
-                    }
-                } catch {
-                    // Process might be gone already
-                }
-            }
-        } catch (error) {
-            // Ignore errors (lsof fails if no process found)
-        }
+        // Force kill any nodeos processes on port 8888
+        killProcessAtPort(8888)
 
         // Wait for port 8888 to be free (only check for LISTENING processes)
         const startTime = Date.now()
@@ -93,7 +66,10 @@ suite('Chain Interaction', () => {
                 // If it's been more than 2 seconds, try stopping again
                 if (Date.now() - startTime > 2000) {
                     try {
-                        execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8', stdio: 'ignore'})
+                        execSync(`node ${cliPath} chain local stop`, {
+                            encoding: 'utf8',
+                            stdio: 'ignore',
+                        })
                     } catch {
                         // Ignore errors
                     }
