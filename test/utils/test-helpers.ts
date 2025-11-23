@@ -28,4 +28,3 @@ export function killProcessAtPort(port: number): void {
         // Port is free or lsof failed
     }
 }
-
