@@ -3,7 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {killProcessAtPort, isNodeosAvailable} from '../utils/test-helpers'
+import {isNodeosAvailable, killProcessAtPort} from '../utils/test-helpers'
 
 suite('Chain Interaction', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')

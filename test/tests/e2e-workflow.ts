@@ -6,7 +6,7 @@ import * as os from 'os'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 import {log} from '../../src/utils'
-import {killProcessAtPort, isNodeosAvailable} from '../utils/test-helpers'
+import {isNodeosAvailable, killProcessAtPort} from '../utils/test-helpers'
 
 /**
  * E2E tests for the complete workflow:
