@@ -57,7 +57,7 @@ suite('Wallet Account Create', () => {
     })
 
     test('creates account with custom name', async function () {
-        const accountName = 'testaccount.gm'
+        const accountName = 'testacc.gm'
         const mockResponse = {
             status: 201,
             json: sandbox.stub().resolves({}),
@@ -130,6 +130,7 @@ suite('Wallet Account Create', () => {
 
         await createAccount({chain: 'KylinTestnet'})
 
+        assert.isTrue(fetchStub.calledOnce)
         const callArgs = fetchStub.getCall(0).args
         assert.equal(callArgs[0], `${Chains.KylinTestnet.url}/account/create`)
 

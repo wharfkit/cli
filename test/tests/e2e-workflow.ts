@@ -318,7 +318,7 @@ suite('E2E Workflow', () => {
             assert.include(output, 'Deploy a compiled contract')
             assert.include(output, '--account')
             assert.include(output, '--url')
-            assert.notInclude(output, '--key')
+            assert.include(output, '--key')
         })
 
         test('dev command is at top level', function () {

@@ -1,3 +1,4 @@
+import '../../types/wharfkit-session'
 import type {PublicKeyType} from '@wharfkit/antelope'
 import {APIClient, FetchProvider, KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
 import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
@@ -36,19 +37,24 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
         let chainIndex: ChainIndices = 'Jungle4'
         if (options.chain) {
             const chainStr = String(options.chain)
-            // Convert to PascalCase (e.g., "jungle4" -> "Jungle4")
-            const pascalCaseChain =
-                chainStr.charAt(0).toUpperCase() + chainStr.slice(1).toLowerCase()
-            if (supportedChains.includes(pascalCaseChain)) {
-                chainIndex = pascalCaseChain as ChainIndices
+            // Try exact match first (handles PascalCase like "KylinTestnet")
+            if (supportedChains.includes(chainStr)) {
+                chainIndex = chainStr as ChainIndices
             } else {
-                log(
-                    `Unsupported chain "${
-                        options.chain
-                    }". Supported chains are: ${supportedChains.join(', ')}`,
-                    'info'
-                )
-                return
+                // Convert to PascalCase (e.g., "jungle4" -> "Jungle4", "kylintestnet" -> "Kylintestnet")
+                const pascalCaseChain =
+                    chainStr.charAt(0).toUpperCase() + chainStr.slice(1).toLowerCase()
+                if (supportedChains.includes(pascalCaseChain)) {
+                    chainIndex = pascalCaseChain as ChainIndices
+                } else {
+                    log(
+                        `Unsupported chain "${
+                            options.chain
+                        }". Supported chains are: ${supportedChains.join(', ')}`,
+                        'info'
+                    )
+                    return
+                }
             }
         }
 
@@ -102,7 +108,7 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
 
         if (isLocalChain) {
             // Use Session Kit for local chain
-            await createAccountOnLocalChain(accountName, publicKey, privateKey!, chainUrl)
+            await createAccountOnLocalChain(String(accountName), publicKey, privateKey!, chainUrl)
         } else {
             // Use POST endpoint for remote chains
             const data = {
