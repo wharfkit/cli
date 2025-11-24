@@ -209,6 +209,42 @@ export async function deployContract(
             provider: new FetchProvider(url, {fetch}),
         })
 
+        // Verify the key matches the account's active permission
+        try {
+            const accountInfo = await client.v1.chain.get_account(accountName)
+            const activePermission = accountInfo.permissions.find(
+                (p) => String(p.perm_name) === 'active'
+            )
+            if (activePermission) {
+                const publicKey = privateKey.toPublic().toString()
+                const keyMatches = activePermission.required_auth.keys.some(
+                    (k) => String(k.key) === publicKey
+                )
+                if (!keyMatches) {
+                    const accountKeys = activePermission.required_auth.keys.map((k) => k.key)
+                    throw new Error(
+                        `The selected key (${publicKey}) does not match account "${accountName}"'s active permission.\n` +
+                            `Account's active permission keys: ${accountKeys.join(', ')}\n\n` +
+                            `To deploy, you need a key that matches the account's active permission.\n` +
+                            `Options:\n` +
+                            `  1. Import the correct key: wharfkit wallet keys add <private-key>\n` +
+                            `  2. Specify the key: wharfkit contract deploy --key <key-name-or-private-key>\n` +
+                            `  3. Set WHARFKIT_DEPLOY_KEY environment variable`
+                    )
+                }
+            }
+        } catch (error: any) {
+            // If account doesn't exist or we can't fetch permissions, let the deployment attempt proceed
+            // (it will fail with a clearer error from the blockchain)
+            if (!error.message.includes('does not match')) {
+                console.log(
+                    `Warning: Could not verify key matches account permission: ${error.message}`
+                )
+            } else {
+                throw error
+            }
+        }
+
         // Create session with private key wallet plugin
         const walletPlugin = new WalletPluginPrivateKey(privateKey)
         walletPlugin.config.requiresChainSelect = false
@@ -366,6 +402,17 @@ async function getPrivateKeyForDeploy(
     if (defaultKey) {
         console.log(`Using wallet key: default`)
         return getKeyFromWallet('default')
+    }
+
+    // Try 'chain-key' (imported when chain starts)
+    // Note: This only works if the account's active permission matches this key
+    const chainKey = keys.find((k) => k.name === 'chain-key')
+    if (chainKey) {
+        console.log(`Using wallet key: chain-key`)
+        console.log(
+            `Note: This will only work if account "${accountName}"'s active permission matches this key`
+        )
+        return getKeyFromWallet('chain-key')
     }
 
     // Use first available key

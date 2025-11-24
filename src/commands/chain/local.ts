@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import {PrivateKey} from '@wharfkit/antelope'
+import {KeyType, PrivateKey} from '@wharfkit/antelope'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {spawn} from 'child_process'
 import * as fs from 'fs'
@@ -29,6 +29,7 @@ import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 export interface LocalStartOptions {
     port: number
     clean: boolean
+    key?: string
 }
 
 /**
@@ -72,17 +73,36 @@ export async function startLocalChain(options: LocalStartOptions): Promise<void>
         )
     }
 
+    // Determine which key to use: provided, env var, or generate new one
+    let chainPrivateKey: PrivateKey
+    let chainPublicKey: string
+    const providedKey = options.key || process.env.WHARFKIT_CHAIN_KEY
+
+    if (providedKey) {
+        // Use provided key
+        chainPrivateKey = PrivateKey.from(providedKey)
+        chainPublicKey = chainPrivateKey.toPublic().toString()
+        console.log('Using provided private key for chain')
+    } else {
+        // Generate a new random key
+        chainPrivateKey = PrivateKey.generate(KeyType.K1)
+        chainPublicKey = chainPrivateKey.toPublic().toString()
+        console.log('Generated new random private key for chain')
+        console.log(`   Public Key: ${chainPublicKey}`)
+        console.log(`   Private Key: ${chainPrivateKey.toString()}`)
+    }
+
     // Create config files
     const configFile = path.join(configDir, 'config.ini')
     const genesisFile = path.join(configDir, 'genesis.json')
 
-    // Write config.ini
-    const configContent = getConfigIni(options.port)
+    // Write config.ini with the determined key
+    const configContent = getConfigIni(options.port, chainPublicKey, chainPrivateKey.toString())
     await fs.promises.writeFile(configFile, configContent)
 
     // Write genesis.json if it doesn't exist or if cleaning
     if (options.clean || !fs.existsSync(genesisFile)) {
-        const genesisContent = getGenesisJson()
+        const genesisContent = getGenesisJson(chainPublicKey)
         await fs.promises.writeFile(genesisFile, genesisContent)
     }
 
@@ -138,17 +158,16 @@ export async function startLocalChain(options: LocalStartOptions): Promise<void>
 
     console.log('Chain is ready!')
 
-    // Setup dev wallet
-    await setupDevWallet()
+    // Setup dev wallet (import the key used for the chain)
+    await setupDevWallet(chainPrivateKey.toString())
 
     console.log('\n✅ Local LEAP blockchain is running!')
     console.log(`   URL: http://127.0.0.1:${options.port}`)
     console.log(`   Data directory: ${dataDir}`)
     console.log(`   Config directory: ${configDir}`)
-    console.log('\n📝 Development keys:')
-    const devKeys = getDevKeys()
-    console.log(`   Public: ${devKeys.publicKey}`)
-    console.log(`   Private: ${devKeys.privateKey}`)
+    console.log('\n📝 Chain keys:')
+    console.log(`   Public: ${chainPublicKey}`)
+    console.log(`   Private: ${chainPrivateKey.toString()}`)
     console.log('\n🛑 To stop: wharfkit chain local stop')
 }
 
@@ -327,9 +346,16 @@ export async function showChainLogs(options: {follow: boolean; errors: boolean})
 }
 
 /**
- * Setup development wallet with default keys
+ * Check if a string looks like a private key
  */
-async function setupDevWallet(): Promise<void> {
+function isPrivateKeyString(str: string): boolean {
+    return str.startsWith('PVT_') || str.startsWith('5') || /^[A-Za-z0-9]{51}$/.test(str)
+}
+
+/**
+ * Setup development wallet with default keys and optionally import custom key
+ */
+async function setupDevWallet(customKey?: string): Promise<void> {
     console.log('Setting up development wallet...')
 
     const walletName = 'dev'
@@ -337,6 +363,7 @@ async function setupDevWallet(): Promise<void> {
     const devPrivateKey = PrivateKey.from(devKeys.privateKey)
 
     try {
+        // First, import the default dev key
         const existingKeys = listWalletKeys()
         const existingEntry = existingKeys.find(
             (key) => key.name === walletName || key.publicKey === devKeys.publicKey
@@ -353,6 +380,44 @@ async function setupDevWallet(): Promise<void> {
             console.log('Development key already stored')
         }
 
+        // If a custom key is provided, import it automatically
+        if (customKey) {
+            try {
+                if (isPrivateKeyString(customKey)) {
+                    const customPrivateKey = PrivateKey.from(customKey)
+                    const customPublicKey = customPrivateKey.toPublic().toString()
+
+                    // Check if this key already exists
+                    const existingCustomKey = existingKeys.find(
+                        (key) => key.publicKey === customPublicKey
+                    )
+
+                    if (!existingCustomKey) {
+                        // Use 'default' if no default exists, otherwise use 'chain-key'
+                        const hasDefault = existingKeys.some((k) => k.name === 'default')
+                        const customKeyName = hasDefault ? 'chain-key' : 'default'
+                        addKeyToWallet(customPrivateKey, customKeyName)
+                        console.log(
+                            `✅ Automatically imported chain key into wallet as "${customKeyName}"`
+                        )
+                        console.log(`   Public Key: ${customPublicKey}`)
+                    } else {
+                        console.log(
+                            `Chain key already exists in wallet as "${existingCustomKey.name}"`
+                        )
+                    }
+                } else {
+                    console.log(
+                        `Warning: Provided key "${customKey}" does not appear to be a valid private key format`
+                    )
+                }
+            } catch (error: any) {
+                console.log(`Warning: Could not import chain key: ${error.message}`)
+                console.log('You can manually import it with:')
+                console.log(`  wharfkit wallet keys add "${customKey}"`)
+            }
+        }
+
         const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
         const renderer = new NonInteractiveConsoleUI()
         renderer.status('WharfKit wallet plugin initialized for local development')
@@ -362,8 +427,6 @@ async function setupDevWallet(): Promise<void> {
     } catch (error: any) {
         console.log(`Warning: Could not setup dev wallet: ${error.message}`)
         console.log('You can manually store the development key with:')
-        console.log(
-            `  wharfkit wallet keys add --name ${walletName} --private ${devKeys.privateKey}`
-        )
+        console.log(`  wharfkit wallet keys add --name ${walletName} ${devKeys.privateKey}`)
     }
 }

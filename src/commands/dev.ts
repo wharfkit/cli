@@ -10,6 +10,7 @@ interface DevOptions {
     account?: string
     port?: number
     clean?: boolean
+    key?: string
 }
 
 let isCompiling = false
@@ -35,6 +36,7 @@ export async function startDevMode(options: DevOptions): Promise<void> {
             await startLocalChain({
                 port,
                 clean: options.clean || false,
+                key: options.key,
             })
             console.log('✅ Local blockchain started\n')
 
@@ -167,12 +169,17 @@ export function createDevCommand(): Command {
         .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
         .option('-p, --port <port>', 'Port for local blockchain', '8888')
         .option('-c, --clean', 'Start with a clean blockchain state')
+        .option(
+            '-k, --key <key>',
+            'Private key to automatically import into wallet (overrides WHARFKIT_CHAIN_KEY env var)'
+        )
         .action(async (options) => {
             try {
                 await startDevMode({
                     account: options.account,
                     port: parseInt(options.port),
                     clean: options.clean,
+                    key: options.key,
                 })
             } catch (error: any) {
                 console.error(`Error: ${error.message}`)

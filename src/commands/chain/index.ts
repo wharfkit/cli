@@ -23,11 +23,16 @@ export function createChainCommand(): Command {
         .description('Start a local LEAP blockchain (installs LEAP automatically if needed)')
         .option('-p, --port <port>', 'Port for the HTTP server', '8888')
         .option('-c, --clean', 'Clean blockchain data before starting', false)
+        .option(
+            '-k, --key <key>',
+            'Private key to automatically import into wallet (overrides WHARFKIT_CHAIN_KEY env var)'
+        )
         .action(async (options) => {
             try {
                 await startLocalChain({
                     port: parseInt(options.port, 10),
                     clean: options.clean,
+                    key: options.key,
                 })
             } catch (error: any) {
                 console.error(`Error: ${error.message}`)

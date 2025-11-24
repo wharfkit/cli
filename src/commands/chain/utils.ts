@@ -180,14 +180,15 @@ export function getDevKeys(): {publicKey: string; privateKey: string} {
 /**
  * Create default genesis.json
  */
-export function getGenesisJson(): string {
+export function getGenesisJson(publicKey?: string): string {
     const devKeys = getDevKeys()
+    const initialKey = publicKey || devKeys.publicKey
     // Use a fixed timestamp for deterministic blockchain
     const timestamp = '2018-12-05T08:55:00.000'
     return JSON.stringify(
         {
             initial_timestamp: timestamp,
-            initial_key: devKeys.publicKey,
+            initial_key: initialKey,
             initial_configuration: {
                 max_block_net_usage: 1048576,
                 target_block_net_usage_pct: 1000,
@@ -216,8 +217,10 @@ export function getGenesisJson(): string {
 /**
  * Create default config.ini
  */
-export function getConfigIni(port: number): string {
+export function getConfigIni(port: number, publicKey?: string, privateKey?: string): string {
     const devKeys = getDevKeys()
+    const producerPublicKey = publicKey || devKeys.publicKey
+    const producerPrivateKey = privateKey || devKeys.privateKey
     return `# Plugins
 plugin = eosio::chain_api_plugin
 plugin = eosio::chain_plugin
@@ -244,7 +247,7 @@ resource-monitor-not-shutdown-on-threshold-exceeded = true
 
 # Producer settings
 producer-name = eosio
-signature-provider = ${devKeys.publicKey}=KEY:${devKeys.privateKey}
+signature-provider = ${producerPublicKey}=KEY:${producerPrivateKey}
 enable-stale-production = true
 pause-on-startup = false
 `
