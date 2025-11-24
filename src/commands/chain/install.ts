@@ -188,11 +188,11 @@ export async function ensureLeapInstalled(): Promise<void> {
         return
     }
 
-    // In test mode, skip auto-installation and just check if nodeos is available
-    if (process.env.WHARFKIT_TEST) {
+    // In CI mode, skip auto-installation and just check if nodeos is available
+    if (process.env.GITHUB_CI) {
         if (!status.nodeos) {
             throw new Error(
-                'LEAP is not installed and auto-installation is disabled in test mode. ' +
+                'LEAP is not installed and auto-installation is disabled in CI mode. ' +
                     'Please install LEAP manually or ensure nodeos is available in PATH.'
             )
         }
