@@ -1,13 +1,27 @@
 import '../../types/wharfkit-session'
 import type {PublicKeyType} from '@wharfkit/antelope'
-import {APIClient, FetchProvider, KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
+import {
+    APIClient,
+    FetchProvider,
+    KeyType,
+    type NameType,
+    PrivateKey,
+    PublicKey,
+} from '@wharfkit/antelope'
 import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
 import {getDevKeys} from '../chain/utils'
 import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
-import {addKeyToWallet, getKeyFromWallet, listWalletKeys} from './utils'
+import {
+    addKeyToWallet,
+    DEFAULT_KEY_NAME,
+    EOSIO_KEY_PREFERRED_NAMES,
+    getKeyFromWallet,
+    listWalletKeys,
+    type StoredKey,
+} from './utils'
 import {log, makeClient} from '../../utils'
 
 interface AccountCreateOptions {
@@ -108,7 +122,7 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
 
         if (isLocalChain) {
             // Use Session Kit for local chain
-            await createAccountOnLocalChain(String(accountName), publicKey, privateKey!, chainUrl)
+            await createAccountOnLocalChain(String(accountName), publicKey, privateKey, chainUrl)
         } else {
             // Use POST endpoint for remote chains
             const data = {
@@ -149,29 +163,27 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
 async function createAccountOnLocalChain(
     accountName: string,
     publicKey: string,
-    privateKey: PrivateKey,
+    privateKey: PrivateKey | undefined,
     chainUrl: string
 ): Promise<void> {
-    const newPublicKey = privateKey.toPublic()
+    // Parse the public key string into a PublicKey object
+    // If we have a private key, derive from it; otherwise use the provided public key string
+    const newPublicKey = privateKey ? privateKey.toPublic() : PublicKey.from(publicKey)
 
-    // Try to get eosio account key from wallet (default, chain-key, dev, or hardcoded)
+    // Try to get eosio account key from wallet (default or hardcoded)
     // This ensures we use the correct key that matches the chain's eosio account permission
     let eosioPrivateKey: PrivateKey
     const walletKeys = listWalletKeys()
     const devKeys = getDevKeys()
 
-    // Try to find a key that might be the chain's eosio key
-    // Priority: default -> chain-key -> dev -> hardcoded dev keys
-    const defaultKey = walletKeys.find((k) => k.name === 'default')
-    const chainKey = walletKeys.find((k) => k.name === 'chain-key')
-    const devKey = walletKeys.find((k) => k.name === 'dev')
+    // Try to find the default key
+    const preferredKeyName = resolveEosioWalletKeyName(walletKeys)
+    const defaultKey = walletKeys.find((k) => k.name === DEFAULT_KEY_NAME)
 
-    if (defaultKey) {
-        eosioPrivateKey = getKeyFromWallet('default')
-    } else if (chainKey) {
-        eosioPrivateKey = getKeyFromWallet('chain-key')
-    } else if (devKey) {
-        eosioPrivateKey = getKeyFromWallet('dev')
+    if (preferredKeyName) {
+        eosioPrivateKey = getKeyFromWallet(preferredKeyName)
+    } else if (defaultKey) {
+        eosioPrivateKey = getKeyFromWallet(DEFAULT_KEY_NAME)
     } else {
         // Fall back to hardcoded dev keys (for backward compatibility)
         eosioPrivateKey = PrivateKey.from(devKeys.privateKey)
@@ -301,19 +313,25 @@ async function createAccountOnLocalChain(
 
     log('Account created successfully!', 'info')
     log(`Account Name: ${accountName}`, 'info')
-    log(`Private Key: ${privateKey.toString()}`, 'info')
+    if (privateKey) {
+        log(`Private Key: ${privateKey.toString()}`, 'info')
+    }
     log(`Public Key: ${publicKey}`, 'info')
     log(`Transaction ID: ${result.resolved?.transaction.id}`, 'info')
 
-    // Store the key in wallet with account name
-    try {
-        addKeyToWallet(privateKey, accountName)
-        log(`Key stored in wallet as: ${accountName}`, 'info')
-    } catch (error) {
-        log(
-            `Could not store key in wallet (may already exist): ${(error as Error).message}`,
-            'info'
-        )
+    // Store the key in wallet with account name (only if we have a private key)
+    if (privateKey) {
+        try {
+            addKeyToWallet(privateKey, accountName)
+            log(`Key stored in wallet as: ${accountName}`, 'info')
+        } catch (error) {
+            log(
+                `Could not store key in wallet (may already exist): ${(error as Error).message}`,
+                'info'
+            )
+        }
+    } else {
+        log('Note: No private key available to store in wallet (public key was provided)', 'info')
     }
 }
 
@@ -335,6 +353,15 @@ function generateRandomLocalAccountName(): string {
         result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
     return result
+}
+
+function resolveEosioWalletKeyName(walletKeys: StoredKey[]): string | undefined {
+    for (const preferredName of EOSIO_KEY_PREFERRED_NAMES) {
+        if (walletKeys.some((key) => key.name === preferredName)) {
+            return preferredName
+        }
+    }
+    return undefined
 }
 
 async function checkAccountNameExists(accountName: NameType, chainUrl: string): Promise<boolean> {

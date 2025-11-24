@@ -3,38 +3,27 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import {KeyType, PrivateKey} from '@wharfkit/antelope'
-import {
-    getDevKeys,
-    getDefaultWalletDir,
-    getDefaultDataDir,
-    getDefaultConfigDir,
-} from '../../src/commands/chain/utils'
+import {getDevKeys} from '../../src/commands/chain/utils'
 import {
     addKeyToWallet,
-    listWalletKeys,
+    DEFAULT_KEY_NAME,
     getKeyFromWallet,
-    removeKeyFromWallet,
     getWalletFilePath,
-    loadWalletData,
+    listWalletKeys,
 } from '../../src/commands/wallet/utils'
 
 suite('Chain Genesis Key Storage', () => {
     let testWalletDir: string
-    let testDataDir: string
-    let testConfigDir: string
     let originalHome: string
-    let originalWalletDir: string | undefined
 
     setup(function () {
         // Create temporary test directories
         const testBaseDir = path.join(os.tmpdir(), `wharfkit-genesis-test-${Date.now()}`)
         testWalletDir = path.join(testBaseDir, '.wharfkit', 'wallet')
-        testDataDir = path.join(testBaseDir, '.wharfkit', 'chain')
-        testConfigDir = path.join(testBaseDir, '.wharfkit', 'config')
 
         fs.mkdirSync(testWalletDir, {recursive: true})
-        fs.mkdirSync(testDataDir, {recursive: true})
-        fs.mkdirSync(testConfigDir, {recursive: true})
+        fs.mkdirSync(path.join(testBaseDir, '.wharfkit', 'chain'), {recursive: true})
+        fs.mkdirSync(path.join(testBaseDir, '.wharfkit', 'config'), {recursive: true})
 
         // Mock HOME to use test directories
         originalHome = process.env.HOME || ''
@@ -70,19 +59,19 @@ suite('Chain Genesis Key Storage', () => {
         assert.equal(initialKeys.length, 0)
 
         // Add genesis key as 'default' (simulating what setupDevWallet does)
-        addKeyToWallet(genesisPrivateKey, 'default')
+        addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
 
         // Verify key was stored
         const keys = listWalletKeys()
         assert.equal(keys.length, 1)
-        assert.equal(keys[0].name, 'default')
+        assert.equal(keys[0].name, DEFAULT_KEY_NAME)
         // Verify the stored key matches genesis key by comparing public keys
-        const storedKey = getKeyFromWallet('default')
+        const storedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         const expectedGenesisKey = PrivateKey.from(devKeys.privateKey)
         assert.equal(storedKey.toPublic().toString(), expectedGenesisKey.toPublic().toString())
 
         // Verify we can retrieve it
-        const retrievedKey = getKeyFromWallet('default')
+        const retrievedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         assert.equal(retrievedKey.toPublic().toString(), expectedGenesisKey.toPublic().toString())
     })
 
@@ -91,22 +80,22 @@ suite('Chain Genesis Key Storage', () => {
         const genesisPrivateKey = PrivateKey.from(devKeys.privateKey)
 
         // First, add the genesis key as 'default'
-        addKeyToWallet(genesisPrivateKey, 'default')
+        addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
 
         // Verify it exists
         const firstKeys = listWalletKeys()
         assert.equal(firstKeys.length, 1)
-        assert.equal(firstKeys[0].name, 'default')
+        assert.equal(firstKeys[0].name, DEFAULT_KEY_NAME)
 
         // Try to add it again (should not create duplicate)
         // This simulates what happens when chain starts multiple times
         const existingKeys = listWalletKeys()
-        const existingDefaultKey = existingKeys.find((k) => k.name === 'default')
+        const existingDefaultKey = existingKeys.find((k) => k.name === DEFAULT_KEY_NAME)
 
         if (existingDefaultKey) {
             // Key already exists - should reuse it
             // Compare by retrieving the key and checking public key
-            const retrievedKey = getKeyFromWallet('default')
+            const retrievedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
             const expectedGenesisKey = PrivateKey.from(devKeys.privateKey)
             assert.equal(
                 retrievedKey.toPublic().toString(),
@@ -114,15 +103,15 @@ suite('Chain Genesis Key Storage', () => {
             )
         } else {
             // Should not reach here, but if it does, add the key
-            addKeyToWallet(genesisPrivateKey, 'default')
+            addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
         }
 
         // Verify still only one key
         const finalKeys = listWalletKeys()
         assert.equal(finalKeys.length, 1)
-        assert.equal(finalKeys[0].name, 'default')
+        assert.equal(finalKeys[0].name, DEFAULT_KEY_NAME)
         // Verify it matches genesis key by comparing public keys
-        const storedKey = getKeyFromWallet('default')
+        const storedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         const expectedGenesisKey = PrivateKey.from(devKeys.privateKey)
         assert.equal(storedKey.toPublic().toString(), expectedGenesisKey.toPublic().toString())
     })
@@ -149,20 +138,20 @@ suite('Chain Genesis Key Storage', () => {
         const genesisPrivateKey = PrivateKey.from(devKeys.privateKey)
 
         // Store genesis key as 'default'
-        addKeyToWallet(genesisPrivateKey, 'default')
+        addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
 
-        // Simulate account creation key lookup (priority: default -> chain-key -> dev -> hardcoded)
+        // Simulate account creation key lookup (priority: default -> hardcoded)
         const walletKeys = listWalletKeys()
-        const defaultKey = walletKeys.find((k) => k.name === 'default')
+        const defaultKey = walletKeys.find((k) => k.name === DEFAULT_KEY_NAME)
 
         assert.isDefined(defaultKey, 'default key should exist')
         // Verify the stored key matches genesis key by comparing public keys
-        const storedKey = getKeyFromWallet('default')
+        const storedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         const expectedGenesisKey = PrivateKey.from(devKeys.privateKey)
         assert.equal(storedKey.toPublic().toString(), expectedGenesisKey.toPublic().toString())
 
         // Retrieve the key and verify it matches genesis key
-        const eosioPrivateKey = getKeyFromWallet('default')
+        const eosioPrivateKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         assert.equal(
             eosioPrivateKey.toPublic().toString(),
             expectedGenesisKey.toPublic().toString()
@@ -177,43 +166,25 @@ suite('Chain Genesis Key Storage', () => {
         const otherKey1 = PrivateKey.generate(KeyType.K1)
         const otherKey2 = PrivateKey.generate(KeyType.K1)
 
-        addKeyToWallet(otherKey1, 'chain-key')
+        addKeyToWallet(otherKey1, 'aux-key')
         addKeyToWallet(otherKey2, 'dev')
 
         // Now add genesis key as 'default'
-        addKeyToWallet(genesisPrivateKey, 'default')
+        addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
 
         // Simulate account creation key lookup priority
         const walletKeys = listWalletKeys()
-        const defaultKey = walletKeys.find((k) => k.name === 'default')
-        const chainKey = walletKeys.find((k) => k.name === 'chain-key')
-        const devKey = walletKeys.find((k) => k.name === 'dev')
+        const defaultKey = walletKeys.find((k) => k.name === DEFAULT_KEY_NAME)
 
-        // 'default' should be found first
+        // Default key should be found first
         assert.isDefined(defaultKey)
         // Verify it's the genesis key by comparing public keys
-        const defaultStoredKey = getKeyFromWallet('default')
+        const defaultStoredKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         const expectedGenesisKey = PrivateKey.from(devKeys.privateKey)
         assert.equal(
             defaultStoredKey.toPublic().toString(),
             expectedGenesisKey.toPublic().toString()
         )
-
-        // Verify priority order: default should be used
-        let selectedKey: PrivateKey
-        if (defaultKey) {
-            selectedKey = getKeyFromWallet('default')
-        } else if (chainKey) {
-            selectedKey = getKeyFromWallet('chain-key')
-        } else if (devKey) {
-            selectedKey = getKeyFromWallet('dev')
-        } else {
-            selectedKey = PrivateKey.from(devKeys.privateKey)
-        }
-
-        // Compare public keys (format may differ)
-        const expectedKey = PrivateKey.from(devKeys.privateKey)
-        assert.equal(selectedKey.toPublic().toString(), expectedKey.toPublic().toString())
     })
 
     test('genesis key is not duplicated when stored multiple times', function () {
@@ -221,11 +192,11 @@ suite('Chain Genesis Key Storage', () => {
         const genesisPrivateKey = PrivateKey.from(devKeys.privateKey)
 
         // Add genesis key as 'default'
-        addKeyToWallet(genesisPrivateKey, 'default')
+        addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
 
         // Try to add it again (should fail because key already exists)
         try {
-            addKeyToWallet(genesisPrivateKey, 'default')
+            addKeyToWallet(genesisPrivateKey, DEFAULT_KEY_NAME)
             assert.fail('Should throw error when adding duplicate key name')
         } catch (error: any) {
             assert.include(error.message, 'already exists')
@@ -234,9 +205,9 @@ suite('Chain Genesis Key Storage', () => {
         // Verify still only one key
         const keys = listWalletKeys()
         assert.equal(keys.length, 1)
-        assert.equal(keys[0].name, 'default')
+        assert.equal(keys[0].name, DEFAULT_KEY_NAME)
         // Verify it's the genesis key by comparing public keys
-        const storedKey = getKeyFromWallet('default')
+        const storedKey = getKeyFromWallet(DEFAULT_KEY_NAME)
         const expectedKey = PrivateKey.from(devKeys.privateKey)
         assert.equal(storedKey.toPublic().toString(), expectedKey.toPublic().toString())
     })

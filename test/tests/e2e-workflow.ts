@@ -77,8 +77,8 @@ suite('E2E Workflow', () => {
         // Also check port 8888 directly in case chain was started by another test with different HOME
         killProcessAtPort(8888)
 
-        // Start the chain
-        execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
+        // Start the chain with --clean to ensure fresh state and genesis key is used
+        execSync(`node ${cliPath} chain local start --clean`, {encoding: 'utf8'})
 
         // Wait for chain to be ready
         await waitForChainReady('http://127.0.0.1:8888', 30000)

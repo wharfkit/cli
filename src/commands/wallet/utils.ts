@@ -4,6 +4,10 @@ import * as path from 'path'
 import * as os from 'os'
 import {PrivateKey} from '@wharfkit/antelope'
 
+export const DEFAULT_KEY_NAME = 'default'
+// Use default for all eosio account keys
+export const EOSIO_KEY_PREFERRED_NAMES = [DEFAULT_KEY_NAME] as const
+
 // Default password for encryption when user doesn't provide one
 const DEFAULT_PASSWORD = 'wharfkit-default-encryption-key-do-not-use-in-production'
 

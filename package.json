@@ -5,7 +5,10 @@
     "homepage": "https://github.com/wharfkit/cli#readme",
     "description": "Command line utilities for Wharf",
     "scripts": {
-        "prepare": "make"
+        "prepare": "make",
+        "check": "tsc --noEmit",
+        "test": "make test",
+        "lint": "make check"
     },
     "engines": {
         "node": ">=18.0.0"

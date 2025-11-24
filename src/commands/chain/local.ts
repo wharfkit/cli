@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
-import {PrivateKey} from '@wharfkit/antelope'
+import {PrivateKey, PublicKey} from '@wharfkit/antelope'
+import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {spawn} from 'child_process'
 import * as fs from 'fs'
@@ -23,7 +24,7 @@ import {
     waitForChain,
 } from './utils'
 import {ensureLeapInstalled} from './install'
-import {addKeyToWallet, listWalletKeys} from '../wallet/utils'
+import {addKeyToWallet, DEFAULT_KEY_NAME, listWalletKeys} from '../wallet/utils'
 import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 
 export interface LocalStartOptions {
@@ -157,6 +158,8 @@ export async function startLocalChain(options: LocalStartOptions): Promise<void>
     }
 
     console.log('Chain is ready!')
+
+    await ensureEosioPermissionsMatchChainKey(options.port, chainPrivateKey)
 
     // Setup dev wallet (import the key used for the chain)
     await setupDevWallet(chainPrivateKey.toString())
@@ -358,62 +361,15 @@ function isPrivateKeyString(str: string): boolean {
 async function setupDevWallet(customKey?: string): Promise<void> {
     console.log('Setting up development wallet...')
 
-    const walletName = 'dev'
+    const walletName = DEFAULT_KEY_NAME
     const devKeys = getDevKeys()
     const devPrivateKey = PrivateKey.from(devKeys.privateKey)
 
     try {
-        // First, import the default dev key
-        const existingKeys = listWalletKeys()
-        const existingEntry = existingKeys.find(
-            (key) => key.name === walletName || key.publicKey === devKeys.publicKey
-        )
+        ensureDevelopmentKeyStored(devPrivateKey, walletName, devKeys.publicKey)
 
-        if (!existingEntry) {
-            addKeyToWallet(devPrivateKey, walletName)
-            console.log(`Stored development key in WharfKit wallet as "${walletName}"`)
-        } else if (existingEntry.name !== walletName) {
-            console.log(
-                `Development key already stored as "${existingEntry.name}", keeping existing entry`
-            )
-        } else {
-            console.log('Development key already stored')
-        }
-
-        // If a custom key is provided, import it automatically
-        // Store genesis key as 'eosio' for predictable account creation
         if (customKey) {
-            try {
-                if (isPrivateKeyString(customKey)) {
-                    const customPrivateKey = PrivateKey.from(customKey)
-                    const customPublicKey = customPrivateKey.toPublic().toString()
-
-                    // Check if 'default' key already exists
-                    const existingDefaultKey = existingKeys.find((k) => k.name === 'default')
-
-                    if (existingDefaultKey) {
-                        // 'default' key already exists - reuse it
-                        console.log(
-                            'Genesis key already exists in wallet as "default" - reusing it'
-                        )
-                    } else {
-                        // 'default' doesn't exist - create it
-                        addKeyToWallet(customPrivateKey, 'default')
-                        console.log(
-                            '✅ Automatically imported genesis key into wallet as "default"'
-                        )
-                        console.log(`   Public Key: ${customPublicKey}`)
-                    }
-                } else {
-                    console.log(
-                        `Warning: Provided key "${customKey}" does not appear to be a valid private key format`
-                    )
-                }
-            } catch (error: any) {
-                console.log(`Warning: Could not import chain key: ${error.message}`)
-                console.log('You can manually import it with:')
-                console.log(`  wharfkit wallet keys add "${customKey}"`)
-            }
+            ensureChainKeyStored(customKey)
         }
 
         const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
@@ -426,5 +382,212 @@ async function setupDevWallet(customKey?: string): Promise<void> {
         console.log(`Warning: Could not setup dev wallet: ${error.message}`)
         console.log('You can manually store the development key with:')
         console.log(`  wharfkit wallet keys add --name ${walletName} ${devKeys.privateKey}`)
+    }
+}
+
+function ensureDevelopmentKeyStored(
+    devPrivateKey: PrivateKey,
+    walletName: string,
+    devPublicKey: string
+): void {
+    const walletKeys = listWalletKeys()
+    const existingByPublic = walletKeys.find((key) => key.publicKey === devPublicKey)
+
+    if (existingByPublic) {
+        if (existingByPublic.name === walletName) {
+            console.log('Development key already stored')
+        } else {
+            console.log(
+                `Development key already stored as "${existingByPublic.name}", keeping existing entry`
+            )
+        }
+        return
+    }
+
+    const conflictingByName = walletKeys.find((key) => key.name === walletName)
+    if (conflictingByName) {
+        console.log(
+            `Warning: Wallet already contains a key named "${walletName}" with a different public key.`
+        )
+        console.log('         Skipping automatic import of the development key to avoid conflicts.')
+        console.log(
+            `         You can remove or rename the existing entry and rerun "wharfkit chain local start".`
+        )
+        return
+    }
+
+    addKeyToWallet(devPrivateKey, walletName)
+    console.log(`Stored development key in WharfKit wallet as "${walletName}"`)
+}
+
+function ensureChainKeyStored(customKey: string): void {
+    if (!isPrivateKeyString(customKey)) {
+        console.log(
+            `Warning: Provided key "${customKey}" does not appear to be a valid private key format`
+        )
+        return
+    }
+
+    try {
+        const customPrivateKey = PrivateKey.from(customKey)
+        const customPublicKey = customPrivateKey.toPublic().toString()
+        const walletKeys = listWalletKeys()
+        const existingEntry = walletKeys.find((key) => key.publicKey === customPublicKey)
+
+        if (existingEntry) {
+            console.log(
+                `Genesis key already stored in wallet as "${existingEntry.name}" - reusing it`
+            )
+            return
+        }
+
+        // Try to use default name
+        const defaultKey = walletKeys.find((key) => key.name === DEFAULT_KEY_NAME)
+        if (!defaultKey) {
+            addKeyToWallet(customPrivateKey, DEFAULT_KEY_NAME)
+            console.log(
+                `✅ Automatically imported genesis key into wallet as "${DEFAULT_KEY_NAME}"`
+            )
+            console.log(`   Public Key: ${customPublicKey}`)
+            return
+        }
+
+        // If default already exists, warn user
+        console.log(
+            `Warning: Key "${DEFAULT_KEY_NAME}" already exists. Skipping automatic import of genesis key.`
+        )
+        console.log('You can manually import it with:')
+        console.log(`  wharfkit wallet keys add "${customKey}"`)
+    } catch (error: any) {
+        console.log(`Warning: Could not import chain key: ${error.message}`)
+        console.log('You can manually import it with:')
+        console.log(`  wharfkit wallet keys add "${customKey}"`)
+    }
+}
+
+async function ensureEosioPermissionsMatchChainKey(
+    port: number,
+    chainPrivateKey: PrivateKey
+): Promise<void> {
+    try {
+        const client = createApiClientForPort(port)
+        const [account, info] = await Promise.all([
+            client.v1.chain.get_account('eosio'),
+            client.v1.chain.get_info(),
+        ])
+        const targetPublicKey = chainPrivateKey.toPublic()
+        const permissions: any[] = account.permissions ?? []
+        const ownerPermission = permissions.find((perm) => perm.perm_name === 'owner')
+        const activePermission = permissions.find((perm) => perm.perm_name === 'active')
+
+        const ownerMatches = permissionIncludesKey(ownerPermission, targetPublicKey)
+        const activeMatches = permissionIncludesKey(activePermission, targetPublicKey)
+
+        if (ownerMatches && activeMatches) {
+            console.log('eosio account permissions already match the configured chain key')
+            return
+        }
+
+        console.log('Aligning eosio account permissions with the configured chain key...')
+
+        const walletPlugin = new WalletPluginPrivateKey(chainPrivateKey)
+        walletPlugin.config.requiresChainSelect = false
+        walletPlugin.config.requiresPermissionSelect = false
+        walletPlugin.config.requiresPermissionEntry = false
+
+        const session = new Session({
+            chain: {
+                id: String(info.chain_id),
+                url: `http://127.0.0.1:${port}`,
+            },
+            actor: 'eosio',
+            permission: 'owner',
+            walletPlugin,
+            ui: new NonInteractiveConsoleUI(),
+        })
+
+        const actions: any[] = []
+        if (!ownerMatches) {
+            actions.push(buildUpdateAuthAction('owner', targetPublicKey))
+        }
+        if (!activeMatches) {
+            actions.push(buildUpdateAuthAction('active', targetPublicKey))
+        }
+
+        if (actions.length === 0) {
+            return
+        }
+
+        await session.transact(
+            {
+                actions,
+            },
+            {
+                broadcast: true,
+            }
+        )
+
+        console.log('Updated eosio account permissions to use the configured chain key')
+    } catch (error: any) {
+        console.log(
+            `Warning: Could not verify or update eosio permissions: ${error?.message ?? error}`
+        )
+        console.log('You can manually verify with:')
+        console.log(
+            '  curl -s http://127.0.0.1:8888/v1/chain/get_account -X POST -d \'{"account_name":"eosio"}\''
+        )
+    }
+}
+
+function permissionIncludesKey(permission: any, targetPublicKey: PublicKey): boolean {
+    if (!permission || !permission.required_auth) {
+        return false
+    }
+
+    const targetVariants = new Set<string>([
+        targetPublicKey.toString(),
+        targetPublicKey.toLegacyString(),
+    ])
+
+    return (permission.required_auth.keys ?? []).some((entry: any) => {
+        if (!entry?.key) {
+            return false
+        }
+
+        try {
+            const parsedKey = PublicKey.from(entry.key)
+            return parsedKey.equals(targetPublicKey)
+        } catch {
+            return targetVariants.has(entry.key)
+        }
+    })
+}
+
+function buildUpdateAuthAction(permission: 'owner' | 'active', publicKey: PublicKey): any {
+    return {
+        account: 'eosio',
+        name: 'updateauth',
+        authorization: [
+            {
+                actor: 'eosio',
+                permission: 'owner',
+            },
+        ],
+        data: {
+            account: 'eosio',
+            permission,
+            parent: permission === 'owner' ? '' : 'owner',
+            auth: {
+                threshold: 1,
+                keys: [
+                    {
+                        key: publicKey.toString(),
+                        weight: 1,
+                    },
+                ],
+                accounts: [],
+                waits: [],
+            },
+        },
     }
 }
