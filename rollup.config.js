@@ -7,8 +7,10 @@ import pkg from './package.json'
 const external = ['fs', ...Object.keys(pkg.dependencies)]
 
 // Add shebang + disable experimental fetch warning
+// Use env -S with explicit PATH to ensure node can be found in restricted environments (e.g., Make)
+// Note: macOS env -S only supports ${VARNAME} syntax, not $VARNAME
 const banner = `
-#!/usr/bin/env node
+#!/usr/bin/env -S PATH="/opt/homebrew/bin:/usr/local/bin:\${PATH}" node
 process.removeAllListeners('warning')
 `.trim()
 
