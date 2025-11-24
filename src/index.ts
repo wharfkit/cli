@@ -4,7 +4,8 @@ import {version} from '../package.json'
 import {createContractCommand, generateContractFromCommand} from './commands/contract'
 import {generateKeysFromCommand} from './commands/keys/index'
 import {createChainCommand} from './commands/chain/index'
-import {createCompileCommand, createDevCommand} from './commands/wharfkit/index'
+import {createCompileCommand} from './commands/compile'
+import {createDevCommand} from './commands/dev'
 import {createWalletCommand} from './commands/wallet/index'
 
 const program = new Command()

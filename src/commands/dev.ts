@@ -1,9 +1,10 @@
 /* eslint-disable no-console */
+import {Command} from 'commander'
 import {watch} from 'fs'
 import {extname} from 'path'
 import {compileContract} from './compile'
-import {deployContract} from '../contract/deploy'
-import {getChainStatus, startLocalChain, stopLocalChain} from '../chain/local'
+import {deployContract} from './contract/deploy'
+import {getChainStatus, startLocalChain, stopLocalChain} from './chain/local'
 
 interface DevOptions {
     account?: string
@@ -154,3 +155,30 @@ process.on('SIGINT', async () => {
 process.on('SIGTERM', async () => {
     await stopDevMode()
 })
+
+/**
+ * Create the dev command
+ */
+export function createDevCommand(): Command {
+    const dev = new Command('dev')
+    dev.description(
+        'Start local chain and watch for changes (auto-compile and auto-deploy on file changes)'
+    )
+        .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
+        .option('-p, --port <port>', 'Port for local blockchain', '8888')
+        .option('-c, --clean', 'Start with a clean blockchain state')
+        .action(async (options) => {
+            try {
+                await startDevMode({
+                    account: options.account,
+                    port: parseInt(options.port),
+                    clean: options.clean,
+                })
+            } catch (error: any) {
+                console.error(`Error: ${error.message}`)
+                process.exit(1)
+            }
+        })
+
+    return dev
+}

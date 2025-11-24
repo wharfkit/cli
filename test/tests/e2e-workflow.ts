@@ -25,10 +25,12 @@ function getTransactionExpiration(): string {
     return now.toISOString().slice(0, 19) // Remove milliseconds and timezone
 }
 
-function getRandomName(prefix: string): string {
+function getRandomLocalAccountName(prefix: string): string {
     const chars = 'abcdefghijklmnopqrstuvwxyz12345'
     let result = prefix
-    for (let i = 0; i < 6; i++) {
+    // Generate up to 12 chars total (no .gm suffix for local chains)
+    const remaining = 12 - prefix.length
+    for (let i = 0; i < remaining; i++) {
         result += chars.charAt(Math.floor(Math.random() * chars.length))
     }
     return result
@@ -351,14 +353,16 @@ suite('E2E Workflow', () => {
 
     suite('Integration: Account and Deployment', () => {
         test('can create an account on the local chain', function () {
-            const accountName = getRandomName('acc')
-            const output = execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
-                encoding: 'utf8',
-            })
+            const accountName = getRandomLocalAccountName('acc')
+            const output = execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888`,
+                {
+                    encoding: 'utf8',
+                }
+            )
 
-            assert.include(output, '✅ Account created successfully!')
-            assert.include(output, `Account: ${accountName}`)
-            assert.include(output, 'Key stored in wallet')
+            assert.include(output, 'Account created successfully!')
+            assert.include(output, `Account Name: ${accountName}`)
         })
 
         test('can deploy a contract to the account', function () {
@@ -370,10 +374,13 @@ suite('E2E Workflow', () => {
             }
 
             // 1. Create an account
-            const accountName = getRandomName('deploy')
-            execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
-                encoding: 'utf8',
-            })
+            const accountName = getRandomLocalAccountName('deploy')
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888`,
+                {
+                    encoding: 'utf8',
+                }
+            )
 
             // 2. Use persistent contract file
             // Copy test.cpp from root to testDir
@@ -412,10 +419,13 @@ suite('E2E Workflow', () => {
                 this.skip()
             }
 
-            const accountName = getRandomName('val')
-            execSync(`node ${cliPath} wallet account create --name ${accountName}`, {
-                encoding: 'utf8',
-            })
+            const accountName = getRandomLocalAccountName('val')
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888`,
+                {
+                    encoding: 'utf8',
+                }
+            )
 
             // 1. Deploy contract V1 (with table)
             const v1Code = `

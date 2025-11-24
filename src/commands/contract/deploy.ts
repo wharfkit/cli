@@ -11,7 +11,7 @@ import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
 import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
 
 import {Chains} from '@wharfkit/common'
-import {compileContract} from '../wharfkit/compile'
+import {compileContract} from '../compile'
 
 interface DeployOptions {
     account?: string
@@ -68,10 +68,11 @@ export async function validateDeploy(
                             console.log(`   ✅ Table '${table}' is empty.`)
                         }
                     } catch (e: any) {
-                        // If check fails, ignore or warn?
-                        // Often "table not found" error if using state history or other plugins if really gone?
-                        // But if get_abi returned it, it was in ABI.
-                        // We assume no data if error, or warn.
+                        console.log(
+                            `   ⚠️  Warning: Could not check table '${table}' for data: ${
+                                e.message || String(e)
+                            }`
+                        )
                     }
                 }
 

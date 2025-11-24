@@ -50,11 +50,18 @@ export function createWalletCommand(): Command {
     accountCommand
         .command('create')
         .description('Create a new account on the blockchain')
-        .option('-n, --name <name>', 'Account name (default: auto-generated, must end with .gm)')
+        .option(
+            '-n, --name <name>',
+            'Account name (default: auto-generated, must end with .gm for remote chains)'
+        )
         .option('-k, --key <key>', 'Public key to use (default: auto-generated)')
         .option(
             '-c, --chain <chain>',
             'Chain to create account on (Jungle4 or KylinTestnet, default: Jungle4)'
+        )
+        .option(
+            '-u, --url <url>',
+            'Blockchain API URL (for local chains, e.g., http://127.0.0.1:8888)'
         )
         .action(async (options) => {
             await createAccount(options)

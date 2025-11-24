@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
+import {Command} from 'commander'
 import {execSync} from 'child_process'
 import {existsSync, readdirSync} from 'fs'
 import {basename, extname, join, resolve} from 'path'
-import {checkLeapInstallation} from '../chain/install'
+import {checkLeapInstallation} from './chain/install'
 
 /**
  * Compile a single C++ file or all .cpp files in the current directory
@@ -127,4 +128,27 @@ async function compileSingleFile(filePath: string, outputDir: string): Promise<v
             }. Make sure cdt-cpp is installed and in your PATH.`
         )
     }
+}
+
+/**
+ * Create the compile command
+ */
+export function createCompileCommand(): Command {
+    const compile = new Command('compile')
+    compile
+        .description(
+            'Compile C++ contract files (single file or all .cpp files in current directory)'
+        )
+        .argument('[file]', 'Optional file to compile (compiles all .cpp files if not specified)')
+        .option('-o, --output <directory>', 'Output directory for compiled WASM files', '.')
+        .action(async (file, options) => {
+            try {
+                await compileContract(file, options.output)
+            } catch (error: any) {
+                console.error(`Error: ${error.message}`)
+                process.exit(1)
+            }
+        })
+
+    return compile
 }
