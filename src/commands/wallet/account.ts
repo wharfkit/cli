@@ -7,7 +7,7 @@ import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
 import {getDevKeys} from '../chain/utils'
 import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
-import {addKeyToWallet} from './utils'
+import {addKeyToWallet, getKeyFromWallet, listWalletKeys} from './utils'
 import {log, makeClient} from '../../utils'
 
 interface AccountCreateOptions {
@@ -154,9 +154,28 @@ async function createAccountOnLocalChain(
 ): Promise<void> {
     const newPublicKey = privateKey.toPublic()
 
-    // Get dev keys for signing the newaccount action
+    // Try to get eosio account key from wallet (default, chain-key, dev, or hardcoded)
+    // This ensures we use the correct key that matches the chain's eosio account permission
+    let eosioPrivateKey: PrivateKey
+    const walletKeys = listWalletKeys()
     const devKeys = getDevKeys()
-    const devPrivateKey = PrivateKey.from(devKeys.privateKey)
+
+    // Try to find a key that might be the chain's eosio key
+    // Priority: default -> chain-key -> dev -> hardcoded dev keys
+    const defaultKey = walletKeys.find((k) => k.name === 'default')
+    const chainKey = walletKeys.find((k) => k.name === 'chain-key')
+    const devKey = walletKeys.find((k) => k.name === 'dev')
+
+    if (defaultKey) {
+        eosioPrivateKey = getKeyFromWallet('default')
+    } else if (chainKey) {
+        eosioPrivateKey = getKeyFromWallet('chain-key')
+    } else if (devKey) {
+        eosioPrivateKey = getKeyFromWallet('dev')
+    } else {
+        // Fall back to hardcoded dev keys (for backward compatibility)
+        eosioPrivateKey = PrivateKey.from(devKeys.privateKey)
+    }
 
     // Create API client
     const client = new APIClient({
@@ -179,8 +198,8 @@ async function createAccountOnLocalChain(
         // Ignore error, assume no system contract
     }
 
-    // Create session with dev key
-    const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
+    // Create session with eosio account key
+    const walletPlugin = new WalletPluginPrivateKey(eosioPrivateKey)
     walletPlugin.config.requiresChainSelect = false
     walletPlugin.config.requiresPermissionSelect = false
     walletPlugin.config.requiresPermissionEntry = false

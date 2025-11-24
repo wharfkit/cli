@@ -1,4 +1,6 @@
 import {execSync} from 'child_process'
+import {APIClient, FetchProvider} from '@wharfkit/antelope'
+import fetch from 'node-fetch'
 
 /**
  * Check if nodeos is available in PATH
@@ -10,6 +12,37 @@ export function isNodeosAvailable(): boolean {
     } catch {
         return false
     }
+}
+
+/**
+ * Wait for the chain to be ready by checking the API
+ * @param url - Chain API URL (default: http://127.0.0.1:8888)
+ * @param timeoutMs - Maximum time to wait in milliseconds (default: 30000)
+ * @returns Promise that resolves when chain is ready, rejects on timeout
+ */
+export async function waitForChainReady(
+    url: string = 'http://127.0.0.1:8888',
+    timeoutMs: number = 30000
+): Promise<void> {
+    const client = new APIClient({
+        provider: new FetchProvider(url, {fetch}),
+    })
+
+    const startTime = Date.now()
+
+    while (Date.now() - startTime < timeoutMs) {
+        try {
+            const info = await client.v1.chain.get_info()
+            if (Number(info.head_block_num) >= 0) {
+                return
+            }
+        } catch {
+            // Chain not ready yet, continue waiting
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500))
+    }
+
+    throw new Error(`Chain at ${url} did not become ready within ${timeoutMs}ms`)
 }
 
 /**

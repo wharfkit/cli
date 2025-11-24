@@ -107,9 +107,10 @@ export async function validateDeploy(
         // We should catch that.
         if (
             error.message.includes('Account not found') ||
-            error.message.includes('does not exist')
+            error.message.includes('does not exist') ||
+            error.message.includes('Account Query Exception')
         ) {
-            // New account, safe.
+            // New account or account doesn't exist yet, safe to proceed
             return
         }
 

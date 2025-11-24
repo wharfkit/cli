@@ -6,7 +6,7 @@ import * as os from 'os'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 import {log} from '../../src/utils'
-import {isNodeosAvailable, killProcessAtPort} from '../utils/test-helpers'
+import {isNodeosAvailable, killProcessAtPort, waitForChainReady} from '../utils/test-helpers'
 
 /**
  * E2E tests for the complete workflow:
@@ -42,7 +42,9 @@ suite('E2E Workflow', () => {
     let testWalletDir: string
     let originalHome: string
 
-    suiteSetup(function () {
+    suiteSetup(async function () {
+        this.timeout(60000) // Increase timeout for chain startup
+
         // Skip suite if nodeos is not available
         if (!isNodeosAvailable()) {
             // eslint-disable-next-line no-console
@@ -75,7 +77,11 @@ suite('E2E Workflow', () => {
         // Also check port 8888 directly in case chain was started by another test with different HOME
         killProcessAtPort(8888)
 
+        // Start the chain
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
+
+        // Wait for chain to be ready
+        await waitForChainReady('http://127.0.0.1:8888', 30000)
     })
 
     suiteTeardown(function () {
@@ -240,11 +246,36 @@ suite('E2E Workflow', () => {
             fs.writeFileSync(txPath, JSON.stringify(transaction))
 
             // Test that the broadcast functionality works properly
-            // Use the 'dev' key which is automatically created by the local chain and has eosio authority
-            const output = execSync(
-                `node ${cliPath} wallet transact ${txPath} --broadcast --key dev`,
-                {encoding: 'utf8'}
-            )
+            // Try to use the chain's key (chain-key, default, or dev) which has eosio authority
+            // The chain key is automatically imported when the chain starts
+            let output: string
+            try {
+                // Try chain-key first (if chain uses random key)
+                output = execSync(
+                    `node ${cliPath} wallet transact ${txPath} --broadcast --key chain-key`,
+                    {
+                        encoding: 'utf8',
+                    }
+                )
+            } catch {
+                try {
+                    // Try default (if chain key was imported as default)
+                    output = execSync(
+                        `node ${cliPath} wallet transact ${txPath} --broadcast --key default`,
+                        {
+                            encoding: 'utf8',
+                        }
+                    )
+                } catch {
+                    // Fall back to dev key (if chain uses dev keys)
+                    output = execSync(
+                        `node ${cliPath} wallet transact ${txPath} --broadcast --key dev`,
+                        {
+                            encoding: 'utf8',
+                        }
+                    )
+                }
+            }
 
             // Should show broadcast success message
             assert.include(output, '🚀 Transaction broadcast successfully!')

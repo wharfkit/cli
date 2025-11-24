@@ -3,7 +3,7 @@ import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
-import {isNodeosAvailable, killProcessAtPort} from '../utils/test-helpers'
+import {isNodeosAvailable, killProcessAtPort, waitForChainReady} from '../utils/test-helpers'
 
 suite('Chain Interaction', () => {
     const cliPath = path.join(__dirname, '../../lib/cli.js')
@@ -11,7 +11,7 @@ suite('Chain Interaction', () => {
     let originalHome: string
     let contractAccount: string
 
-    suiteSetup(function () {
+    suiteSetup(async function () {
         // Skip suite if nodeos is not available
         if (!isNodeosAvailable()) {
             // eslint-disable-next-line no-console
@@ -117,8 +117,8 @@ suite('Chain Interaction', () => {
         // Start local chain
         execSync(`node ${cliPath} chain local start`, {encoding: 'utf8'})
 
-        // Wait for chain
-        execSync('sleep 5')
+        // Wait for chain to be ready
+        await waitForChainReady('http://127.0.0.1:8888', 30000)
 
         // Check if cdt-cpp is installed
         try {

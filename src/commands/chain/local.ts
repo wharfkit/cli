@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import {KeyType, PrivateKey} from '@wharfkit/antelope'
+import {PrivateKey} from '@wharfkit/antelope'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {spawn} from 'child_process'
 import * as fs from 'fs'
@@ -73,7 +73,7 @@ export async function startLocalChain(options: LocalStartOptions): Promise<void>
         )
     }
 
-    // Determine which key to use: provided, env var, or generate new one
+    // Determine which key to use: provided, env var, or genesis key (default)
     let chainPrivateKey: PrivateKey
     let chainPublicKey: string
     const providedKey = options.key || process.env.WHARFKIT_CHAIN_KEY
@@ -84,12 +84,12 @@ export async function startLocalChain(options: LocalStartOptions): Promise<void>
         chainPublicKey = chainPrivateKey.toPublic().toString()
         console.log('Using provided private key for chain')
     } else {
-        // Generate a new random key
-        chainPrivateKey = PrivateKey.generate(KeyType.K1)
-        chainPublicKey = chainPrivateKey.toPublic().toString()
-        console.log('Generated new random private key for chain')
+        // Use genesis key by default (always the same key for consistency)
+        const devKeys = getDevKeys()
+        chainPrivateKey = PrivateKey.from(devKeys.privateKey)
+        chainPublicKey = devKeys.publicKey
+        console.log('Using genesis key for chain (default)')
         console.log(`   Public Key: ${chainPublicKey}`)
-        console.log(`   Private Key: ${chainPrivateKey.toString()}`)
     }
 
     // Create config files
@@ -381,30 +381,28 @@ async function setupDevWallet(customKey?: string): Promise<void> {
         }
 
         // If a custom key is provided, import it automatically
+        // Store genesis key as 'eosio' for predictable account creation
         if (customKey) {
             try {
                 if (isPrivateKeyString(customKey)) {
                     const customPrivateKey = PrivateKey.from(customKey)
                     const customPublicKey = customPrivateKey.toPublic().toString()
 
-                    // Check if this key already exists
-                    const existingCustomKey = existingKeys.find(
-                        (key) => key.publicKey === customPublicKey
-                    )
+                    // Check if 'default' key already exists
+                    const existingDefaultKey = existingKeys.find((k) => k.name === 'default')
 
-                    if (!existingCustomKey) {
-                        // Use 'default' if no default exists, otherwise use 'chain-key'
-                        const hasDefault = existingKeys.some((k) => k.name === 'default')
-                        const customKeyName = hasDefault ? 'chain-key' : 'default'
-                        addKeyToWallet(customPrivateKey, customKeyName)
+                    if (existingDefaultKey) {
+                        // 'default' key already exists - reuse it
                         console.log(
-                            `✅ Automatically imported chain key into wallet as "${customKeyName}"`
+                            'Genesis key already exists in wallet as "default" - reusing it'
+                        )
+                    } else {
+                        // 'default' doesn't exist - create it
+                        addKeyToWallet(customPrivateKey, 'default')
+                        console.log(
+                            '✅ Automatically imported genesis key into wallet as "default"'
                         )
                         console.log(`   Public Key: ${customPublicKey}`)
-                    } else {
-                        console.log(
-                            `Chain key already exists in wallet as "${existingCustomKey.name}"`
-                        )
                     }
                 } else {
                     console.log(
