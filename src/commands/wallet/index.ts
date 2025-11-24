@@ -1,7 +1,7 @@
 import {Command} from 'commander'
 import {createAccount} from './account'
 import {createWalletKey} from './create'
-import {createKey, listKeys} from './keys'
+import {addKey, createKey, listKeys} from './keys'
 import {transactTransaction} from './transact'
 
 /**
@@ -38,6 +38,17 @@ export function createWalletCommand(): Command {
         .option('-p, --password', 'Prompt for a password to encrypt the key')
         .action(async (options) => {
             await createKey(options)
+        })
+
+    // wallet keys add - Add an existing private key
+    keysCommand
+        .command('add')
+        .description('Add an existing private key to the wallet')
+        .argument('<private-key>', 'Private key to import (e.g., PVT_K1_...)')
+        .option('-n, --name <name>', 'Name for the key (default: auto-generated)')
+        .option('-p, --password', 'Prompt for a password to encrypt the key')
+        .action(async (privateKey, options) => {
+            await addKey(options, privateKey)
         })
 
     walletCommand.addCommand(keysCommand)

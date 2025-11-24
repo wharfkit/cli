@@ -8,6 +8,11 @@ interface KeysCreateOptions {
     password?: boolean
 }
 
+interface KeysAddOptions {
+    name?: string
+    password?: boolean
+}
+
 /**
  * Prompt for password from stdin
  */
@@ -144,6 +149,52 @@ export async function createKey(options: KeysCreateOptions): Promise<void> {
         log('💡 To view all keys: wharfkit wallet keys', 'info')
     } catch (error) {
         log(`❌ Failed to create key: ${(error as Error).message}`, 'info')
+        process.exit(1)
+    }
+}
+
+/**
+ * Add an existing private key to the wallet
+ */
+export async function addKey(options: KeysAddOptions, privateKeyString: string): Promise<void> {
+    try {
+        // Validate and parse the private key
+        let privateKey: PrivateKey
+        try {
+            privateKey = PrivateKey.from(privateKeyString)
+        } catch (error) {
+            throw new Error(`Invalid private key format: ${(error as Error).message}`)
+        }
+
+        const publicKey = privateKey.toPublic()
+
+        // Get password if requested
+        const password = await getPassword(!!options.password)
+
+        // Determine key name
+        const keyName = options.name || generateDefaultKeyName()
+
+        // Store the key
+        addKeyToWallet(privateKey, keyName, password)
+
+        log('✅ Key added successfully!', 'info')
+        log(`Name: ${keyName}`, 'info')
+        log(`Public Key: ${publicKey.toString()}`, 'info')
+        log('', 'info')
+
+        if (!options.password) {
+            log(
+                '⚠️  Note: Key is encrypted with default password. Use --password flag for custom password.',
+                'info'
+            )
+        } else {
+            log('🔒 Key is encrypted with your custom password.', 'info')
+        }
+
+        log('', 'info')
+        log('💡 To view all keys: wharfkit wallet keys', 'info')
+    } catch (error) {
+        log(`❌ Failed to add key: ${(error as Error).message}`, 'info')
         process.exit(1)
     }
 }

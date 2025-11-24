@@ -45,6 +45,10 @@ export function createContractCommand(): Command {
         .argument('[wasm]', 'WASM file to deploy (auto-detects if not specified)')
         .option('-a, --account <name>', 'Contract account name (default: derived from filename)')
         .option('-u, --url <url>', 'Blockchain API URL (override network argument)')
+        .option(
+            '-k, --key <key>',
+            'Private key or wallet key name to use for deployment (overrides WHARFKIT_DEPLOY_KEY env var)'
+        )
         .option('--force', 'Force deployment even if safety checks fail')
         .option('--validate', 'Validate deployment safety without deploying')
         .action(async (networkOrWasm, wasmFile, options) => {

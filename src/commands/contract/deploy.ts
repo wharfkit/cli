@@ -2,8 +2,7 @@
 import '../../types/wharfkit-session'
 import {existsSync, readdirSync, readFileSync} from 'fs'
 import {basename, extname, resolve} from 'path'
-import type {PrivateKey} from '@wharfkit/antelope'
-import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
+import {ABI, APIClient, FetchProvider, PrivateKey, Serializer} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
@@ -18,6 +17,7 @@ interface DeployOptions {
     url?: string
     force?: boolean
     validate?: boolean
+    key?: string
 }
 
 /**
@@ -202,7 +202,7 @@ export async function deployContract(
         }
 
         // Get private key from wallet for this account
-        const privateKey = await getPrivateKeyForDeploy(accountName)
+        const privateKey = await getPrivateKeyForDeploy(accountName, options)
 
         // Create API client
         const client = new APIClient({
@@ -288,9 +288,66 @@ export async function deployContract(
 }
 
 /**
- * Get private key for deployment based on account name
+ * Check if a string looks like a private key
  */
-async function getPrivateKeyForDeploy(accountName: string): Promise<PrivateKey> {
+function isPrivateKeyString(str: string): boolean {
+    return str.startsWith('PVT_') || str.startsWith('5') || /^[A-Za-z0-9]{51}$/.test(str)
+}
+
+/**
+ * Get private key for deployment based on account name, options, and environment
+ */
+async function getPrivateKeyForDeploy(
+    accountName: string,
+    options?: DeployOptions
+): Promise<PrivateKey> {
+    // 1. Check if --key option is provided
+    if (options?.key) {
+        // Check if it's a private key string
+        if (isPrivateKeyString(options.key)) {
+            try {
+                console.log('Using private key from --key option')
+                return PrivateKey.from(options.key)
+            } catch (error) {
+                throw new Error(`Invalid private key format: ${(error as Error).message}`)
+            }
+        }
+
+        // Otherwise, treat it as a key name
+        const keys = listWalletKeys()
+        const key = keys.find((k) => k.name === options.key || k.publicKey === options.key)
+        if (key) {
+            console.log(`Using wallet key: ${key.name}`)
+            return getKeyFromWallet(key.name)
+        }
+        throw new Error(`Key "${options.key}" not found in wallet`)
+    }
+
+    // 2. Check environment variable
+    const envKey = process.env.WHARFKIT_DEPLOY_KEY
+    if (envKey) {
+        if (isPrivateKeyString(envKey)) {
+            try {
+                console.log('Using private key from WHARFKIT_DEPLOY_KEY environment variable')
+                return PrivateKey.from(envKey)
+            } catch (error) {
+                throw new Error(
+                    `Invalid private key format in WHARFKIT_DEPLOY_KEY: ${(error as Error).message}`
+                )
+            }
+        }
+
+        // Otherwise, treat it as a key name
+        const keys = listWalletKeys()
+        const key = keys.find((k) => k.name === envKey || k.publicKey === envKey)
+        if (key) {
+            console.log(`Using wallet key from environment: ${key.name}`)
+            return getKeyFromWallet(key.name)
+        }
+        throw new Error(`Key "${envKey}" from WHARFKIT_DEPLOY_KEY not found in wallet`)
+    }
+
+    // 3. Fallback to existing logic: try account name, then default, then first key
     const keys = listWalletKeys()
 
     if (keys.length === 0) {
