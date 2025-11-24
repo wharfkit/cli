@@ -1,190 +1,113 @@
-/* eslint-disable no-console */
-import {APIClient, FetchProvider, KeyType, PrivateKey} from '@wharfkit/antelope'
-import {Session} from '@wharfkit/session'
-import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
+import type {PublicKeyType} from '@wharfkit/antelope'
+import {KeyType, type NameType, PrivateKey} from '@wharfkit/antelope'
+import {type ChainDefinition, type ChainIndices, Chains} from '@wharfkit/common'
 import fetch from 'node-fetch'
-import {getDevKeys} from '../chain/utils'
-import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
-import {addKeyToWallet} from './utils'
+import {log, makeClient} from '../../utils'
 
 interface AccountCreateOptions {
-    name?: string
-    url?: string
+    key?: PublicKeyType | string
+    name?: NameType | string
+    chain?: ChainIndices | string
 }
 
+const supportedChains = ['Jungle4', 'KylinTestnet']
+
 export async function createAccount(options: AccountCreateOptions): Promise<void> {
-    const url = options.url || 'http://127.0.0.1:8888'
+    let publicKey
+    let privateKey
 
-    // Generate account name if not provided
-    const accountName = options.name || generateRandomAccountName()
-
-    // Validate account name
-    if (accountName.length > 12 || accountName.length < 3) {
-        console.error('Account name must be between 3 and 12 characters long')
-        process.exit(1)
+    // Convert chain option to ChainIndices format (PascalCase)
+    let chainIndex: ChainIndices = 'Jungle4'
+    if (options.chain) {
+        const chainStr = String(options.chain)
+        // Convert to PascalCase (e.g., "jungle4" -> "Jungle4")
+        const pascalCaseChain = chainStr.charAt(0).toUpperCase() + chainStr.slice(1).toLowerCase()
+        if (supportedChains.includes(pascalCaseChain)) {
+            chainIndex = pascalCaseChain as ChainIndices
+        } else {
+            log(
+                `Unsupported chain "${options.chain}". Supported chains are: ${supportedChains.join(
+                    ', '
+                )}`,
+                'info'
+            )
+            return
+        }
     }
 
-    console.log('Creating account on local chain...')
-    console.log(`  Account: ${accountName}`)
-    console.log(`  URL: ${url}`)
+    const chainDefinition: ChainDefinition = Chains[chainIndex]
+
+    // Default to "jungle4" if no chain option is provided
+    const chainUrl = chainDefinition
+        ? chainDefinition.url
+        : `http://${chainIndex.toLowerCase()}.greymass.com`
+
+    if (options.name) {
+        if (!String(options.name).endsWith('.gm')) {
+            log('Account name must end with ".gm"', 'info')
+            return
+        }
+        if (options.name && (String(options.name).length > 12 || String(options.name).length < 3)) {
+            log('Account name must be between 3 and 12 characters long', 'info')
+            return
+        }
+        const accountNameExists =
+            options.name && (await checkAccountNameExists(options.name, chainUrl))
+
+        if (accountNameExists) {
+            log(
+                `Account name "${options.name}" is already taken. Please choose another name.`,
+                'info'
+            )
+            return
+        }
+    }
+
+    // Generate a random account name if not provided
+    const accountName = options.name || generateRandomAccountName()
 
     try {
-        // Generate a new key pair for the account
-        const newPrivateKey = PrivateKey.generate(KeyType.K1)
-        const newPublicKey = newPrivateKey.toPublic()
+        // Check if a public key is provided in the options
+        if (options.key) {
+            publicKey = String(options.key)
+        } else {
+            // Generate a new private key if none is provided
+            privateKey = PrivateKey.generate(KeyType.K1)
+            // Derive the corresponding public key
+            publicKey = String(privateKey.toPublic())
+        }
 
-        console.log(`  Public Key: ${newPublicKey.toString()}`)
+        // Prepare the data for the POST request
+        const data = {
+            accountName: accountName,
+            activeKey: publicKey,
+            ownerKey: publicKey,
+            network: chainDefinition.id,
+        }
 
-        // Get dev keys for signing the newaccount action
-        const devKeys = getDevKeys()
-        const devPrivateKey = PrivateKey.from(devKeys.privateKey)
-
-        // Create API client
-        const client = new APIClient({
-            provider: new FetchProvider(url, {fetch}),
+        // Make the POST request to create the account
+        const response = await fetch(`${chainUrl}/account/create`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
         })
 
-        // Get chain info
-        const info = await client.v1.chain.get_info()
-
-        // Check if system contract is deployed (for buyram/delegatebw)
-        let hasSystemContract = false
-        try {
-            const abiResponse = await client.v1.chain.get_abi('eosio')
-            if (abiResponse.abi) {
-                const actionNames = abiResponse.abi.actions.map((a) => String(a.name))
-                hasSystemContract =
-                    actionNames.includes('buyrambytes') && actionNames.includes('delegatebw')
+        if (response.status === 201) {
+            log('Account created successfully!', 'info')
+            log(`Account Name: ${accountName}`, 'info')
+            if (privateKey) {
+                // Only print the private key if it was generated
+                log(`Private Key: ${privateKey.toString()}`, 'info')
             }
-        } catch (e) {
-            // Ignore error, assume no system contract
+            log(`Public Key: ${publicKey}`, 'info')
+        } else {
+            const responseData = await response.json()
+            log(`Failed to create account: ${responseData.message || responseData.reason}`, 'info')
         }
-
-        // Create session with dev key
-        const walletPlugin = new WalletPluginPrivateKey(devPrivateKey)
-        walletPlugin.config.requiresChainSelect = false
-        walletPlugin.config.requiresPermissionSelect = false
-        walletPlugin.config.requiresPermissionEntry = false
-
-        const session = new Session({
-            chain: {
-                id: String(info.chain_id),
-                url,
-            },
-            actor: 'eosio',
-            permission: 'active',
-            walletPlugin,
-            ui: new NonInteractiveConsoleUI(),
-        })
-
-        const actions: any[] = [
-            {
-                account: 'eosio',
-                name: 'newaccount',
-                authorization: [
-                    {
-                        actor: 'eosio',
-                        permission: 'active',
-                    },
-                ],
-                data: {
-                    creator: 'eosio',
-                    name: accountName,
-                    owner: {
-                        threshold: 1,
-                        keys: [
-                            {
-                                key: newPublicKey,
-                                weight: 1,
-                            },
-                        ],
-                        accounts: [],
-                        waits: [],
-                    },
-                    active: {
-                        threshold: 1,
-                        keys: [
-                            {
-                                key: newPublicKey,
-                                weight: 1,
-                            },
-                        ],
-                        accounts: [],
-                        waits: [],
-                    },
-                },
-            },
-        ]
-
-        if (hasSystemContract) {
-            actions.push({
-                account: 'eosio',
-                name: 'buyrambytes',
-                authorization: [
-                    {
-                        actor: 'eosio',
-                        permission: 'active',
-                    },
-                ],
-                data: {
-                    payer: 'eosio',
-                    receiver: accountName,
-                    bytes: 8192,
-                },
-            })
-            actions.push({
-                account: 'eosio',
-                name: 'delegatebw',
-                authorization: [
-                    {
-                        actor: 'eosio',
-                        permission: 'active',
-                    },
-                ],
-                data: {
-                    from: 'eosio',
-                    receiver: accountName,
-                    stake_net_quantity: '1.0000 SYS',
-                    stake_cpu_quantity: '1.0000 SYS',
-                    transfer: false,
-                },
-            })
-        }
-
-        // Create newaccount action
-        const result = await session.transact(
-            {
-                actions,
-            },
-            {
-                broadcast: true,
-            }
-        )
-
-        console.log('\n✅ Account created successfully!')
-        console.log(`Account: ${accountName}`)
-        console.log(`Private Key: ${newPrivateKey.toString()}`)
-        console.log(`Public Key: ${newPublicKey.toString()}`)
-        console.log(`Transaction ID: ${result.resolved?.transaction.id}`)
-
-        // Store the key in wallet with account name
-        try {
-            addKeyToWallet(newPrivateKey, accountName)
-            console.log(`\n🔐 Key stored in wallet as: ${accountName}`)
-            console.log(
-                'You can now deploy contracts with: wharfkit contract deploy --account ' +
-                    accountName
-            )
-        } catch (error) {
-            console.log(
-                '\n⚠️  Could not store key in wallet (may already exist): ' +
-                    (error as Error).message
-            )
-        }
-    } catch (error) {
-        console.error(`\n❌ Failed to create account: ${(error as Error).message}`)
-        console.error('\nMake sure the local chain is running: wharfkit chain local start')
-        process.exit(1)
+    } catch (error: unknown) {
+        log(`Error during account creation: ${(error as {message: string}).message}`, 'info')
     }
 }
 
@@ -192,8 +115,26 @@ function generateRandomAccountName(): string {
     // Generate a random 12-character account name using the allowed characters for Antelope accounts
     const characters = 'abcdefghijklmnopqrstuvwxyz12345'
     let result = ''
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 9; i++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
-    return result
+    return `${result}.gm`
+}
+
+async function checkAccountNameExists(accountName: NameType, chainUrl: string): Promise<boolean> {
+    const client = makeClient(chainUrl)
+
+    try {
+        const account = await client.v1.chain.get_account(accountName)
+        return !!account?.account_name
+    } catch (error: unknown) {
+        const errorMessage = (error as {message: string}).message
+        if (
+            errorMessage.includes('Account not found') ||
+            errorMessage.includes('Account Query Exception')
+        ) {
+            return false
+        }
+        throw Error(`Error checking if account name exists: ${errorMessage}`)
+    }
 }
