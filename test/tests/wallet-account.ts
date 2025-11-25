@@ -156,7 +156,9 @@ suite('Wallet Account Create', () => {
 
         assert.isTrue(
             logStub.calledWith(
-                sinon.match(/Unsupported chain.*Supported chains are: Jungle4, KylinTestnet/),
+                sinon.match(
+                    /Unsupported chain.*Supported chains are: Jungle4, KylinTestnet, local/
+                ),
                 'info'
             )
         )

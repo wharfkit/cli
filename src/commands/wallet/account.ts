@@ -47,35 +47,41 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
         chainUrl = options.url
         isLocalChain = chainUrl.includes('127.0.0.1') || chainUrl.includes('localhost')
     } else {
-        // Convert chain option to ChainIndices format (PascalCase)
-        let chainIndex: ChainIndices = 'Jungle4'
-        if (options.chain) {
-            const chainStr = String(options.chain)
-            // Try exact match first (handles PascalCase like "KylinTestnet")
-            if (supportedChains.includes(chainStr)) {
-                chainIndex = chainStr as ChainIndices
-            } else {
-                // Convert to PascalCase (e.g., "jungle4" -> "Jungle4", "kylintestnet" -> "Kylintestnet")
-                const pascalCaseChain =
-                    chainStr.charAt(0).toUpperCase() + chainStr.slice(1).toLowerCase()
-                if (supportedChains.includes(pascalCaseChain)) {
-                    chainIndex = pascalCaseChain as ChainIndices
+        // Check if "local" chain is specified
+        if (options.chain && String(options.chain).toLowerCase() === 'local') {
+            chainUrl = 'http://127.0.0.1:8888'
+            isLocalChain = true
+        } else {
+            // Convert chain option to ChainIndices format (PascalCase)
+            let chainIndex: ChainIndices = 'Jungle4'
+            if (options.chain) {
+                const chainStr = String(options.chain)
+                // Try exact match first (handles PascalCase like "KylinTestnet")
+                if (supportedChains.includes(chainStr)) {
+                    chainIndex = chainStr as ChainIndices
                 } else {
-                    log(
-                        `Unsupported chain "${
-                            options.chain
-                        }". Supported chains are: ${supportedChains.join(', ')}`,
-                        'info'
-                    )
-                    return
+                    // Convert to PascalCase (e.g., "jungle4" -> "Jungle4", "kylintestnet" -> "Kylintestnet")
+                    const pascalCaseChain =
+                        chainStr.charAt(0).toUpperCase() + chainStr.slice(1).toLowerCase()
+                    if (supportedChains.includes(pascalCaseChain)) {
+                        chainIndex = pascalCaseChain as ChainIndices
+                    } else {
+                        log(
+                            `Unsupported chain "${
+                                options.chain
+                            }". Supported chains are: ${supportedChains.join(', ')}, local`,
+                            'info'
+                        )
+                        return
+                    }
                 }
             }
-        }
 
-        chainDefinition = Chains[chainIndex]
-        chainUrl = chainDefinition
-            ? chainDefinition.url
-            : `http://${chainIndex.toLowerCase()}.greymass.com`
+            chainDefinition = Chains[chainIndex]
+            chainUrl = chainDefinition
+                ? chainDefinition.url
+                : `http://${chainIndex.toLowerCase()}.greymass.com`
+        }
     }
 
     // For local chains, don't require .gm suffix
