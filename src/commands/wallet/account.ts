@@ -149,10 +149,22 @@ export async function createAccount(options: AccountCreateOptions): Promise<void
             if (response.status === 201) {
                 log('Account created successfully!', 'info')
                 log(`Account Name: ${accountName}`, 'info')
-                if (privateKey) {
-                    log(`Private Key: ${privateKey.toString()}`, 'info')
-                }
                 log(`Public Key: ${publicKey}`, 'info')
+
+                // Import the private key into the wallet
+                if (privateKey) {
+                    try {
+                        addKeyToWallet(privateKey, String(accountName))
+                        log(`✅ Private key imported into wallet as: ${accountName}`, 'info')
+                    } catch (error) {
+                        log(
+                            `⚠️  Could not import key into wallet (may already exist): ${
+                                (error as Error).message
+                            }`,
+                            'info'
+                        )
+                    }
+                }
             } else {
                 const responseData = await response.json()
                 log(
@@ -319,25 +331,24 @@ async function createAccountOnLocalChain(
 
     log('Account created successfully!', 'info')
     log(`Account Name: ${accountName}`, 'info')
-    if (privateKey) {
-        log(`Private Key: ${privateKey.toString()}`, 'info')
-    }
     log(`Public Key: ${publicKey}`, 'info')
     log(`Transaction ID: ${result.resolved?.transaction.id}`, 'info')
 
-    // Store the key in wallet with account name (only if we have a private key)
+    // Import the private key into the wallet (only if we have a private key)
     if (privateKey) {
         try {
             addKeyToWallet(privateKey, accountName)
-            log(`Key stored in wallet as: ${accountName}`, 'info')
+            log(`✅ Private key imported into wallet as: ${accountName}`, 'info')
         } catch (error) {
             log(
-                `Could not store key in wallet (may already exist): ${(error as Error).message}`,
+                `⚠️  Could not import key into wallet (may already exist): ${
+                    (error as Error).message
+                }`,
                 'info'
             )
         }
     } else {
-        log('Note: No private key available to store in wallet (public key was provided)', 'info')
+        log('Note: No private key available to import (public key was provided)', 'info')
     }
 }
 

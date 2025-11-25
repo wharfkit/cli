@@ -7,6 +7,7 @@ import {createChainCommand} from './commands/chain/index'
 import {createCompileCommand} from './commands/compile'
 import {createDevCommand} from './commands/dev'
 import {createWalletCommand} from './commands/wallet/index'
+import {createAccountCommand} from './commands/account'
 
 const program = new Command()
 
@@ -47,5 +48,8 @@ program.addCommand(createDevCommand())
 
 // 7. Command to manage wallet (includes account creation)
 program.addCommand(createWalletCommand())
+
+// 8. Command to lookup account data
+program.addCommand(createAccountCommand())
 
 program.parse(process.argv)

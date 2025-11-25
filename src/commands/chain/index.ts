@@ -3,6 +3,7 @@ import {Command} from 'commander'
 import {showChainLogs, showChainStatus, startLocalChain, stopLocalChain} from './local'
 import {checkLeapInstallation} from './install'
 import {addInteractCommands, addInteractSubcommands} from './interact'
+import {setDefaultChain} from './utils'
 
 /**
  * Create the chain command with subcommands
@@ -78,6 +79,20 @@ export function createChainCommand(): Command {
                     follow: options.follow,
                     errors: options.errors,
                 })
+            } catch (error: any) {
+                console.error(`Error: ${error.message}`)
+                process.exit(1)
+            }
+        })
+
+    // Set default chain
+    chain
+        .command('set <chainName>')
+        .description('Set the default chain for account lookups')
+        .action(async (chainName) => {
+            try {
+                await setDefaultChain(chainName)
+                console.log(`Default chain set to: ${chainName}`)
             } catch (error: any) {
                 console.error(`Error: ${error.message}`)
                 process.exit(1)

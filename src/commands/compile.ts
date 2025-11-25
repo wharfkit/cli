@@ -2,7 +2,7 @@
 import {Command} from 'commander'
 import {execSync} from 'child_process'
 import {existsSync, mkdirSync, readdirSync, readFileSync, statSync} from 'fs'
-import {basename, dirname, extname, join, relative, resolve} from 'path'
+import {basename, dirname, extname, isAbsolute, join, normalize, relative, resolve} from 'path'
 import {checkLeapInstallation} from './chain/install'
 
 /**
@@ -19,7 +19,10 @@ export async function compileContract(file: string | undefined, outputDir: strin
         return
     }
 
-    const absoluteOutputDir = resolve(outputDir)
+    // Resolve output directory to absolute path, handling both relative and absolute paths
+    const absoluteOutputDir = isAbsolute(outputDir)
+        ? normalize(outputDir)
+        : normalize(resolve(outputDir))
     ensureOutputDirectory(absoluteOutputDir)
 
     // Ensure cdt-cpp is installed
@@ -92,11 +95,11 @@ export async function getFilesToCompile(
 }
 
 /**
- * Ensure output directory exists
+ * Ensure output directory exists, create it if it doesn't
  */
 function ensureOutputDirectory(dir: string): void {
     if (!existsSync(dir)) {
-        throw new Error(`Output directory does not exist: ${dir}`)
+        mkdirSync(dir, {recursive: true})
     }
 }
 
@@ -314,7 +317,15 @@ async function compileSingleFile(
         }
     } else {
         // Use path relative to current directory (preserve structure)
-        relativePath = relative(currentDir, filePath)
+        // But if the relative path goes outside currentDir (starts with ..), 
+        // just use the filename to avoid path issues
+        const relPath = relative(currentDir, filePath)
+        if (relPath.startsWith('..')) {
+            // If path goes outside current directory, just use filename
+            relativePath = basename(filePath, '.cpp')
+        } else {
+            relativePath = relPath
+        }
     }
     
     const relativeDir = dirname(relativePath)
@@ -326,7 +337,8 @@ async function compileSingleFile(
         wasmOutput = join(outputDir, `${fileName}.wasm`)
     } else {
         // File is in a subdirectory, preserve the structure (but without src/ prefix if stripped)
-        const outputSubDir = join(outputDir, relativeDir)
+        // Normalize the path to prevent issues with relative paths containing '..'
+        const outputSubDir = normalize(join(outputDir, relativeDir))
         // Ensure the output subdirectory exists
         if (!existsSync(outputSubDir)) {
             mkdirSync(outputSubDir, {recursive: true})

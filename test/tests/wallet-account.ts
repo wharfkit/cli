@@ -5,18 +5,21 @@ import {Chains} from '@wharfkit/common'
 
 import {createAccount} from 'src/commands/wallet/account'
 import * as utils from 'src/utils'
+import * as walletUtils from 'src/commands/wallet/utils'
 
 suite('Wallet Account Create', () => {
     let sandbox: sinon.SinonSandbox
     let fetchStub: sinon.SinonStub
     let makeClientStub: sinon.SinonStub
     let logStub: sinon.SinonStub
+    let addKeyToWalletStub: sinon.SinonStub
 
     setup(function () {
         sandbox = sinon.createSandbox()
         fetchStub = sandbox.stub()
         makeClientStub = sandbox.stub()
         logStub = sandbox.stub()
+        addKeyToWalletStub = sandbox.stub()
 
         // Mock fetch from node-fetch
         sandbox.stub(nodeFetch, 'default').callsFake(fetchStub as any)
@@ -24,6 +27,9 @@ suite('Wallet Account Create', () => {
         // Mock makeClient and log from utils
         sandbox.stub(utils, 'makeClient').callsFake(makeClientStub as any)
         sandbox.stub(utils, 'log').callsFake(logStub as any)
+
+        // Mock addKeyToWallet from wallet utils
+        sandbox.stub(walletUtils, 'addKeyToWallet').callsFake(addKeyToWalletStub as any)
     })
 
     teardown(function () {
@@ -101,6 +107,8 @@ suite('Wallet Account Create', () => {
         // Should not log private key when key is provided
         const logCalls = logStub.getCalls().map((call) => call.args[0])
         assert.isFalse(logCalls.some((msg) => msg.includes('Private Key')))
+        // Should not import key when only public key is provided
+        assert.isFalse(addKeyToWalletStub.called)
     })
 
     test('generates private key when not provided', async function () {
@@ -116,9 +124,11 @@ suite('Wallet Account Create', () => {
         assert.isString(body.activeKey)
         assert.include(body.activeKey, 'PUB_K1_')
 
-        // Should log private key when it was generated
+        // Should import private key when it was generated (not log it)
         const logCalls = logStub.getCalls().map((call) => call.args[0])
-        assert.isTrue(logCalls.some((msg) => msg.includes('Private Key')))
+        assert.isFalse(logCalls.some((msg) => msg.includes('Private Key:')))
+        assert.isTrue(logCalls.some((msg) => msg.includes('Private key imported into wallet')))
+        assert.isTrue(addKeyToWalletStub.calledOnce)
     })
 
     test('creates account on KylinTestnet chain', async function () {

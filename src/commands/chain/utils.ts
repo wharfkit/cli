@@ -280,3 +280,34 @@ export function createApiClientForPort(port: number): APIClient {
     const provider = new FetchProvider(url, {fetch})
     return new APIClient({provider})
 }
+
+/**
+ * Get the config file path for storing default chain preference
+ */
+export function getConfigFilePath(): string {
+    return path.join(getDefaultConfigDir(), 'default-chain.json')
+}
+
+/**
+ * Get the default chain name (defaults to 'local')
+ */
+export async function getDefaultChain(): Promise<string> {
+    const configFile = getConfigFilePath()
+    try {
+        const content = await fs.promises.readFile(configFile, 'utf-8')
+        const config = JSON.parse(content)
+        return config.chain || 'local'
+    } catch {
+        return 'local'
+    }
+}
+
+/**
+ * Set the default chain name
+ */
+export async function setDefaultChain(chainName: string): Promise<void> {
+    const configFile = getConfigFilePath()
+    await ensureDir(path.dirname(configFile))
+    const config = {chain: chainName}
+    await fs.promises.writeFile(configFile, JSON.stringify(config, null, 2))
+}
