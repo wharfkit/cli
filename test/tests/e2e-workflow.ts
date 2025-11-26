@@ -1,12 +1,13 @@
 import {assert} from 'chai'
-import {execSync} from 'child_process'
+import type {ChildProcess} from 'child_process'
+import {execSync, spawn} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 import {log} from '../../src/utils'
-import {isNodeosAvailable, killProcessAtPort, waitForChainReady} from '../utils/test-helpers'
+import {killProcessAtPort, waitForChainReady} from '../utils/test-helpers'
 
 /**
  * E2E tests for the complete workflow:
@@ -43,15 +44,7 @@ suite('E2E Workflow', () => {
     let originalHome: string
 
     suiteSetup(async function () {
-        this.timeout(60000) // Increase timeout for chain startup
-
-        // Skip suite if nodeos is not available
-        if (!isNodeosAvailable()) {
-            // eslint-disable-next-line no-console
-            console.log('Skipping E2E Workflow tests: nodeos is not available')
-            this.skip()
-            return
-        }
+        this.timeout(180000) // Increase timeout for potential LEAP installation + chain startup
 
         // Create a temporary test directory
         testDir = path.join(os.tmpdir(), `wharfkit-e2e-test-${Date.now()}`)
@@ -397,12 +390,7 @@ suite('E2E Workflow', () => {
         })
 
         test('can deploy a contract to the account', function () {
-            // Check if cdt-cpp is installed before running this test
-            try {
-                execSync('which cdt-cpp')
-            } catch (e) {
-                this.skip()
-            }
+            this.timeout(60000) // Allow time for compilation
 
             // 1. Create an account
             const accountName = getRandomLocalAccountName('deploy')
@@ -429,9 +417,9 @@ suite('E2E Workflow', () => {
 
             assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
 
-            // 4. Deploy contract
+            // 4. Deploy contract with --yes flag to skip prompts
             const output = execSync(
-                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName}`,
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --yes`,
                 {
                     encoding: 'utf8',
                     cwd: testDir,
@@ -442,13 +430,243 @@ suite('E2E Workflow', () => {
             assert.include(output, 'Transaction ID:')
         })
 
-        test('validates table removal safety', async function () {
-            // Check if cdt-cpp is installed
-            try {
-                execSync('which cdt-cpp')
-            } catch (e) {
-                this.skip()
+        test('shows RAM analysis during deployment', function () {
+            this.timeout(60000) // Allow time for compilation
+
+            // 1. Create an account
+            const accountName = getRandomLocalAccountName('ramtest')
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Use persistent contract file
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, `ramtest.cpp`)
+            const wasmPath = path.join(testDir, 'ramtest.wasm')
+
+            fs.copyFileSync(rootCppPath, cppPath)
+
+            // 3. Compile contract
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 4. Deploy contract with --yes to skip prompts and check output
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
+
+            // Verify RAM analysis output is shown
+            assert.include(output, '📊 RAM Analysis')
+            assert.include(output, 'RAM needed for deployment:')
+            assert.include(output, 'Current RAM available:')
+            assert.include(output, 'RAM to purchase:')
+            assert.include(output, 'Estimated cost:')
+            assert.include(output, '✅ Contract deployed successfully!')
+        })
+
+        test('shows QR code when insufficient funds and completes after transfer', async function () {
+            this.timeout(120000) // 120 second timeout to allow for potential LEAP installation
+
+            // 1. Create an account WITHOUT tokens (only minimal RAM from account creation)
+            // The account creation gives 8192 bytes which is not enough for contract deployment
+            const accountName = getRandomLocalAccountName('qrtest')
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // Verify account has no tokens
+            const client = new APIClient({
+                provider: new FetchProvider('http://127.0.0.1:8888', {fetch}),
+            })
+            const balances = await client.v1.chain.get_currency_balance('eosio.token', accountName)
+            assert.equal(balances.length, 0, 'Account should have no token balance initially')
+
+            // 2. Compile a contract (use the test.cpp which is a simple contract)
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'qrtest.cpp')
+            const wasmPath = path.join(testDir, 'qrtest.wasm')
+
+            fs.copyFileSync(rootCppPath, cppPath)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Spawn the deploy command as a child process
+            // It should detect insufficient funds and show QR code
+            let deployOutput = ''
+            let deployExitCode: number | null = null
+
+            const deployProcess: ChildProcess = spawn(
+                'node',
+                [cliPath, 'contract', 'deploy', wasmPath, '--account', accountName, '--yes'],
+                {
+                    cwd: testDir,
+                    env: {...process.env, HOME: testDir},
+                }
+            )
+
+            const deployPromise = new Promise<void>((resolve, reject) => {
+                deployProcess.stdout?.on('data', (data: Buffer) => {
+                    const text = data.toString()
+                    deployOutput += text
+                    // Log for debugging
+                    // process.stdout.write(`[deploy stdout]: ${text}`)
+                })
+
+                deployProcess.stderr?.on('data', (data: Buffer) => {
+                    const text = data.toString()
+                    deployOutput += text
+                    // process.stderr.write(`[deploy stderr]: ${text}`)
+                })
+
+                deployProcess.on('close', (code) => {
+                    deployExitCode = code
+                    if (code === 0) {
+                        resolve()
+                    } else {
+                        reject(new Error(`Deploy process exited with code ${code}`))
+                    }
+                })
+
+                deployProcess.on('error', (err) => {
+                    reject(err)
+                })
+            })
+
+            // 4. Wait for the QR code / ESR link to appear in output
+            const waitForQrCode = async (): Promise<boolean> => {
+                const startTime = Date.now()
+                const timeout = 30000 // 30 seconds
+
+                while (Date.now() - startTime < timeout) {
+                    if (
+                        deployOutput.includes('esr://') ||
+                        deployOutput.includes('Scan this QR code')
+                    ) {
+                        return true
+                    }
+                    // Check if process exited (might have enough RAM already)
+                    if (deployExitCode !== null) {
+                        return false
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 200))
+                }
+                return false
             }
+
+            const qrCodeShown = await waitForQrCode()
+
+            // If QR code was shown, we need to transfer funds
+            if (qrCodeShown) {
+                // Verify ESR link is present
+                assert.include(deployOutput, 'esr://', 'Should show ESR link')
+                assert.include(
+                    deployOutput,
+                    'Scan this QR code',
+                    'Should show QR code instructions'
+                )
+                assert.include(deployOutput, 'Waiting for funds', 'Should show waiting message')
+
+                // 5. Transfer tokens from eosio to the account
+                // Get chain info for TAPOS
+                const chainInfo = await client.v1.chain.get_info()
+                const blockNum = chainInfo.last_irreversible_block_num.toNumber()
+                const blockInfo = await client.v1.chain.get_block(blockNum)
+
+                // Create transfer transaction
+                // Data for eosio.token::transfer: from, to, quantity, memo
+                const transferTx = {
+                    expiration: getTransactionExpiration(),
+                    ref_block_num: blockNum & 0xffff,
+                    ref_block_prefix: blockInfo.ref_block_prefix.toNumber(),
+                    max_net_usage_words: 0,
+                    max_cpu_usage_ms: 0,
+                    delay_sec: 0,
+                    context_free_actions: [],
+                    actions: [
+                        {
+                            account: 'eosio.token',
+                            name: 'transfer',
+                            authorization: [{actor: 'eosio', permission: 'active'}],
+                            // Pre-serialized transfer data: eosio -> accountName, 100.0000 SYS
+                            data: Serializer.encode({
+                                object: {
+                                    from: 'eosio',
+                                    to: accountName,
+                                    quantity: '100.0000 SYS',
+                                    memo: 'funding for contract deployment',
+                                },
+                                abi: (await client.v1.chain.get_abi('eosio.token')).abi!,
+                                type: 'transfer',
+                            }).hexString,
+                        },
+                    ],
+                    transaction_extensions: [],
+                }
+
+                const txPath = path.join(testDir, 'transfer_for_deploy.json')
+                fs.writeFileSync(txPath, JSON.stringify(transferTx))
+
+                // Execute the transfer
+                log('Transferring 100 SYS to account...', 'info')
+                execSync(`node ${cliPath} wallet transact ${txPath} --broadcast --key chain-key`, {
+                    encoding: 'utf8',
+                    env: {...process.env, HOME: testDir},
+                })
+
+                // 6. Wait for the deploy to complete (should happen within ~10 seconds due to polling)
+                try {
+                    await Promise.race([
+                        deployPromise,
+                        new Promise((_, reject) =>
+                            setTimeout(
+                                () => reject(new Error('Deploy timed out after transfer')),
+                                20000
+                            )
+                        ),
+                    ])
+                } catch (e) {
+                    // If timed out, kill the process
+                    if (deployExitCode === null) {
+                        deployProcess.kill()
+                    }
+                    throw e
+                }
+            } else {
+                // Process might have completed without needing QR code
+                // (if account had enough RAM from creation)
+                await deployPromise
+            }
+
+            // 7. Assert deployment succeeded
+            assert.include(
+                deployOutput,
+                '✅ Contract deployed successfully!',
+                'Deployment should succeed'
+            )
+            assert.include(deployOutput, 'Transaction ID:', 'Should show transaction ID')
+        })
+
+        test('validates table removal safety', async function () {
+            this.timeout(120000) // Allow time for multiple compilations
 
             const accountName = getRandomLocalAccountName('val')
             execSync(

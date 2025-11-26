@@ -51,6 +51,7 @@ export function createContractCommand(): Command {
         )
         .option('--force', 'Force deployment even if safety checks fail')
         .option('--validate', 'Validate deployment safety without deploying')
+        .option('-y, --yes', 'Skip confirmation prompts')
         .action(async (networkOrWasm, wasmFile, options) => {
             let network = networkOrWasm
             let wasm = wasmFile

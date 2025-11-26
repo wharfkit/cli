@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import '../../types/wharfkit-session'
-import {existsSync, readdirSync, readFileSync} from 'fs'
+import {existsSync, readdirSync, readFileSync, statSync} from 'fs'
 import {basename, extname, resolve} from 'path'
-import {ABI, APIClient, FetchProvider, PrivateKey, Serializer} from '@wharfkit/antelope'
+import {ABI, APIClient, Asset, FetchProvider, PrivateKey, Serializer} from '@wharfkit/antelope'
 import {Session} from '@wharfkit/session'
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import fetch from 'node-fetch'
@@ -11,6 +11,15 @@ import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
 
 import {Chains} from '@wharfkit/common'
 import {compileContract} from '../compile'
+import {
+    analyzeRamRequirements,
+    createTransferESR,
+    displayQRCode,
+    displayRamAnalysis,
+    formatBytes,
+    promptConfirmation,
+    waitForBalance,
+} from './deploy-utils'
 
 interface DeployOptions {
     account?: string
@@ -18,6 +27,7 @@ interface DeployOptions {
     force?: boolean
     validate?: boolean
     key?: string
+    yes?: boolean // Skip confirmation prompts
 }
 
 /**
@@ -202,6 +212,107 @@ export async function deployContract(
             return
         }
 
+        // Create API client for RAM analysis
+        const analysisClient = new APIClient({
+            provider: new FetchProvider(url, {fetch}),
+        })
+
+        // Get file sizes for RAM calculation
+        const wasmSize = statSync(wasmPath).size
+        const abiSize = statSync(abiPath).size
+
+        // Analyze RAM requirements
+        console.log('\n📊 Analyzing RAM requirements...')
+        let ramInfo = await analyzeRamRequirements(analysisClient, accountName, wasmSize, abiSize)
+        displayRamAnalysis(ramInfo, accountName)
+
+        // Handle insufficient resources
+        if (!ramInfo.hasEnoughRam && !ramInfo.hasEnoughTokens) {
+            // Need to acquire tokens first
+            const tokensNeeded = Asset.from(ramInfo.costInTokens)
+            const symbol = String(tokensNeeded).split(' ')[1]
+            const currentBalance = ramInfo.tokenBalance.value || 0
+            const shortfall = tokensNeeded.value - currentBalance
+            const amountToSend = Asset.from(
+                `${(shortfall * 1.1).toFixed(4)} ${symbol}` // Add 10% buffer
+            )
+
+            console.log(
+                `\n❌ Insufficient funds! Need approximately ${amountToSend} more ${symbol}`
+            )
+
+            try {
+                const {uri} = await createTransferESR(
+                    analysisClient,
+                    accountName,
+                    amountToSend,
+                    `RAM for contract deployment`
+                )
+
+                displayQRCode(uri, `💰 Send ${amountToSend} to ${accountName}`)
+
+                // Poll for balance
+                const targetBalance = Asset.from(`${tokensNeeded.value.toFixed(4)} ${symbol}`)
+                const received = await waitForBalance(
+                    analysisClient,
+                    accountName,
+                    targetBalance,
+                    5000,
+                    300000
+                )
+
+                if (!received) {
+                    throw new Error('Deployment cancelled: Funds not received within timeout')
+                }
+
+                // Re-analyze RAM after receiving funds
+                ramInfo = await analyzeRamRequirements(
+                    analysisClient,
+                    accountName,
+                    wasmSize,
+                    abiSize
+                )
+            } catch (esrError) {
+                // ESR creation might fail on local chains without proper setup
+                console.log(
+                    `\n⚠️  Could not create payment request: ${(esrError as Error).message}`
+                )
+                console.log(
+                    `\n💡 Please manually send at least ${ramInfo.costInTokens} to ${accountName}`
+                )
+                throw new Error('Insufficient funds for deployment')
+            }
+        }
+
+        // Check if we need to buy RAM
+        if (!ramInfo.hasEnoughRam && ramInfo.hasEnoughTokens) {
+            console.log(`\n💡 Account needs to purchase ${formatBytes(ramInfo.ramToBuy)} of RAM`)
+            console.log(`   Estimated cost: ${ramInfo.costInTokens}`)
+
+            if (!options.yes) {
+                const proceed = await promptConfirmation(
+                    `\nPurchase ${formatBytes(ramInfo.ramToBuy)} of RAM for ~${
+                        ramInfo.costInTokens
+                    }?`
+                )
+
+                if (!proceed) {
+                    console.log('Deployment cancelled by user.')
+                    return
+                }
+            }
+        } else if (!options.yes) {
+            // Confirm deployment even if RAM is sufficient
+            const proceed = await promptConfirmation(
+                `\nProceed with deployment? (RAM needed: ${formatBytes(ramInfo.ramBytesNeeded)})`
+            )
+
+            if (!proceed) {
+                console.log('Deployment cancelled by user.')
+                return
+            }
+        }
+
         // Get private key from wallet for this account
         const privateKey = await getPrivateKeyForDeploy(accountName, options)
 
@@ -265,6 +376,34 @@ export async function deployContract(
 
         console.log('\n🚀 Deploying contract...')
 
+        // Build actions array
+        const actions: Array<{
+            account: string
+            name: string
+            authorization: Array<{actor: string; permission: string}>
+            data: Record<string, unknown>
+        }> = []
+
+        // Add buyrambytes action if needed
+        if (!ramInfo.hasEnoughRam && ramInfo.ramToBuy > 0) {
+            console.log(`   📦 Buying ${formatBytes(ramInfo.ramToBuy)} of RAM...`)
+            actions.push({
+                account: 'eosio',
+                name: 'buyrambytes',
+                authorization: [
+                    {
+                        actor: accountName,
+                        permission: 'active',
+                    },
+                ],
+                data: {
+                    payer: accountName,
+                    receiver: accountName,
+                    bytes: ramInfo.ramToBuy,
+                },
+            })
+        }
+
         // Create setcode action
         const setcodeAction = {
             account: 'eosio',
@@ -282,6 +421,7 @@ export async function deployContract(
                 code: wasmCode.toString('hex'),
             },
         }
+        actions.push(setcodeAction)
 
         // Create setabi action
         const setabiAction = {
@@ -298,11 +438,12 @@ export async function deployContract(
                 abi: Serializer.encode({object: ABI.from(abiJson), type: ABI}).hexString,
             },
         }
+        actions.push(setabiAction)
 
-        // Transact both actions
+        // Transact all actions
         const result = await session.transact(
             {
-                actions: [setcodeAction, setabiAction],
+                actions,
             },
             {
                 broadcast: true,
