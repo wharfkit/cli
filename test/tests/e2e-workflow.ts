@@ -10,6 +10,18 @@ import {log} from '../../src/utils'
 import {killProcessAtPort, waitForChainReady} from '../utils/test-helpers'
 
 /**
+ * Check if nodeos is available in PATH
+ */
+function isNodeosAvailable(): boolean {
+    try {
+        execSync('which nodeos', {encoding: 'utf8', stdio: 'pipe'})
+        return true
+    } catch {
+        return false
+    }
+}
+
+/**
  * E2E tests for the complete workflow:
  * 1. Create wallet keys
  * 2. Create accounts
@@ -46,6 +58,14 @@ suite('E2E Workflow', () => {
     suiteSetup(async function () {
         this.timeout(180000) // Increase timeout for potential LEAP installation + chain startup
 
+        // Skip E2E tests if nodeos is not available (e.g., in CI without LEAP installed)
+        if (!isNodeosAvailable()) {
+            // eslint-disable-next-line no-console
+            console.log('Skipping E2E tests: nodeos is not available in PATH')
+            this.skip()
+            return
+        }
+
         // Create a temporary test directory
         testDir = path.join(os.tmpdir(), `wharfkit-e2e-test-${Date.now()}`)
         fs.mkdirSync(testDir, {recursive: true})
@@ -79,6 +99,12 @@ suite('E2E Workflow', () => {
 
     suiteTeardown(function () {
         this.timeout(30000)
+
+        // If suite was skipped (nodeos not available), nothing to clean up
+        if (!testDir) {
+            return
+        }
+
         // Restore original HOME
         process.env.HOME = originalHome
 
@@ -87,7 +113,11 @@ suite('E2E Workflow', () => {
             fs.rmSync(testDir, {recursive: true, force: true})
         }
 
-        execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
+        try {
+            execSync(`node ${cliPath} chain local stop`, {encoding: 'utf8'})
+        } catch {
+            // Ignore errors if chain wasn't started
+        }
     })
 
     suite('Wallet Key Management', () => {
