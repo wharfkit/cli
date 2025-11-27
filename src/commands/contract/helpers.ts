@@ -1,8 +1,12 @@
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {formatClassName} from '../../utils'
+import {capitalize, extractDecorator, parseType, trim} from './contract-utils'
 import {findAbiType, findAliasFromType, findCoreClass, findCoreType, findVariant} from './finders'
 import type {TypeInterfaceDeclaration} from './interfaces'
+
+// Re-export utilities for backwards compatibility
+export {capitalize, extractDecorator, parseType, trim, cleanupType} from './contract-utils'
 
 export function getCoreImports(abi: ABI.Def) {
     const coreImports: string[] = []
@@ -211,55 +215,15 @@ export function formatInternalType(
     return `${type}${decorator}`
 }
 
-const decorators = ['?', '[]']
-export function extractDecorator(type: string): {type: string; decorator?: string} {
-    for (const decorator of decorators) {
-        if (type.includes(decorator)) {
-            type = type.replace(decorator, '')
+export function findInternalType(
+    type: string,
+    typeNamespace: string | undefined,
+    abi: ABI.Def
+): string {
+    const {type: typeString, decorator} = findAbiType(type, abi, typeNamespace)
 
-            return {type, decorator}
-        }
-    }
-
-    return {type}
-}
-
-export function cleanupType(type: string): string {
-    return extractDecorator(parseType(trim(type))).type
-}
-
-export function parseType(type: string): string {
-    type = type.replace('$', '')
-
-    if (type === 'String') {
-        return 'string'
-    }
-
-    if (type === 'String[]') {
-        return 'string[]'
-    }
-
-    if (type === 'Boolean') {
-        return 'boolean'
-    }
-
-    if (type === 'Boolean[]') {
-        return 'boolean[]'
-    }
-
-    return type
-}
-
-export function trim(string: string) {
-    return string.replace(/\s/g, '')
-}
-
-export function capitalize(string) {
-    if (typeof string !== 'string' || string.length === 0) {
-        return ''
-    }
-
-    return string.charAt(0).toUpperCase() + string.slice(1)
+    // TODO: inside findAbiType, namespace is prefixed, but formatInternalType is doing the same
+    return formatInternalType(typeString, typeNamespace, abi, decorator)
 }
 
 export function removeDuplicateInterfaces(

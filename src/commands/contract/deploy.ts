@@ -454,14 +454,7 @@ export async function deployContract(
         console.log(`Transaction ID: ${result.resolved?.transaction.id}`)
     } catch (error) {
         const errorMessage = (error as Error).message
-        throw new Error(
-            `Failed to deploy contract: ${errorMessage}\n\n` +
-                `Make sure:\n` +
-                `1. The blockchain is running (wharfkit chain local start)\n` +
-                `2. The account "${accountName}" exists\n` +
-                `3. You have a wallet key with permissions for this account\n` +
-                `4. The ABI file exists alongside the WASM file`
-        )
+        throw new Error(`Failed to deploy contract: ${errorMessage}`)
     }
 }
 

@@ -1,6 +1,6 @@
 import * as Antelope from '@wharfkit/antelope'
 import type {ABI} from '@wharfkit/antelope'
-import {capitalize, extractDecorator, formatInternalType, parseType, trim} from './helpers'
+import {capitalize, extractDecorator, parseType, trim} from './contract-utils'
 import {formatClassName} from '../../utils'
 
 const ANTELOPE_CLASSES: string[] = []
@@ -125,13 +125,3 @@ export function findCoreClass(type: string): string | undefined {
     )
 }
 
-export function findInternalType(
-    type: string,
-    typeNamespace: string | undefined,
-    abi: ABI.Def
-): string {
-    const {type: typeString, decorator} = findType(type, abi, typeNamespace)
-
-    // TODO: inside findType, namespace is prefixed, but format internal is doing the same
-    return formatInternalType(typeString, typeNamespace, abi, decorator)
-}

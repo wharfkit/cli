@@ -504,7 +504,7 @@ suite('E2E Workflow', () => {
 
             // Verify RAM analysis output is shown
             assert.include(output, '📊 RAM Analysis')
-            assert.include(output, 'RAM needed for deployment:')
+            assert.include(output, 'RAM needed:')
             assert.include(output, 'Current RAM available:')
             // On local chains without system contracts, we show a different message
             // On chains with system contracts, we show RAM purchase details
@@ -877,6 +877,273 @@ suite('E2E Workflow', () => {
             // Verify it shows up in list
             const listOutput = execSync(`node ${cliPath} wallet keys`, {encoding: 'utf8'})
             assert.include(listOutput, keyName)
+        })
+    })
+
+    suite('Integration: Deploy Key Options', () => {
+        let deployKeyPrivate: string
+        let deployKeyPublic: string
+
+        suiteSetup(function () {
+            // Create a key and extract its private key for testing
+            const keyOutput = execSync(`node ${cliPath} wallet create --name deploy-test-key`, {
+                encoding: 'utf8',
+            })
+            // Extract private key from output (format: "Private Key: PVT_K1_...")
+            const privateKeyMatch = keyOutput.match(/Private Key: (PVT_K1_[A-Za-z0-9]+)/)
+            const publicKeyMatch = keyOutput.match(/Public Key: (PUB_K1_[A-Za-z0-9]+)/)
+            if (!privateKeyMatch || !publicKeyMatch) {
+                throw new Error('Could not extract keys from wallet create output')
+            }
+            deployKeyPrivate = privateKeyMatch[1]
+            deployKeyPublic = publicKeyMatch[1]
+        })
+
+        test('can deploy using --key option with wallet key name', function () {
+            this.timeout(60000)
+
+            // 1. Create an account using chain-key (the account needs the deploy-test-key's public key)
+            const accountName = getRandomLocalAccountName('keyopt')
+
+            // Create account with the deploy-test-key's public key
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888 --key ${deployKeyPublic}`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Copy and compile test contract
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'keyopt_test.cpp')
+            const wasmPath = path.join(testDir, 'keyopt_test.wasm')
+
+            const contractCode = fs.readFileSync(rootCppPath, 'utf8')
+            const modifiedCode = contractCode.replace(
+                /class \[\[eosio::contract\]\] test/,
+                'class [[eosio::contract]] keyopt_test'
+            )
+            fs.writeFileSync(cppPath, modifiedCode)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Deploy using --key option with wallet key name
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --key deploy-test-key --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
+
+            assert.include(output, 'Using wallet key: deploy-test-key')
+            assert.include(output, '✅ Contract deployed successfully!')
+            assert.include(output, 'Transaction ID:')
+        })
+
+        test('can deploy using --key option with private key directly', function () {
+            this.timeout(60000)
+
+            // 1. Create an account with the deploy-test-key's public key
+            const accountName = getRandomLocalAccountName('keypvt')
+
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888 --key ${deployKeyPublic}`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Copy and compile test contract
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'keypvt_test.cpp')
+            const wasmPath = path.join(testDir, 'keypvt_test.wasm')
+
+            const contractCode = fs.readFileSync(rootCppPath, 'utf8')
+            const modifiedCode = contractCode.replace(
+                /class \[\[eosio::contract\]\] test/,
+                'class [[eosio::contract]] keypvt_test'
+            )
+            fs.writeFileSync(cppPath, modifiedCode)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Deploy using --key option with private key directly
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --key ${deployKeyPrivate} --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
+
+            assert.include(output, 'Using private key from --key option')
+            assert.include(output, '✅ Contract deployed successfully!')
+            assert.include(output, 'Transaction ID:')
+        })
+
+        test('can deploy using WHARFKIT_DEPLOY_KEY environment variable with private key', function () {
+            this.timeout(60000)
+
+            // 1. Create an account with the deploy-test-key's public key
+            const accountName = getRandomLocalAccountName('envkey')
+
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888 --key ${deployKeyPublic}`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Copy and compile test contract
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'envkey_test.cpp')
+            const wasmPath = path.join(testDir, 'envkey_test.wasm')
+
+            const contractCode = fs.readFileSync(rootCppPath, 'utf8')
+            const modifiedCode = contractCode.replace(
+                /class \[\[eosio::contract\]\] test/,
+                'class [[eosio::contract]] envkey_test'
+            )
+            fs.writeFileSync(cppPath, modifiedCode)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Deploy using WHARFKIT_DEPLOY_KEY environment variable
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                    env: {
+                        ...process.env,
+                        HOME: testDir,
+                        WHARFKIT_DEPLOY_KEY: deployKeyPrivate,
+                    },
+                }
+            )
+
+            assert.include(output, 'Using private key from WHARFKIT_DEPLOY_KEY environment variable')
+            assert.include(output, '✅ Contract deployed successfully!')
+            assert.include(output, 'Transaction ID:')
+        })
+
+        test('can deploy using WHARFKIT_DEPLOY_KEY environment variable with wallet key name', function () {
+            this.timeout(60000)
+
+            // 1. Create an account with the deploy-test-key's public key
+            const accountName = getRandomLocalAccountName('envnam')
+
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888 --key ${deployKeyPublic}`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Copy and compile test contract
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'envnam_test.cpp')
+            const wasmPath = path.join(testDir, 'envnam_test.wasm')
+
+            const contractCode = fs.readFileSync(rootCppPath, 'utf8')
+            const modifiedCode = contractCode.replace(
+                /class \[\[eosio::contract\]\] test/,
+                'class [[eosio::contract]] envnam_test'
+            )
+            fs.writeFileSync(cppPath, modifiedCode)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Deploy using WHARFKIT_DEPLOY_KEY environment variable with key name
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                    env: {
+                        ...process.env,
+                        HOME: testDir,
+                        WHARFKIT_DEPLOY_KEY: 'deploy-test-key',
+                    },
+                }
+            )
+
+            assert.include(output, 'Using wallet key from environment: deploy-test-key')
+            assert.include(output, '✅ Contract deployed successfully!')
+            assert.include(output, 'Transaction ID:')
+        })
+
+        test('--key option takes precedence over WHARFKIT_DEPLOY_KEY', function () {
+            this.timeout(60000)
+
+            // 1. Create an account with the deploy-test-key's public key
+            const accountName = getRandomLocalAccountName('keyprec')
+
+            execSync(
+                `node ${cliPath} wallet account create --name ${accountName} --url http://127.0.0.1:8888 --key ${deployKeyPublic}`,
+                {
+                    encoding: 'utf8',
+                }
+            )
+
+            // 2. Copy and compile test contract
+            const rootCppPath = path.join(__dirname, '../../test.cpp')
+            const cppPath = path.join(testDir, 'keyprec_test.cpp')
+            const wasmPath = path.join(testDir, 'keyprec_test.wasm')
+
+            const contractCode = fs.readFileSync(rootCppPath, 'utf8')
+            const modifiedCode = contractCode.replace(
+                /class \[\[eosio::contract\]\] test/,
+                'class [[eosio::contract]] keyprec_test'
+            )
+            fs.writeFileSync(cppPath, modifiedCode)
+
+            execSync(`node ${cliPath} compile ${cppPath} --output ${testDir}`, {
+                encoding: 'utf8',
+                cwd: testDir,
+            })
+
+            assert.isTrue(fs.existsSync(wasmPath), 'WASM file should be generated')
+
+            // 3. Deploy with both --key and WHARFKIT_DEPLOY_KEY set
+            // --key should take precedence
+            const output = execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${accountName} --key deploy-test-key --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                    env: {
+                        ...process.env,
+                        HOME: testDir,
+                        WHARFKIT_DEPLOY_KEY: 'some-other-key', // This should be ignored
+                    },
+                }
+            )
+
+            // Should use the --key option, not the env var
+            assert.include(output, 'Using wallet key: deploy-test-key')
+            assert.include(output, '✅ Contract deployed successfully!')
         })
     })
 })
