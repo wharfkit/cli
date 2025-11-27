@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import * as readline from 'readline'
-import type {APIClient, Name} from '@wharfkit/antelope'
-import {Action, Asset, Serializer, Struct} from '@wharfkit/antelope'
-import {SigningRequest} from '@wharfkit/signing-request'
+import type {APIClient} from '@wharfkit/antelope'
+import {ABI, Asset, Struct} from '@wharfkit/antelope'
+import {PlaceholderName, PlaceholderPermission, SigningRequest} from '@wharfkit/signing-request'
 import * as qrcode from 'qrcode-terminal'
 
 /**
@@ -265,67 +265,49 @@ export async function createTransferESR(
     const info = await client.v1.chain.get_info()
     const chainId = String(info.chain_id)
 
-    // Create transfer action with placeholder authorization
-    const transferAction = Action.from({
-        account: 'eosio.token',
-        name: 'transfer',
-        authorization: [
-            {
-                actor: '............1', // Placeholder for signing wallet
-                permission: '............2', // Placeholder for permission
-            },
-        ],
-        data: {
-            from: '............1', // Placeholder
-            to: toAccount,
-            quantity: String(amount),
-            memo,
-        },
-    })
-
-    // Encode action data
-    const tokenAbi = await client.v1.chain.get_abi('eosio.token')
-    if (!tokenAbi.abi) {
+    // Fetch the eosio.token ABI for serialization
+    const tokenAbiResponse = await client.v1.chain.get_abi('eosio.token')
+    if (!tokenAbiResponse.abi) {
         throw new Error('Could not fetch eosio.token ABI')
     }
-    const encodedData = Serializer.encode({
-        object: transferAction.data,
-        abi: tokenAbi.abi,
-        type: 'transfer',
-    })
+    const tokenAbi = ABI.from(tokenAbiResponse.abi)
 
+    // Create the signing request with placeholders for the signing wallet
     const request = await SigningRequest.create(
         {
-            actions: [
-                {
-                    account: 'eosio.token',
-                    name: 'transfer',
-                    authorization: [
-                        {
-                            actor: '............1',
-                            permission: '............2',
-                        },
-                    ],
-                    data: encodedData.array,
+            action: {
+                account: 'eosio.token',
+                name: 'transfer',
+                authorization: [
+                    {
+                        actor: PlaceholderName,
+                        permission: PlaceholderPermission,
+                    },
+                ],
+                data: {
+                    from: PlaceholderName,
+                    to: toAccount,
+                    quantity: String(amount),
+                    memo,
                 },
-            ],
+            },
             chainId,
         },
         {
             abiProvider: {
-                getAbi: async (account: Name) => {
-                    const response = await client.v1.chain.get_abi(String(account))
-                    if (!response.abi) {
-                        throw new Error(`Could not fetch ABI for ${account}`)
-                    }
-                    return response.abi
-                },
+                getAbi: async () => tokenAbi,
             },
         }
     )
 
     const encodedUri = request.encode()
-    const uri = `esr://${encodedUri.slice(4)}` // Convert esr: to esr://
+    // Normalize to esr:// format
+    let uri = encodedUri
+    if (uri.startsWith('esr://')) {
+        // Already correct format
+    } else if (uri.startsWith('esr:')) {
+        uri = `esr://${uri.slice(4)}`
+    }
 
     return {uri, encodedUri}
 }
@@ -341,57 +323,48 @@ export async function createBuyRamESR(
     const info = await client.v1.chain.get_info()
     const chainId = String(info.chain_id)
 
-    // Get eosio ABI for buyrambytes
-    const eosioAbi = await client.v1.chain.get_abi('eosio')
-    if (!eosioAbi.abi) {
+    // Get eosio ABI for buyram
+    const eosioAbiResponse = await client.v1.chain.get_abi('eosio')
+    if (!eosioAbiResponse.abi) {
         throw new Error('Could not fetch eosio ABI')
     }
+    const eosioAbi = ABI.from(eosioAbiResponse.abi)
 
-    // Create buyram action
-    const buyramData = {
-        payer: '............1', // Placeholder
-        receiver,
-        quant: String(amount),
-    }
-
-    const encodedData = Serializer.encode({
-        object: buyramData,
-        abi: eosioAbi.abi,
-        type: 'buyram',
-    })
-
+    // Create the signing request with placeholders
     const request = await SigningRequest.create(
         {
-            actions: [
-                {
-                    account: 'eosio',
-                    name: 'buyram',
-                    authorization: [
-                        {
-                            actor: '............1',
-                            permission: '............2',
-                        },
-                    ],
-                    data: encodedData.array,
+            action: {
+                account: 'eosio',
+                name: 'buyram',
+                authorization: [
+                    {
+                        actor: PlaceholderName,
+                        permission: PlaceholderPermission,
+                    },
+                ],
+                data: {
+                    payer: PlaceholderName,
+                    receiver,
+                    quant: String(amount),
                 },
-            ],
+            },
             chainId,
         },
         {
             abiProvider: {
-                getAbi: async (account: Name) => {
-                    const response = await client.v1.chain.get_abi(String(account))
-                    if (!response.abi) {
-                        throw new Error(`Could not fetch ABI for ${account}`)
-                    }
-                    return response.abi
-                },
+                getAbi: async () => eosioAbi,
             },
         }
     )
 
     const encodedUri = request.encode()
-    const uri = `esr://${encodedUri.slice(4)}`
+    // Normalize to esr:// format
+    let uri = encodedUri
+    if (uri.startsWith('esr://')) {
+        // Already correct format
+    } else if (uri.startsWith('esr:')) {
+        uri = `esr://${uri.slice(4)}`
+    }
 
     return {uri, encodedUri}
 }
@@ -422,7 +395,7 @@ export async function waitForBalance(
     const symbol = String(targetBalance).split(' ')[1]
 
     console.log(`\n⏳ Waiting for funds... (polling every ${pollInterval / 1000}s)`)
-    console.log(`   Target: ${targetBalance}`)
+    console.log(`   Needed: ${targetBalance}`)
     console.log('   Press Ctrl+C to cancel\n')
 
     while (Date.now() - startTime < timeout) {

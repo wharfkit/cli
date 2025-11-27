@@ -8,9 +8,11 @@ import {getDefaultChain} from './chain/utils'
  */
 export function createAccountCommand(): Command {
     const accountCommand = new Command('account')
-    accountCommand.description('Lookup account data on the blockchain')
+    accountCommand.description('Account management commands')
 
     accountCommand
+        .command('info')
+        .description('Display information about an account')
         .argument('<accountName>', 'Account name to lookup')
         .option('-c, --chain <chainName>', 'Chain to query (default: local or configured default)')
         .option('--json', 'Output as JSON')

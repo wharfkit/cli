@@ -10,6 +10,8 @@ import {Command} from 'commander'
 import {log, makeClient} from '../../utils'
 import {generateContractClass} from './class'
 import {deployContract} from './deploy'
+import {lookupContractInfo} from './info'
+import {getDefaultChain} from '../chain/utils'
 import {generateImportStatement, getCoreImports} from './helpers'
 import {
     generateActionNamesInterface,
@@ -69,6 +71,23 @@ export function createContractCommand(): Command {
 
             try {
                 await deployContract(wasm, options)
+            } catch (error: any) {
+                // eslint-disable-next-line no-console
+                console.error(`Error: ${error.message}`)
+                process.exit(1)
+            }
+        })
+
+    contract
+        .command('info')
+        .description('Display information about a deployed contract')
+        .argument('<accountName>', 'The account name where the contract is deployed')
+        .option('-c, --chain <chainName>', 'Chain to query (default: local or configured default)')
+        .option('--json', 'Output as JSON')
+        .action(async (accountName, options) => {
+            try {
+                const chainName = options.chain || (await getDefaultChain())
+                await lookupContractInfo(chainName, accountName, options)
             } catch (error: any) {
                 // eslint-disable-next-line no-console
                 console.error(`Error: ${error.message}`)
