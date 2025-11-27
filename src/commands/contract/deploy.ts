@@ -233,9 +233,7 @@ export async function deployContract(
             const symbol = String(tokensNeeded).split(' ')[1]
             const currentBalance = ramInfo.tokenBalance.value || 0
             const shortfall = tokensNeeded.value - currentBalance
-            const amountToSend = Asset.from(
-                `${(shortfall * 1.1).toFixed(4)} ${symbol}` // Add 10% buffer
-            )
+            const amountToSend = Asset.from(`${(shortfall * 1.01).toFixed(4)} ${symbol}`)
 
             console.log(
                 `\n❌ Insufficient funds! Need approximately ${amountToSend} more ${symbol}`
@@ -251,7 +249,7 @@ export async function deployContract(
 
                 displayQRCode(uri, `💰 Send ${amountToSend} to ${accountName}`)
 
-                // Poll for balance
+                // Poll for balance - only wait for the actual amount needed (not the buffered amount)
                 const targetBalance = Asset.from(`${tokensNeeded.value.toFixed(4)} ${symbol}`)
                 const received = await waitForBalance(
                     analysisClient,
@@ -290,10 +288,9 @@ export async function deployContract(
             console.log(`   Estimated cost: ${ramInfo.costInTokens}`)
 
             if (!options.yes) {
+                const ramAmount = formatBytes(ramInfo.ramToBuy)
                 const proceed = await promptConfirmation(
-                    `\nPurchase ${formatBytes(ramInfo.ramToBuy)} of RAM for ~${
-                        ramInfo.costInTokens
-                    }?`
+                    `\nPurchase ${ramAmount} of RAM for ~${ramInfo.costInTokens}?`
                 )
 
                 if (!proceed) {
