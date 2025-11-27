@@ -120,56 +120,58 @@ suite('Chain Interaction', () => {
         // Wait for chain to be ready
         await waitForChainReady('http://127.0.0.1:8888', 30000)
 
-        // Check if cdt-cpp is installed
+        // Check if cdt-cpp is installed - skip contract tests if not
         try {
-            execSync('which cdt-cpp')
-
-            // Deploy a test contract
-            contractAccount = 'testcontract'
-            execSync(`node ${cliPath} wallet account create --name ${contractAccount}`, {
-                encoding: 'utf8',
-            })
-
-            const contractCode = `
-            #include <eosio/eosio.hpp>
-            class [[eosio::contract]] testcontract : public eosio::contract {
-              public:
-                using eosio::contract::contract;
-                
-                struct [[eosio::table]] item {
-                    uint64_t id;
-                    std::string name;
-                    uint64_t primary_key() const { return id; }
-                };
-                typedef eosio::multi_index<"items"_n, item> items_table;
-
-                [[eosio::action]]
-                void add(uint64_t id, std::string name) {
-                    items_table items(get_self(), get_self().value);
-                    items.emplace(get_self(), [&](auto& row) {
-                        row.id = id;
-                        row.name = name;
-                    });
-                }
-            };
-            `
-            const cppPath = path.join(testDir, 'testcontract.cpp')
-            const wasmPath = path.join(testDir, 'testcontract.wasm')
-            fs.writeFileSync(cppPath, contractCode)
-
-            execSync(`node ${cliPath} compile`, {encoding: 'utf8', cwd: testDir})
-            execSync(
-                `node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount} --yes`,
-                {
-                    encoding: 'utf8',
-                    cwd: testDir,
-                }
-            )
-        } catch (e) {
+            execSync('which cdt-cpp', {stdio: 'ignore'})
+        } catch {
             // eslint-disable-next-line no-console
-            console.log('Skipping contract deployment (cdt-cpp not found or failed)')
+            console.log('Skipping contract deployment tests: cdt-cpp not installed')
             contractAccount = ''
+            return
         }
+
+        // Deploy a test contract
+        contractAccount = 'testcontract'
+        execSync(
+            `node ${cliPath} wallet account create --name ${contractAccount} --url http://127.0.0.1:8888`,
+            {encoding: 'utf8'}
+        )
+
+        const contractCode = `
+        #include <eosio/eosio.hpp>
+        class [[eosio::contract]] testcontract : public eosio::contract {
+          public:
+            using eosio::contract::contract;
+            
+            struct [[eosio::table]] item {
+                uint64_t id;
+                std::string name;
+                uint64_t primary_key() const { return id; }
+            };
+            typedef eosio::multi_index<"items"_n, item> items_table;
+
+            [[eosio::action]]
+            void add(uint64_t id, std::string name) {
+                items_table items(get_self(), get_self().value);
+                items.emplace(get_self(), [&](auto& row) {
+                    row.id = id;
+                    row.name = name;
+                });
+            }
+        };
+        `
+        const cppPath = path.join(testDir, 'testcontract.cpp')
+        const wasmPath = path.join(testDir, 'testcontract.wasm')
+        fs.writeFileSync(cppPath, contractCode)
+
+        execSync(`node ${cliPath} compile`, {encoding: 'utf8', cwd: testDir})
+        execSync(
+            `node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount} --yes`,
+            {
+                encoding: 'utf8',
+                cwd: testDir,
+            }
+        )
     })
 
     suiteTeardown(function () {
