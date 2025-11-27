@@ -8,6 +8,7 @@ import {createCompileCommand} from './commands/compile'
 import {createDevCommand} from './commands/dev'
 import {createWalletCommand} from './commands/wallet/index'
 import {createAccountCommand} from './commands/account'
+import {createTableCommand} from './commands/table'
 
 const program = new Command()
 
@@ -51,5 +52,8 @@ program.addCommand(createWalletCommand())
 
 // 8. Command to lookup account data
 program.addCommand(createAccountCommand())
+
+// 9. Command to lookup table data (uses default chain)
+program.addCommand(createTableCommand())
 
 program.parse(process.argv)

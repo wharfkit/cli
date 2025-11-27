@@ -44,6 +44,7 @@ export interface RamInfo {
     hasEnoughRam: boolean
     hasEnoughTokens: boolean
     ramToBuy: number
+    hasSystemContract: boolean // Whether the chain has full system contracts (RAM market)
 }
 
 export interface AccountResources {
@@ -99,48 +100,56 @@ export async function getCoreSymbol(client: APIClient): Promise<string> {
 
 /**
  * Get RAM price from the rammarket table using Bancor algorithm
+ * Falls back to default values for local chains without system contracts
  */
 export async function getRamPrice(
     client: APIClient
-): Promise<{pricePerByte: number; symbol: string}> {
-    const rammarket = await client.v1.chain.get_table_rows({
-        code: 'eosio',
-        scope: 'eosio',
-        table: 'rammarket',
-        limit: 1,
-    })
+): Promise<{pricePerByte: number; symbol: string; hasSystemContract: boolean}> {
+    try {
+        const rammarket = await client.v1.chain.get_table_rows({
+            code: 'eosio',
+            scope: 'eosio',
+            table: 'rammarket',
+            limit: 1,
+        })
 
-    if (rammarket.rows.length === 0) {
-        throw new Error('Could not fetch RAM market data')
+        if (rammarket.rows.length === 0) {
+            // No RAM market data, this is a simple local chain
+            return {pricePerByte: 0.00000001, symbol: 'SYS', hasSystemContract: false}
+        }
+
+        const state = rammarket.rows[0]
+
+        // Parse base (RAM) and quote (tokens) from the market
+        // Base is RAM bytes, Quote is the token (e.g., EOS)
+        let baseBalance: number
+        let quoteBalance: number
+        let symbol = 'EOS'
+
+        // Handle different response formats
+        if (state.base?.balance) {
+            // Format: { balance: "123456789 RAM", weight: "0.50000000000000000" }
+            const baseStr = state.base.balance
+            baseBalance = parseFloat(baseStr.split(' ')[0])
+            const quoteStr = state.quote.balance
+            const quoteParts = quoteStr.split(' ')
+            quoteBalance = parseFloat(quoteParts[0])
+            symbol = quoteParts[1] || 'EOS'
+        } else {
+            // Simpler format
+            baseBalance = parseFloat(state.base)
+            quoteBalance = parseFloat(state.quote)
+        }
+
+        // Bancor formula: price = quote_balance / base_balance
+        const pricePerByte = quoteBalance / baseBalance
+
+        return {pricePerByte, symbol, hasSystemContract: true}
+    } catch {
+        // RAM market might not exist on local chains, use default values
+        // This allows deployment to proceed on simple local chains
+        return {pricePerByte: 0.00000001, symbol: 'SYS', hasSystemContract: false}
     }
-
-    const state = rammarket.rows[0]
-
-    // Parse base (RAM) and quote (tokens) from the market
-    // Base is RAM bytes, Quote is the token (e.g., EOS)
-    let baseBalance: number
-    let quoteBalance: number
-    let symbol = 'EOS'
-
-    // Handle different response formats
-    if (state.base?.balance) {
-        // Format: { balance: "123456789 RAM", weight: "0.50000000000000000" }
-        const baseStr = state.base.balance
-        baseBalance = parseFloat(baseStr.split(' ')[0])
-        const quoteStr = state.quote.balance
-        const quoteParts = quoteStr.split(' ')
-        quoteBalance = parseFloat(quoteParts[0])
-        symbol = quoteParts[1] || 'EOS'
-    } else {
-        // Simpler format
-        baseBalance = parseFloat(state.base)
-        quoteBalance = parseFloat(state.quote)
-    }
-
-    // Bancor formula: price = quote_balance / base_balance
-    const pricePerByte = quoteBalance / baseBalance
-
-    return {pricePerByte, symbol}
 }
 
 /**
@@ -163,7 +172,8 @@ export async function getAccountResources(
             const balances = await client.v1.chain.get_currency_balance('eosio.token', accountName)
             const matchingBalance = balances.find((b) => String(b).includes(symbol))
             coreBalance = matchingBalance || Asset.from(`0.0000 ${symbol}`)
-        } catch (e) {
+        } catch {
+            // eosio.token might not exist on local chains, default to zero balance
             coreBalance = Asset.from(`0.0000 ${symbol}`)
         }
 
@@ -173,8 +183,8 @@ export async function getAccountResources(
             ramAvailable: ramQuota - ramUsage,
             coreBalance,
         }
-    } catch (error) {
-        // Account might not exist yet
+    } catch {
+        // Account might not exist yet or other API errors
         return {
             ramQuota: 0,
             ramUsage: 0,
@@ -205,13 +215,14 @@ export async function analyzeRamRequirements(
     abiSize: number
 ): Promise<RamInfo> {
     const ramBytesNeeded = calculateRamNeeded(wasmSize, abiSize)
-    const {pricePerByte, symbol} = await getRamPrice(client)
+    const {pricePerByte, symbol, hasSystemContract} = await getRamPrice(client)
     const resources = await getAccountResources(client, accountName, symbol)
 
     const ramToBuy = Math.max(0, ramBytesNeeded - resources.ramAvailable)
     const costInTokens = calculateRamCost(ramToBuy, pricePerByte, symbol)
 
-    const hasEnoughRam = resources.ramAvailable >= ramBytesNeeded
+    // On chains without system contracts, RAM is essentially free/unlimited
+    const hasEnoughRam = !hasSystemContract || resources.ramAvailable >= ramBytesNeeded
     const hasEnoughTokens = hasEnoughRam || resources.coreBalance.value >= costInTokens.value
 
     return {
@@ -224,6 +235,7 @@ export async function analyzeRamRequirements(
         hasEnoughRam,
         hasEnoughTokens,
         ramToBuy,
+        hasSystemContract,
     }
 }
 
@@ -480,6 +492,13 @@ export function displayRamAnalysis(ramInfo: RamInfo, accountName: string): void 
     console.log(`Account: ${accountName}`)
     console.log(`RAM needed for deployment: ${formatBytes(ramInfo.ramBytesNeeded)}`)
     console.log(`Current RAM available: ${formatBytes(ramInfo.currentRamAvailable)}`)
+
+    if (!ramInfo.hasSystemContract) {
+        console.log('─'.repeat(50))
+        console.log('ℹ️  Local chain without system contracts - RAM management not required')
+        return
+    }
+
     console.log(`RAM to purchase: ${formatBytes(ramInfo.ramToBuy)}`)
     console.log(`Estimated cost: ${ramInfo.costInTokens}`)
     console.log(`Current balance: ${ramInfo.tokenBalance}`)

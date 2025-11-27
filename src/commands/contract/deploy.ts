@@ -226,8 +226,8 @@ export async function deployContract(
         let ramInfo = await analyzeRamRequirements(analysisClient, accountName, wasmSize, abiSize)
         displayRamAnalysis(ramInfo, accountName)
 
-        // Handle insufficient resources
-        if (!ramInfo.hasEnoughRam && !ramInfo.hasEnoughTokens) {
+        // Handle insufficient resources (only on chains with system contracts)
+        if (ramInfo.hasSystemContract && !ramInfo.hasEnoughRam && !ramInfo.hasEnoughTokens) {
             // Need to acquire tokens first
             const tokensNeeded = Asset.from(ramInfo.costInTokens)
             const symbol = String(tokensNeeded).split(' ')[1]
@@ -284,8 +284,8 @@ export async function deployContract(
             }
         }
 
-        // Check if we need to buy RAM
-        if (!ramInfo.hasEnoughRam && ramInfo.hasEnoughTokens) {
+        // Check if we need to buy RAM (only on chains with system contracts)
+        if (ramInfo.hasSystemContract && !ramInfo.hasEnoughRam && ramInfo.hasEnoughTokens) {
             console.log(`\n💡 Account needs to purchase ${formatBytes(ramInfo.ramToBuy)} of RAM`)
             console.log(`   Estimated cost: ${ramInfo.costInTokens}`)
 
@@ -384,8 +384,8 @@ export async function deployContract(
             data: Record<string, unknown>
         }> = []
 
-        // Add buyrambytes action if needed
-        if (!ramInfo.hasEnoughRam && ramInfo.ramToBuy > 0) {
+        // Add buyrambytes action if needed (only on chains with system contracts)
+        if (ramInfo.hasSystemContract && !ramInfo.hasEnoughRam && ramInfo.ramToBuy > 0) {
             console.log(`   📦 Buying ${formatBytes(ramInfo.ramToBuy)} of RAM...`)
             actions.push({
                 account: 'eosio',

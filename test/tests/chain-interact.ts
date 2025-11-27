@@ -158,10 +158,13 @@ suite('Chain Interaction', () => {
             fs.writeFileSync(cppPath, contractCode)
 
             execSync(`node ${cliPath} compile`, {encoding: 'utf8', cwd: testDir})
-            execSync(`node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount}`, {
-                encoding: 'utf8',
-                cwd: testDir,
-            })
+            execSync(
+                `node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount} --yes`,
+                {
+                    encoding: 'utf8',
+                    cwd: testDir,
+                }
+            )
         } catch (e) {
             // eslint-disable-next-line no-console
             console.log('Skipping contract deployment (cdt-cpp not found or failed)')
