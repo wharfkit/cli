@@ -37,6 +37,8 @@ export class ExchangeState extends Struct {
 export interface RamInfo {
     pricePerByte: number
     ramBytesNeeded: number
+    existingContractRam: number // RAM used by existing contract code (will be freed on update)
+    deltaRamNeeded: number // Actual new RAM needed (ramBytesNeeded - existingContractRam)
     costInTokens: Asset
     currentRamBytes: number
     currentRamAvailable: number
@@ -45,6 +47,7 @@ export interface RamInfo {
     hasEnoughTokens: boolean
     ramToBuy: number
     hasSystemContract: boolean // Whether the chain has full system contracts (RAM market)
+    isUpdate: boolean // Whether this is an update to existing contract
 }
 
 export interface AccountResources {
@@ -67,6 +70,51 @@ export function calculateRamNeeded(wasmSize: number, abiSize: number): number {
     // Add a 10% buffer for overhead
     const buffer = Math.ceil((setcodeRam + setabiRam) * 0.1)
     return setcodeRam + setabiRam + buffer
+}
+
+/**
+ * Get existing contract RAM usage
+ * When updating a contract, the existing code RAM will be freed and replaced
+ * Returns 0 if no contract exists
+ */
+export async function getExistingContractRam(client: APIClient, accountName: string): Promise<number> {
+    try {
+        // Get the API URL from the client's provider
+        const baseUrl = (client.provider as {url?: string}).url
+
+        if (!baseUrl) {
+            return 0
+        }
+
+        // Use fetch to call get_raw_code_and_abi endpoint directly
+        // as wharfkit APIClient doesn't have this method built-in
+        const response = await fetch(`${baseUrl}/v1/chain/get_raw_code_and_abi`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({account_name: accountName}),
+        })
+
+        if (!response.ok) {
+            return 0
+        }
+
+        const data = (await response.json()) as {wasm?: string; abi?: string}
+
+        // Check if there's existing code
+        if (!data.wasm || data.wasm.length === 0) {
+            return 0
+        }
+
+        // Decode base64 to get actual sizes
+        const wasmBytes = Buffer.from(data.wasm, 'base64')
+        const abiBytes = data.abi ? Buffer.from(data.abi, 'base64') : Buffer.alloc(0)
+
+        // Calculate RAM used by existing contract using same formula
+        return calculateRamNeeded(wasmBytes.length, abiBytes.length)
+    } catch {
+        // Account might not exist or have no code
+        return 0
+    }
 }
 
 /**
@@ -207,6 +255,8 @@ export function calculateRamCost(bytesNeeded: number, pricePerByte: number, symb
 
 /**
  * Analyze RAM requirements for deployment
+ * When updating an existing contract, calculates the delta RAM needed
+ * (existing contract RAM will be freed when replaced)
  */
 export async function analyzeRamRequirements(
     client: APIClient,
@@ -218,16 +268,27 @@ export async function analyzeRamRequirements(
     const {pricePerByte, symbol, hasSystemContract} = await getRamPrice(client)
     const resources = await getAccountResources(client, accountName, symbol)
 
-    const ramToBuy = Math.max(0, ramBytesNeeded - resources.ramAvailable)
+    // Check for existing contract - its RAM will be freed when we update
+    const existingContractRam = await getExistingContractRam(client, accountName)
+    const isUpdate = existingContractRam > 0
+
+    // Calculate actual delta RAM needed (new - existing, minimum 0)
+    // When updating, the existing contract RAM is freed and replaced
+    const deltaRamNeeded = Math.max(0, ramBytesNeeded - existingContractRam)
+
+    // Only need to buy RAM for the delta beyond what's available
+    const ramToBuy = Math.max(0, deltaRamNeeded - resources.ramAvailable)
     const costInTokens = calculateRamCost(ramToBuy, pricePerByte, symbol)
 
     // On chains without system contracts, RAM is essentially free/unlimited
-    const hasEnoughRam = !hasSystemContract || resources.ramAvailable >= ramBytesNeeded
+    const hasEnoughRam = !hasSystemContract || resources.ramAvailable >= deltaRamNeeded
     const hasEnoughTokens = hasEnoughRam || resources.coreBalance.value >= costInTokens.value
 
     return {
         pricePerByte,
         ramBytesNeeded,
+        existingContractRam,
+        deltaRamNeeded,
         costInTokens,
         currentRamBytes: resources.ramQuota,
         currentRamAvailable: resources.ramAvailable,
@@ -236,6 +297,7 @@ export async function analyzeRamRequirements(
         hasEnoughTokens,
         ramToBuy,
         hasSystemContract,
+        isUpdate,
     }
 }
 
@@ -490,7 +552,17 @@ export function displayRamAnalysis(ramInfo: RamInfo, accountName: string): void 
     console.log('\n📊 RAM Analysis')
     console.log('─'.repeat(50))
     console.log(`Account: ${accountName}`)
-    console.log(`RAM needed for deployment: ${formatBytes(ramInfo.ramBytesNeeded)}`)
+
+    if (ramInfo.isUpdate) {
+        console.log(`📦 Updating existing contract`)
+        console.log(`   New contract RAM: ${formatBytes(ramInfo.ramBytesNeeded)}`)
+        console.log(`   Existing contract RAM: ${formatBytes(ramInfo.existingContractRam)}`)
+        console.log(`   Delta RAM needed: ${formatBytes(ramInfo.deltaRamNeeded)}`)
+    } else {
+        console.log(`📦 New contract deployment`)
+        console.log(`   RAM needed: ${formatBytes(ramInfo.ramBytesNeeded)}`)
+    }
+
     console.log(`Current RAM available: ${formatBytes(ramInfo.currentRamAvailable)}`)
 
     if (!ramInfo.hasSystemContract) {
@@ -499,8 +571,10 @@ export function displayRamAnalysis(ramInfo: RamInfo, accountName: string): void 
         return
     }
 
-    console.log(`RAM to purchase: ${formatBytes(ramInfo.ramToBuy)}`)
-    console.log(`Estimated cost: ${ramInfo.costInTokens}`)
+    if (ramInfo.ramToBuy > 0) {
+        console.log(`RAM to purchase: ${formatBytes(ramInfo.ramToBuy)}`)
+        console.log(`Estimated cost: ${ramInfo.costInTokens}`)
+    }
     console.log(`Current balance: ${ramInfo.tokenBalance}`)
     console.log(
         `Price per KB: ${(ramInfo.pricePerByte * 1024).toFixed(4)} ${
