@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import * as fs from 'fs'
 import {ABI, APIClient, FetchProvider} from '@wharfkit/antelope'
 import {Chains} from '@wharfkit/common'
 import {PlaceholderName, PlaceholderPermission, SigningRequest} from '@wharfkit/signing-request'
@@ -31,10 +32,20 @@ export function parseAuthorization(authString?: string): {
 }
 
 /**
- * Parse action data from string (JSON or key=value pairs)
+ * Parse action data from string (JSON file, JSON string, or key=value pairs)
  */
 export function parseActionData(dataString: string): Record<string, unknown> {
-    // Try JSON first
+    // Try to read as file first
+    try {
+        if (fs.existsSync(dataString)) {
+            const fileContent = fs.readFileSync(dataString, 'utf8')
+            return JSON.parse(fileContent)
+        }
+    } catch {
+        // Not a valid file or couldn't parse, continue with other methods
+    }
+
+    // Try JSON string
     try {
         return JSON.parse(dataString)
     } catch {
@@ -61,7 +72,7 @@ export function parseActionData(dataString: string): Record<string, unknown> {
 
         if (Object.keys(data).length === 0) {
             throw new Error(
-                `Invalid action data format. Use JSON (e.g., '{"key": "value"}') or key=value pairs (e.g., 'key1=value1,key2=value2')`
+                `Invalid action data format. Use a JSON file path, JSON string (e.g., '{"key": "value"}'), or key=value pairs (e.g., 'key1=value1,key2=value2')`
             )
         }
 
@@ -238,11 +249,17 @@ export async function createActionRequest(
     // Get the API URL
     const url = getApiUrl(options.chain || 'local')
 
+    // Format data for display (show placeholder info)
+    const displayData = JSON.stringify(actionData, null, 2).replace(
+        /"\$signer"/g,
+        '"<wallet signer>"'
+    )
+
     console.log('Creating signing request...')
     console.log(`  Contract: ${contractAccount}`)
     console.log(`  Action: ${actionName}`)
     console.log(`  Chain: ${options.chain || 'local'} (${url})`)
-    console.log(`  Data: ${JSON.stringify(actionData, null, 2)}`)
+    console.log(`  Data: ${displayData}`)
 
     if (auth.actor) {
         console.log(`  Authorization: ${auth.actor}@${auth.permission}`)

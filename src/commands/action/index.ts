@@ -13,7 +13,7 @@ export function createSignCommand(): Command {
         .command('request')
         .description('Create a signing request (ESR) and display QR code for any action')
         .argument('<contract::action>', 'Contract and action in format "contract::action"')
-        .argument('<data>', 'Action data as JSON or key=value pairs')
+        .argument('<data>', 'Action data as JSON file, JSON string, or key=value pairs')
         .option(
             '-c, --chain <chain>',
             'Chain name or API URL (e.g., local, Jungle4, EOS, https://...)',
