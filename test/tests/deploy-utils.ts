@@ -16,11 +16,11 @@ suite('deploy-utils', function () {
             const ramNeeded = calculateRamNeeded(wasmSize, abiSize)
 
             // setcode requires 10x WASM, setabi requires ABI size
-            // Then 10% buffer is added
-            // Formula in code: setcodeRam + setabiRam + ceil((setcodeRam + setabiRam) * 0.1)
+            // Then 1% buffer is added
+            // Formula in code: setcodeRam + setabiRam + ceil((setcodeRam + setabiRam) * 0.01)
             const setcodeRam = wasmSize * 10
             const setabiRam = abiSize
-            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.1)
+            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.01)
             const expected = setcodeRam + setabiRam + buffer
             assert.equal(ramNeeded, expected)
         })
@@ -32,10 +32,10 @@ suite('deploy-utils', function () {
 
             const ramNeeded = calculateRamNeeded(wasmSize, abiSize)
 
-            // setcode needs 10x WASM, setabi needs ABI size, plus 10% buffer
+            // setcode needs 10x WASM, setabi needs ABI size, plus 1% buffer
             const setcodeRam = wasmSize * 10
             const setabiRam = abiSize
-            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.1)
+            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.01)
             const expected = setcodeRam + setabiRam + buffer
             assert.equal(ramNeeded, expected)
         })
@@ -49,10 +49,10 @@ suite('deploy-utils', function () {
 
             const setcodeRam = wasmSize * 10
             const setabiRam = abiSize
-            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.1)
+            const buffer = Math.ceil((setcodeRam + setabiRam) * 0.01)
             const expected = setcodeRam + setabiRam + buffer
             assert.equal(ramNeeded, expected)
-            // Should be around 2.2MB
+            // Should be around 2.1MB
             assert.isAbove(ramNeeded, 2 * 1024 * 1024)
         })
     })

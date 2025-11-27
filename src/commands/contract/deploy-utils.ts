@@ -3,7 +3,7 @@ import * as readline from 'readline'
 import type {APIClient} from '@wharfkit/antelope'
 import {ABI, Asset, Struct} from '@wharfkit/antelope'
 import {PlaceholderName, PlaceholderPermission, SigningRequest} from '@wharfkit/signing-request'
-import * as qrcode from 'qrcode-terminal'
+import {displayQRCode} from '../../utils'
 
 /**
  * RAM market row structure
@@ -67,8 +67,8 @@ export function calculateRamNeeded(wasmSize: number, abiSize: number): number {
     const setcodeRam = wasmSize * 10
     // setabi action requires roughly the ABI file size
     const setabiRam = abiSize
-    // Add a 10% buffer for overhead
-    const buffer = Math.ceil((setcodeRam + setabiRam) * 0.1)
+    // Add a 1% buffer for overhead
+    const buffer = Math.ceil((setcodeRam + setabiRam) * 0.01)
     return setcodeRam + setabiRam + buffer
 }
 
@@ -441,18 +441,6 @@ export async function createBuyRamESR(
     }
 
     return {uri, encodedUri}
-}
-
-/**
- * Display QR code and link in terminal
- */
-export function displayQRCode(uri: string, title: string): void {
-    console.log(`\n${title}`)
-    console.log('─'.repeat(60))
-    console.log(`\nLink: ${uri}`)
-    console.log('\nScan this QR code with your wallet app:\n')
-    qrcode.generate(uri, {small: true})
-    console.log('─'.repeat(60))
 }
 
 /**

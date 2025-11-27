@@ -11,10 +11,10 @@ import {getKeyFromWallet, listWalletKeys} from '../wallet/utils'
 
 import {Chains} from '@wharfkit/common'
 import {compileContract} from '../compile'
+import {displayQRCode} from '../../utils'
 import {
     analyzeRamRequirements,
     createTransferESR,
-    displayQRCode,
     displayRamAnalysis,
     formatBytes,
     promptConfirmation,

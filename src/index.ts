@@ -9,6 +9,7 @@ import {createDevCommand} from './commands/dev'
 import {createWalletCommand} from './commands/wallet/index'
 import {createAccountCommand} from './commands/account'
 import {createTableCommand} from './commands/table'
+import {createSignCommand} from './commands/action'
 
 const program = new Command()
 
@@ -55,5 +56,8 @@ program.addCommand(createAccountCommand())
 
 // 9. Command to lookup table data (uses default chain)
 program.addCommand(createTableCommand())
+
+// 10. Command to create signing requests
+program.addCommand(createSignCommand())
 
 program.parse(process.argv)
