@@ -69,3 +69,8 @@ clean:
 .PHONY: distclean
 distclean: clean
 	rm -rf node_modules/
+
+.PHONY: publish-next
+publish-next: lib
+	yarn version --minor --no-git-tag-version
+	yarn publish --tag next
