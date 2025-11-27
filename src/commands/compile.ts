@@ -302,7 +302,7 @@ async function compileSingleFile(
     const contractRoot = findContractRoot(filePath)
     const contractRootSrc = join(contractRoot, 'src')
     const sourceFileAbsolute = resolve(filePath)
-    
+
     // Check if source file is inside a src/ directory relative to contract root
     // If so, strip the src/ prefix from output path
     let relativePath: string
@@ -317,7 +317,7 @@ async function compileSingleFile(
         }
     } else {
         // Use path relative to current directory (preserve structure)
-        // But if the relative path goes outside currentDir (starts with ..), 
+        // But if the relative path goes outside currentDir (starts with ..),
         // just use the filename to avoid path issues
         const relPath = relative(currentDir, filePath)
         if (relPath.startsWith('..')) {
@@ -327,7 +327,7 @@ async function compileSingleFile(
             relativePath = relPath
         }
     }
-    
+
     const relativeDir = dirname(relativePath)
 
     // Calculate output path

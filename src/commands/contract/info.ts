@@ -3,12 +3,44 @@ import {APIClient} from '@wharfkit/antelope'
 import {Chains} from '@wharfkit/common'
 import fetch from 'node-fetch'
 
+interface ApiClientLike {
+    v1: {
+        chain: {
+            get_account: (name: string) => Promise<{
+                last_code_update: string
+                ram_usage: {toNumber?: () => number} | number
+                ram_quota: {toNumber?: () => number} | number
+                core_liquid_balance?: {toString: () => string}
+            }>
+            get_abi: (name: string) => Promise<{
+                abi?: {
+                    actions?: {
+                        name: {toString: () => string}
+                        type: string
+                        ricardian_contract?: string
+                    }[]
+                    tables?: {
+                        name: {toString: () => string}
+                        type: string
+                        key_names?: string[]
+                        index_type?: string
+                    }[]
+                    structs?: {name: string; fields?: {name: string; type: string}[]}[]
+                    action_results?: {name: string; result_type: string}[]
+                    variants?: {name: string; types?: string[]}[]
+                }
+            }>
+        }
+    }
+}
+
 interface ContractInfoOptions {
     chain?: string
     json?: boolean
+    _apiClient?: ApiClientLike // For testing purposes
 }
 
-function getApiUrl(chainName: string): string {
+export function getApiUrl(chainName: string): string {
     const knownChainKey = Object.keys(Chains).find(
         (key) => key.toLowerCase() === chainName.toLowerCase()
     )
@@ -30,7 +62,7 @@ function getApiUrl(chainName: string): string {
     }
 }
 
-function createApiClient(url: string): APIClient {
+export function createApiClient(url: string): APIClient {
     return new APIClient({
         url,
         fetch,
@@ -43,7 +75,7 @@ export async function lookupContractInfo(
     options: ContractInfoOptions
 ): Promise<void> {
     const url = getApiUrl(chainName)
-    const api = createApiClient(url)
+    const api = options._apiClient || createApiClient(url)
 
     try {
         // Get account info
@@ -107,14 +139,20 @@ export async function lookupContractInfo(
             for (const table of tables) {
                 const tableStruct = abiResponse.abi.structs?.find((s) => s.name === table.type)
                 const fields = tableStruct?.fields?.length || 0
-                console.log(`  ${table.name} (${fields} fields, key: ${table.key_names?.[0] || table.index_type || 'primary'})`)
+                console.log(
+                    `  ${table.name} (${fields} fields, key: ${
+                        table.key_names?.[0] || table.index_type || 'primary'
+                    })`
+                )
             }
         } else {
             console.log('\nTables: none')
         }
 
         // Ricardian contracts (if any)
-        const hasRicardian = actions.some((a) => a.ricardian_contract && a.ricardian_contract.length > 0)
+        const hasRicardian = actions.some(
+            (a) => a.ricardian_contract && a.ricardian_contract.length > 0
+        )
         if (hasRicardian) {
             console.log('\n✓ Has Ricardian contracts')
         }
@@ -145,4 +183,3 @@ export async function lookupContractInfo(
         process.exit(1)
     }
 }
-
