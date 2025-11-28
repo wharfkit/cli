@@ -73,4 +73,3 @@ suite('E2E: CLI Structure', () => {
         })
     })
 })
-

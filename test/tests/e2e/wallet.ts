@@ -4,11 +4,11 @@ import * as fs from 'fs'
 import * as path from 'path'
 import {APIClient, FetchProvider, KeyType, PrivateKey} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
+import type {E2ETestContext} from '../../utils/test-helpers'
 import {
-    E2ETestContext,
+    getTransactionExpiration,
     setupE2ETestEnvironment,
     teardownE2ETestEnvironment,
-    getTransactionExpiration,
 } from '../../utils/test-helpers'
 
 /**
@@ -272,4 +272,3 @@ suite('E2E: Wallet', () => {
         })
     })
 })
-

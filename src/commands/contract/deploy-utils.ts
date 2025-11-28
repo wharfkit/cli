@@ -77,7 +77,10 @@ export function calculateRamNeeded(wasmSize: number, abiSize: number): number {
  * When updating a contract, the existing code RAM will be freed and replaced
  * Returns 0 if no contract exists
  */
-export async function getExistingContractRam(client: APIClient, accountName: string): Promise<number> {
+export async function getExistingContractRam(
+    client: APIClient,
+    accountName: string
+): Promise<number> {
     try {
         // Get the API URL from the client's provider
         const baseUrl = (client.provider as {url?: string}).url

@@ -2,11 +2,8 @@ import {assert} from 'chai'
 import {execSync} from 'child_process'
 import * as fs from 'fs'
 import * as path from 'path'
-import {
-    E2ETestContext,
-    setupE2ETestEnvironment,
-    teardownE2ETestEnvironment,
-} from '../utils/test-helpers'
+import type {E2ETestContext} from '../utils/test-helpers'
+import {setupE2ETestEnvironment, teardownE2ETestEnvironment} from '../utils/test-helpers'
 
 /**
  * E2E tests for contract compilation:
@@ -68,4 +65,3 @@ suite('E2E: Compile', () => {
         })
     })
 })
-

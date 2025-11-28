@@ -4,11 +4,11 @@ import * as fs from 'fs'
 import * as path from 'path'
 import {APIClient, FetchProvider} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
+import type {E2ETestContext} from '../utils/test-helpers'
 import {
-    E2ETestContext,
+    getTransactionExpiration,
     setupE2ETestEnvironment,
     teardownE2ETestEnvironment,
-    getTransactionExpiration,
 } from '../utils/test-helpers'
 
 /**
@@ -67,21 +67,11 @@ suite('E2E: Wallet', () => {
 
         test('can add an existing private key to wallet', function () {
             if (!ctx) this.skip()
-            // Generate a private key using the CLI first to get a valid key format
-            const createOutput = execSync(`node ${ctx.cliPath} wallet create --name tempkey`, {
-                encoding: 'utf8',
-            })
+            // Use a fresh private key that isn't already in the wallet
+            const privateKey = 'PVT_K1_2PZuogUksib5NkEVzSp5BseRhiTYtogVjy7YYxLv5GKxezXdYA'
+            const expectedPublicKey = 'PUB_K1_6C7Svr4XqPgcGS5iXpTyvtAKYXVipcP42FBNkM78zPw6UpLobb'
 
-            // Extract the private key from the output
-            const privateKeyMatch = createOutput.match(/Private Key: (PVT_K1_[A-Za-z0-9]+)/)
-            const publicKeyMatch = createOutput.match(/Public Key: (PUB_K1_[A-Za-z0-9]+)/)
-            assert.isNotNull(privateKeyMatch, 'Should have private key in output')
-            assert.isNotNull(publicKeyMatch, 'Should have public key in output')
-
-            const privateKey = privateKeyMatch![1]
-            const expectedPublicKey = publicKeyMatch![1]
-
-            // Add the same private key with a different name
+            // Add the private key to the wallet
             const addOutput = execSync(
                 `node ${ctx.cliPath} wallet keys add ${privateKey} --name imported-key`,
                 {encoding: 'utf8'}
@@ -101,22 +91,16 @@ suite('E2E: Wallet', () => {
                 })
                 assert.fail('Should have thrown an error')
             } catch (error: any) {
-                assert.include(error.message, 'Invalid private key format')
+                // Check stdout for the error message (CLI writes errors there)
+                const output = error.stdout || error.stderr || ''
+                assert.include(output, 'Invalid private key format')
             }
         })
 
         test('wallet keys add generates name when not specified', function () {
             if (!ctx) this.skip()
-            // Generate a private key using the CLI first
-            const createOutput = execSync(`node ${ctx.cliPath} wallet create --name tempkey2`, {
-                encoding: 'utf8',
-            })
-
-            // Extract the private key from the output
-            const privateKeyMatch = createOutput.match(/Private Key: (PVT_K1_[A-Za-z0-9]+)/)
-            assert.isNotNull(privateKeyMatch, 'Should have private key in output')
-
-            const privateKey = privateKeyMatch![1]
+            // Use a fresh private key that isn't already in the wallet
+            const privateKey = 'PVT_K1_KpqNgdCDPhd7zmcFFea9u91HbWs4QrofxULj5SS5PmS1sfXBT'
 
             // Add without specifying name
             const addOutput = execSync(`node ${ctx.cliPath} wallet keys add ${privateKey}`, {
@@ -287,4 +271,3 @@ suite('E2E: Wallet', () => {
         })
     })
 })
-

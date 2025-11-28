@@ -165,13 +165,10 @@ suite('Chain Interaction', () => {
         fs.writeFileSync(cppPath, contractCode)
 
         execSync(`node ${cliPath} compile`, {encoding: 'utf8', cwd: testDir})
-        execSync(
-            `node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount} --yes`,
-            {
-                encoding: 'utf8',
-                cwd: testDir,
-            }
-        )
+        execSync(`node ${cliPath} contract deploy ${wasmPath} --account ${contractAccount} --yes`, {
+            encoding: 'utf8',
+            cwd: testDir,
+        })
     })
 
     suiteTeardown(function () {

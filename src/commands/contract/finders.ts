@@ -124,4 +124,3 @@ export function findCoreClass(type: string): string | undefined {
         )
     )
 }
-

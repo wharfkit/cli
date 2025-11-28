@@ -6,12 +6,12 @@ import * as path from 'path'
 import {ABI, APIClient, FetchProvider, Serializer} from '@wharfkit/antelope'
 import fetch from 'node-fetch'
 import {log} from '../../../src/utils'
+import type {E2ETestContext} from '../../utils/test-helpers'
 import {
-    E2ETestContext,
+    getRandomLocalAccountName,
+    getTransactionExpiration,
     setupE2ETestEnvironment,
     teardownE2ETestEnvironment,
-    getTransactionExpiration,
-    getRandomLocalAccountName,
 } from '../../utils/test-helpers'
 
 /**
@@ -293,7 +293,11 @@ suite('E2E: Deploy', () => {
 
             if (qrCodeShown) {
                 assert.include(deployOutput, 'esr://', 'Should show ESR link')
-                assert.include(deployOutput, 'Scan this QR code', 'Should show QR code instructions')
+                assert.include(
+                    deployOutput,
+                    'Scan this QR code',
+                    'Should show QR code instructions'
+                )
                 assert.include(deployOutput, 'Waiting for funds', 'Should show waiting message')
 
                 const chainInfo = await client.v1.chain.get_info()
@@ -332,10 +336,13 @@ suite('E2E: Deploy', () => {
                 fs.writeFileSync(txPath, JSON.stringify(transferTx))
 
                 log('Transferring 100 SYS to account...', 'info')
-                execSync(`node ${ctx.cliPath} wallet transact ${txPath} --broadcast --key chain-key`, {
-                    encoding: 'utf8',
-                    env: {...process.env, HOME: ctx.testDir},
-                })
+                execSync(
+                    `node ${ctx.cliPath} wallet transact ${txPath} --broadcast --key chain-key`,
+                    {
+                        encoding: 'utf8',
+                        env: {...process.env, HOME: ctx.testDir},
+                    }
+                )
 
                 try {
                     await Promise.race([
@@ -357,7 +364,11 @@ suite('E2E: Deploy', () => {
                 await deployPromise
             }
 
-            assert.include(deployOutput, '✅ Contract deployed successfully!', 'Deployment should succeed')
+            assert.include(
+                deployOutput,
+                '✅ Contract deployed successfully!',
+                'Deployment should succeed'
+            )
             assert.include(deployOutput, 'Transaction ID:', 'Should show transaction ID')
         })
 
@@ -398,9 +409,14 @@ suite('E2E: Deploy', () => {
             const cppPath = path.join(ctx.testDir, 'v1.cpp')
             fs.writeFileSync(cppPath, v1Code)
 
-            execSync(`node ${ctx.cliPath} compile ${cppPath} --output ${ctx.testDir}`, {encoding: 'utf8'})
+            execSync(`node ${ctx.cliPath} compile ${cppPath} --output ${ctx.testDir}`, {
+                encoding: 'utf8',
+            })
             execSync(
-                `node ${ctx.cliPath} contract deploy ${path.join(ctx.testDir, 'v1.wasm')} --account ${accountName} --yes`,
+                `node ${ctx.cliPath} contract deploy ${path.join(
+                    ctx.testDir,
+                    'v1.wasm'
+                )} --account ${accountName} --yes`,
                 {encoding: 'utf8', cwd: ctx.testDir}
             )
 
@@ -458,7 +474,9 @@ suite('E2E: Deploy', () => {
             const v2CppPath = path.join(ctx.testDir, 'v2.cpp')
             fs.writeFileSync(v2CppPath, v2Code)
 
-            execSync(`node ${ctx.cliPath} compile ${v2CppPath} --output ${ctx.testDir}`, {encoding: 'utf8'})
+            execSync(`node ${ctx.cliPath} compile ${v2CppPath} --output ${ctx.testDir}`, {
+                encoding: 'utf8',
+            })
             const v2Wasm = path.join(ctx.testDir, 'v2.wasm')
 
             // 4. Try to deploy V2 - SHOULD FAIL
@@ -636,7 +654,10 @@ suite('E2E: Deploy', () => {
                 }
             )
 
-            assert.include(output, 'Using private key from WHARFKIT_DEPLOY_KEY environment variable')
+            assert.include(
+                output,
+                'Using private key from WHARFKIT_DEPLOY_KEY environment variable'
+            )
             assert.include(output, '✅ Contract deployed successfully!')
             assert.include(output, 'Transaction ID:')
         })
@@ -735,4 +756,3 @@ suite('E2E: Deploy', () => {
         })
     })
 })
-
