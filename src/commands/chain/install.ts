@@ -2,6 +2,12 @@
 import {WalletPluginPrivateKey} from '@wharfkit/wallet-plugin-privatekey'
 import {executeCommand, getDevKeys, getPlatform} from './utils'
 import {NonInteractiveConsoleUI} from '../../utils/wharfkit-ui'
+import * as os from 'os'
+import * as path from 'path'
+import * as fs from 'fs'
+
+const LEAP_VERSION = 'v5.0.3'
+const LEAP_REPO = 'https://github.com/AntelopeIO/leap'
 
 export interface InstallationStatus {
     installed: boolean
@@ -12,6 +18,13 @@ export interface InstallationStatus {
         consoleRenderer: boolean
         walletPlugin: boolean
     }
+}
+
+/**
+ * Get the directory where LEAP will be cloned and built
+ */
+function getLeapBuildDir(): string {
+    return path.join(os.homedir(), '.wharfkit', 'leap-build')
 }
 
 /**
@@ -59,10 +72,162 @@ export async function checkLeapInstallation(): Promise<InstallationStatus> {
 }
 
 /**
- * Install LEAP on macOS using Homebrew
+ * Ensure directory exists
+ */
+async function ensureBuildDir(dir: string): Promise<void> {
+    if (!fs.existsSync(dir)) {
+        await fs.promises.mkdir(dir, {recursive: true})
+    }
+}
+
+/**
+ * Clone and checkout LEAP repository
+ */
+async function cloneLeapRepo(buildDir: string): Promise<void> {
+    const leapDir = path.join(buildDir, 'leap')
+
+    // Check if already cloned
+    if (fs.existsSync(path.join(leapDir, '.git'))) {
+        console.log('LEAP repository already cloned, updating...')
+        try {
+            await executeCommand(`cd ${leapDir} && git fetch --all --tags`)
+            await executeCommand(`cd ${leapDir} && git checkout ${LEAP_VERSION}`)
+            await executeCommand(`cd ${leapDir} && git pull || true`)
+            await executeCommand(`cd ${leapDir} && git submodule update --init --recursive`)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error)
+            throw new Error(`Failed to update LEAP repository: ${message}`)
+        }
+    } else {
+        console.log('Cloning LEAP repository...')
+        try {
+            await executeCommand(`git clone --recursive ${LEAP_REPO} ${leapDir}`)
+            await executeCommand(`cd ${leapDir} && git fetch --all --tags`)
+            await executeCommand(`cd ${leapDir} && git checkout ${LEAP_VERSION}`)
+            await executeCommand(`cd ${leapDir} && git submodule update --init --recursive`)
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error)
+            throw new Error(`Failed to clone LEAP repository: ${message}`)
+        }
+    }
+}
+
+/**
+ * Build LEAP from source
+ */
+async function buildLeap(buildDir: string, numJobs?: number): Promise<void> {
+    const leapDir = path.join(buildDir, 'leap')
+    const leapBuildDir = path.join(leapDir, 'build')
+
+    // Create build directory
+    await ensureBuildDir(leapBuildDir)
+
+    const jobs = numJobs || Math.max(1, Math.floor(os.cpus().length / 2))
+    console.log(`Building LEAP with ${jobs} parallel jobs (this may take a while)...`)
+
+    try {
+        const {os: platform} = getPlatform()
+
+        if (platform === 'darwin') {
+            // macOS build - use llvm from Homebrew
+            const llvmPrefix = await getLlvmPrefix()
+            await executeCommand(
+                `cd ${leapBuildDir} && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=${llvmPrefix} ..`
+            )
+        } else {
+            // Linux build
+            await executeCommand(
+                `cd ${leapBuildDir} && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..`
+            )
+        }
+
+        await executeCommand(`cd ${leapBuildDir} && make -j ${jobs}`)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to build LEAP: ${message}`)
+    }
+}
+
+/**
+ * Get LLVM prefix path on macOS
+ */
+async function getLlvmPrefix(): Promise<string> {
+    try {
+        const {stdout} = await executeCommand('brew --prefix llvm@11')
+        return stdout.trim()
+    } catch {
+        // Try llvm without version
+        try {
+            const {stdout} = await executeCommand('brew --prefix llvm')
+            return stdout.trim()
+        } catch {
+            return '/usr/local/opt/llvm'
+        }
+    }
+}
+
+/**
+ * Install built LEAP binaries
+ */
+async function installBuiltLeap(buildDir: string): Promise<void> {
+    const leapDir = path.join(buildDir, 'leap')
+    const leapBuildDir = path.join(leapDir, 'build')
+    const binDir = path.join(leapBuildDir, 'bin')
+
+    console.log('Installing LEAP binaries...')
+
+    const binaries = ['nodeos', 'cleos', 'keosd', 'leap-util']
+    const targetDir = '/usr/local/bin'
+
+    try {
+        const {os: platform} = getPlatform()
+
+        // First, try to copy binaries directly (works if user owns /usr/local/bin)
+        try {
+            for (const binary of binaries) {
+                const src = path.join(binDir, binary)
+                const dest = path.join(targetDir, binary)
+                if (fs.existsSync(src)) {
+                    await fs.promises.copyFile(src, dest)
+                    await fs.promises.chmod(dest, 0o755)
+                }
+            }
+            console.log('Binaries copied to /usr/local/bin')
+            return
+        } catch {
+            // Direct copy failed, try sudo methods
+            console.log('Direct copy failed, trying with elevated permissions...')
+        }
+
+        if (platform === 'darwin') {
+            // On macOS, use make install with sudo
+            await executeCommand(`cd ${leapBuildDir} && sudo make install`)
+        } else {
+            // On Linux, install the .deb package if available, otherwise make install
+            try {
+                const {stdout} = await executeCommand(
+                    `ls ${leapBuildDir}/leap*.deb 2>/dev/null | head -1`
+                )
+                if (stdout.trim()) {
+                    await executeCommand(`sudo apt-get install -y ${stdout.trim()}`)
+                } else {
+                    await executeCommand(`cd ${leapBuildDir} && sudo make install`)
+                }
+            } catch {
+                await executeCommand(`cd ${leapBuildDir} && sudo make install`)
+            }
+        }
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to install LEAP: ${message}`)
+    }
+}
+
+/**
+ * Install LEAP on macOS by building from source
  */
 async function installLeapMacOS(): Promise<void> {
-    console.log('Installing LEAP on macOS using Homebrew...')
+    console.log('Installing LEAP on macOS by building from source...')
 
     // Check if Homebrew is installed
     try {
@@ -73,79 +238,135 @@ async function installLeapMacOS(): Promise<void> {
         )
     }
 
-    // Tap AntelopeIO
-    console.log('Adding AntelopeIO tap...')
+    // Install build dependencies
+    console.log('Installing build dependencies...')
     try {
-        await executeCommand('brew tap antelopeio/leap')
-    } catch (error: any) {
-        throw new Error(`Failed to add AntelopeIO tap: ${error.message}`)
+        await executeCommand('brew install cmake git llvm@11 gmp curl python3 numpy || true')
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to install dependencies: ${message}`)
     }
 
-    // Install LEAP
-    console.log('Installing LEAP (this may take a few minutes)...')
-    try {
-        await executeCommand('brew install leap')
-    } catch (error: any) {
-        throw new Error(`Failed to install LEAP: ${error.message}`)
-    }
+    const buildDir = getLeapBuildDir()
+    await ensureBuildDir(buildDir)
+
+    // Clone repository
+    await cloneLeapRepo(buildDir)
+
+    // Build from source
+    await buildLeap(buildDir)
+
+    // Install
+    await installBuiltLeap(buildDir)
 
     console.log('LEAP installed successfully!')
 }
 
 /**
- * Install LEAP on Linux using apt
+ * Get Ubuntu version for determining LLVM version
  */
-async function installLeapLinux(): Promise<void> {
-    console.log('Installing LEAP on Linux using apt...')
-
-    // Detect distribution
-    let distro = 'ubuntu'
-    let version = '22.04'
-
-    try {
-        const {stdout} = await executeCommand('lsb_release -is')
-        distro = stdout.trim().toLowerCase()
-    } catch {
-        console.log('Could not detect distribution, assuming Ubuntu')
-    }
-
+async function getUbuntuVersion(): Promise<string> {
     try {
         const {stdout} = await executeCommand('lsb_release -rs')
-        version = stdout.trim()
+        return stdout.trim()
     } catch {
-        console.log('Could not detect version, assuming 22.04')
+        return '22.04'
     }
+}
 
-    // Add AntelopeIO repository
-    console.log('Adding AntelopeIO repository...')
-    try {
-        await executeCommand(
-            'wget -O - https://apt.antelope.io/repos/antelope.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/antelope.gpg > /dev/null'
-        )
-        await executeCommand(
-            `echo "deb [arch=amd64] https://apt.antelope.io ${distro} ${version}" | sudo tee /etc/apt/sources.list.d/antelope.list`
-        )
-    } catch (error: any) {
-        throw new Error(`Failed to add AntelopeIO repository: ${error.message}`)
-    }
+/**
+ * Install LEAP on Linux by building from source
+ */
+async function installLeapLinux(): Promise<void> {
+    console.log('Installing LEAP on Linux by building from source...')
+
+    const ubuntuVersion = await getUbuntuVersion()
+    const majorVersion = parseInt(ubuntuVersion.split('.')[0], 10)
 
     // Update package list
     console.log('Updating package list...')
     try {
         await executeCommand('sudo apt-get update')
-    } catch (error: any) {
-        throw new Error(`Failed to update package list: ${error.message}`)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to update package list: ${message}`)
     }
 
-    // Install LEAP
-    console.log('Installing LEAP (this may take a few minutes)...')
+    // Install build dependencies
+    console.log('Installing build dependencies...')
     try {
-        await executeCommand('sudo apt-get install -y leap')
-    } catch (error: any) {
-        throw new Error(`Failed to install LEAP: ${error.message}`)
+        await executeCommand(`sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            libcurl4-openssl-dev \
+            libgmp-dev \
+            llvm-11-dev \
+            python3-numpy \
+            file \
+            zlib1g-dev`)
+
+        // On Ubuntu 20.04, install gcc-10 for C++20 support
+        if (majorVersion === 20) {
+            await executeCommand('sudo apt-get install -y g++-10')
+        }
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to install dependencies: ${message}`)
     }
+
+    const buildDir = getLeapBuildDir()
+    await ensureBuildDir(buildDir)
+
+    // Clone repository
+    await cloneLeapRepo(buildDir)
+
+    // Build from source (with Ubuntu 20.04 specific compiler flags)
+    await buildLeapLinux(buildDir, majorVersion)
+
+    // Install
+    await installBuiltLeap(buildDir)
 
     console.log('LEAP installed successfully!')
+}
+
+/**
+ * Build LEAP on Linux with version-specific settings
+ */
+async function buildLeapLinux(buildDir: string, ubuntuMajorVersion: number): Promise<void> {
+    const leapDir = path.join(buildDir, 'leap')
+    const leapBuildDir = path.join(leapDir, 'build')
+
+    // Create build directory
+    await ensureBuildDir(leapBuildDir)
+
+    const jobs = Math.max(1, Math.floor(os.cpus().length / 2))
+    console.log(`Building LEAP with ${jobs} parallel jobs (this may take a while)...`)
+
+    try {
+        if (ubuntuMajorVersion === 20) {
+            // Ubuntu 20.04 needs gcc-10 specified
+            await executeCommand(
+                `cd ${leapBuildDir} && cmake \
+                    -DCMAKE_C_COMPILER=gcc-10 \
+                    -DCMAKE_CXX_COMPILER=g++-10 \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..`
+            )
+        } else {
+            // Ubuntu 22.04+ has gcc-11 by default
+            await executeCommand(
+                `cd ${leapBuildDir} && cmake \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..`
+            )
+        }
+
+        await executeCommand(`cd ${leapBuildDir} && make -j ${jobs}`)
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error)
+        throw new Error(`Failed to build LEAP: ${message}`)
+    }
 }
 
 /**
