@@ -1,7 +1,7 @@
 import type {ABI} from '@wharfkit/antelope'
 import * as ts from 'typescript'
 import {formatClassName} from '../../utils'
-import {capitalize, extractDecorator, parseType, trim} from './contract-utils'
+import {capitalize, extractDecorator} from './contract-utils'
 import {findAbiType, findAliasFromType, findCoreClass, findCoreType, findVariant} from './finders'
 import type {TypeInterfaceDeclaration} from './interfaces'
 

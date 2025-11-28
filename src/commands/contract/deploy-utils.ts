@@ -3,7 +3,6 @@ import * as readline from 'readline'
 import type {APIClient} from '@wharfkit/antelope'
 import {ABI, Asset, Struct} from '@wharfkit/antelope'
 import {PlaceholderName, PlaceholderPermission, SigningRequest} from '@wharfkit/signing-request'
-import {displayQRCode} from '../../utils'
 
 /**
  * RAM market row structure
