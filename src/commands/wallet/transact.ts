@@ -1,4 +1,4 @@
-import {Checksum256, SignedTransaction, Transaction} from '@wharfkit/antelope'
+import {ABI, Action, Checksum256, SignedTransaction, Transaction} from '@wharfkit/antelope'
 import {APIClient} from '@wharfkit/antelope'
 import {FetchProvider} from '@wharfkit/antelope'
 import {log} from '../../utils'
@@ -16,6 +16,9 @@ interface TransactOptions extends SignOptions {
     broadcast?: boolean
     url?: string
 }
+
+// Cache for ABIs to avoid fetching the same ABI multiple times
+const abiCache: Map<string, ABI> = new Map()
 
 /**
  * Prompt for password from stdin
@@ -83,10 +86,54 @@ async function getPassword(usePassword: boolean): Promise<string | undefined> {
 }
 
 /**
- * Load transaction from JSON file or string
+ * Fetch ABI for a contract account
  */
-function loadTransaction(transactionJson: string): Transaction {
-    let transactionData: any
+async function fetchAbi(client: APIClient, account: string): Promise<ABI> {
+    // Check cache first
+    const cached = abiCache.get(account)
+    if (cached) {
+        return cached
+    }
+
+    const abiResponse = await client.v1.chain.get_abi(account)
+    if (!abiResponse.abi) {
+        throw new Error(`Could not fetch ABI for contract: ${account}`)
+    }
+
+    const abi = ABI.from(abiResponse.abi)
+    abiCache.set(account, abi)
+    return abi
+}
+
+/**
+ * Check if action data needs ABI-based serialization
+ * Returns true if data is an object (untyped), false if it's already serialized
+ */
+function needsAbiSerialization(actionData: unknown): boolean {
+    // If data is a plain object (not Bytes/Uint8Array), it needs serialization
+    return (
+        typeof actionData === 'object' &&
+        actionData !== null &&
+        !Array.isArray(actionData) &&
+        !(actionData instanceof Uint8Array) &&
+        // Check if it's a plain object, not a special antelope type
+        Object.getPrototypeOf(actionData) === Object.prototype
+    )
+}
+
+/**
+ * Load transaction from JSON file or string, fetching ABIs as needed
+ */
+async function loadTransaction(transactionJson: string, apiUrl?: string): Promise<Transaction> {
+    let transactionData: {
+        actions?: Array<{
+            account: string
+            name: string
+            authorization: Array<{actor: string; permission: string}>
+            data: unknown
+        }>
+        [key: string]: unknown
+    }
 
     try {
         // Try to read as file first
@@ -104,6 +151,71 @@ function loadTransaction(transactionJson: string): Transaction {
         )
     }
 
+    // Check if any action has untyped data that needs ABI serialization
+    const actions = transactionData.actions || []
+    const needsAbi = actions.some((action) => needsAbiSerialization(action.data))
+
+    if (needsAbi) {
+        // We need to fetch ABIs to serialize the action data
+        const url = apiUrl || 'http://127.0.0.1:8888'
+        const client = new APIClient({
+            provider: new FetchProvider(url, {fetch: globalThis.fetch}),
+        })
+
+        // Get unique contract accounts that need ABI fetching
+        const accountsNeedingAbi = new Set<string>()
+        for (const action of actions) {
+            if (needsAbiSerialization(action.data)) {
+                accountsNeedingAbi.add(action.account)
+            }
+        }
+
+        // Fetch all needed ABIs
+        log(`Fetching ABIs for: ${Array.from(accountsNeedingAbi).join(', ')}`, 'info')
+        for (const account of accountsNeedingAbi) {
+            await fetchAbi(client, account)
+        }
+
+        // Create properly serialized actions
+        const serializedActions: Action[] = []
+        for (const action of actions) {
+            if (needsAbiSerialization(action.data)) {
+                const abi = abiCache.get(action.account)!
+                const serializedAction = Action.from(
+                    {
+                        account: action.account,
+                        name: action.name,
+                        authorization: action.authorization,
+                        data: action.data,
+                    },
+                    abi
+                )
+                serializedActions.push(serializedAction)
+            } else {
+                serializedActions.push(Action.from(action))
+            }
+        }
+
+        // Build the transaction with serialized actions
+        const txData = {
+            ...transactionData,
+            actions: serializedActions,
+        }
+
+        // If transaction doesn't have header fields, we need to fetch them
+        if (!transactionData.expiration || !transactionData.ref_block_num) {
+            const info = await client.v1.chain.get_info()
+            const header = info.getTransactionHeader()
+            return Transaction.from({
+                ...header,
+                ...txData,
+            })
+        }
+
+        return Transaction.from(txData)
+    }
+
+    // No ABI needed, try to parse directly
     try {
         return Transaction.from(transactionData)
     } catch (error) {
@@ -177,7 +289,7 @@ export async function signTransaction(
 ): Promise<void> {
     try {
         // Load the transaction
-        const transaction = loadTransaction(transactionJson)
+        const transaction = await loadTransaction(transactionJson)
 
         log('Transaction loaded:', 'info')
         log(JSON.stringify(transaction, null, 2), 'info')
@@ -241,8 +353,8 @@ export async function transactTransaction(
     options: TransactOptions
 ): Promise<void> {
     try {
-        // Load the transaction
-        const transaction = loadTransaction(transactionJson)
+        // Load the transaction (pass URL so it can fetch ABIs if needed)
+        const transaction = await loadTransaction(transactionJson, options.url)
 
         log('Transaction loaded:', 'info')
         log(JSON.stringify(transaction, null, 2), 'info')

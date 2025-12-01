@@ -54,3 +54,5 @@ export function capitalize(string: string) {
 export function cleanupType(type: string): string {
     return extractDecorator(parseType(trim(type))).type
 }
+
+
